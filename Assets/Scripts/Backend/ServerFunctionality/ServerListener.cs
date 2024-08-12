@@ -3,6 +3,7 @@
 using System.Net.Sockets;
 using System.Text;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 public enum NetworkInstruction
 {
@@ -13,14 +14,15 @@ public class ServerListener
 	private readonly TcpClient client;
 	private readonly StringBuilder buffer = new();
 
-	public readonly Lobby lobby =  new();
+	public readonly Lobby lobby;
 	public const int bufferSize = 4096;
 
 	private string? uuid = null;
 	private string? username = null;
-	public ServerListener(string hostname,int portNumber )
+	public ServerListener(string hostname,int portNumber, string pathToAssets)
 	{
-		client = new(hostname, portNumber);
+		this.client = new(hostname, portNumber);
+		this.lobby = new(pathToAssets);
 	}
 
 	/// <summary>
@@ -39,7 +41,7 @@ public class ServerListener
 	/// </summary>
 	/// <param name="username">name of user passed to lobby</param>
 	/// <param name="lobbyCode">code of the lobby you are trying to connect to</param>
-	public void ConnectToLobby(string username, string lobbyCode)
+	public void JoinToLobby(string username, string lobbyCode)
 	{
 		this.username = username;
 		SendMessage(client.GetStream(), NetworkInstruction.JoinLobby, $"{lobbyCode}|{username}");
@@ -47,12 +49,13 @@ public class ServerListener
 
 	public void ReadServerData()
 	{
-		NetworkCommand? instruction;
+		NetworkCommand? command;
 		do
 		{
-			instruction = NetworkCommandManager.GetNextNetworkCommand(client.GetStream(),buffer, bufferSize);
+			command = NetworkCommandManager.GetNextNetworkCommand(client.GetStream(),buffer, bufferSize);
+			this.HandleServerCommand(command);
 
-		}while(instruction != null);
+		}while(command != null);
 	}
 
 	private void HandleServerCommand(NetworkCommand command)
@@ -63,9 +66,14 @@ public class ServerListener
 				this.HandleCreateLobby(command.instruction);
 				break;
 			case (int)NetworkInstruction.JoinLobby:
-				this.lobby.UpdatePlayersInLobby(command.instruction);
+				this.HandleJoinLobby(command.instruction);
+				this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){this.username}));
 				break;
 			case (int)NetworkInstruction.PlayersInLobby:
+				this.lobby.UpdatePlayersInLobby(command.instruction);
+				break;
+			case (int)NetworkInstruction.StartGame:
+				this.lobby.StartGame(command.instruction);
 				break;
 			case (int) NetworkInstruction.NetworkAttribute:
 				break;
@@ -86,11 +94,13 @@ public class ServerListener
 		string lobbyCode = data[1];
 		this.lobby.LobbyCode = lobbyCode;
 		this.lobby.UpdatePlayersInLobby(username);
+		this.lobby.lobbyCreatedOrJoined();
 	}
 
 	private void HandleJoinLobby(string instruction)
 	{
 		this.uuid = instruction;
+		this.lobby.lobbyCreatedOrJoined();
 	}
 
 
