@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -8,16 +9,14 @@ public class Lobby
 {
 	private string? lobbyCode = null;
 	private List<string> playerNames = new();
-	public Action<List<string>> playersInLobbyChanged = delegate{};
-	public Action<Playtable> startGame = delegate{};
-	public Action lobbyCreatedOrJoined = delegate{};
-
+	public event Action<List<string>> playersInLobbyChanged = delegate{};
+	public event Action<Playtable> playtableCreated = delegate{};
 	private readonly string pathToAssets;
 	public event PropertyChangedEventHandler lobbyCodeChanged = delegate{};
 
 	public Lobby(string pathToAssets)
 	{
-
+		this.pathToAssets = pathToAssets;
 	}
 
 	public String LobbyCode
@@ -33,7 +32,7 @@ public class Lobby
 				return;
 			}
 			this.lobbyCode = value;
-			lobbyCodeChanged(lobbyCodeChanged, new PropertyChangedEventArgs("lobbyCode"));
+			this.lobbyCodeChanged(this.lobbyCode, new PropertyChangedEventArgs("lobbyCode"));
 		}
 	}
 	public void UpdatePlayersInLobby(string rawList)
@@ -45,14 +44,14 @@ public class Lobby
 		}
 		catch (Exception ex)
 		{
-			Logger.Log($"Could not convert {rawList} to list - {ex.Message}");
+			Logger.LogError($"Could not convert {rawList} to list - {ex.Message}");
 			return;
 		}
 		this.playerNames = result;
-		this.playersInLobbyChanged(this.playerNames);
+		this.playersInLobbyChanged.Invoke(this.playerNames);
 	}
 
-	public void StartGame(string rawPlayerDict)
+	public void CreatePlaytable(string rawPlayerDict)
 	{
 		Dictionary<string,string>? playerDict;
 		try
@@ -61,12 +60,12 @@ public class Lobby
 		}
 		catch (Exception ex)
 		{
-			Logger.Log($"Unable to parse - {rawPlayerDict}");
+			Logger.LogError($"Unable to parse - {rawPlayerDict}");
 			return;
 		}
 		Playtable newTable = new Playtable(playerDict.Keys.Count,$"{pathToAssets}/CSVs/cards.csv", $"{pathToAssets}/CSVs/tokens.csv" );
-		// playerDict.foreach (uuid =>  newTable.)
-		
+		playerDict.Keys.ToList().ForEach(uuid => newTable.AddPlayer(uuid, playerDict[uuid]));
+		playtableCreated.Invoke(newTable);
 	}
 
 

@@ -18,12 +18,12 @@ public class LobbyConnectMenu : MonoBehaviour
     [SerializeField]
     private TMP_InputField lobbyCodeField;
 
-    public Action triedToJoinOrCreateLobby = delegate{};
+    public event Action triedToJoinOrCreateLobby = delegate{};
 
     void Start()
     {
         createLobbyBtn.onClick.AddListener(() => this.CreateLobby(usernameField, lobbySizeField));
-        joinLobbyBtn.onClick.AddListener(() => this.JoinLobby(usernameField, lobbySizeField));
+        joinLobbyBtn.onClick.AddListener(() => this.JoinLobby(usernameField, lobbyCodeField));
 
     }
 
@@ -33,13 +33,13 @@ public class LobbyConnectMenu : MonoBehaviour
         {
             return;
         }
-		if(int.TryParse(lobbySizeField.text, out int lobbySize))
+		if(!int.TryParse(lobbySizeField.text, out int lobbySize))
 		{
 			Debug.LogError($"Invalid value for lobby size - {lobbySizeField.text}");
 			return;
 		}
 		GameOrchestrator.Instance.serverListener.CreateLobby(usernameField.text, lobbySize);
-        triedToJoinOrCreateLobby();
+        triedToJoinOrCreateLobby.Invoke();
 	}
 
 	public void JoinLobby(TMP_InputField usernameField, TMP_InputField lobbyCodeField)
@@ -49,6 +49,6 @@ public class LobbyConnectMenu : MonoBehaviour
             return;
         }
 		GameOrchestrator.Instance.serverListener.JoinToLobby(usernameField.text, lobbyCodeField.text);
-        triedToJoinOrCreateLobby();
+        triedToJoinOrCreateLobby.Invoke();
 	}
 }

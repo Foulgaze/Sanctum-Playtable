@@ -71,7 +71,7 @@ public static class NetworkCommandManager
             catch (Exception e)
             {
                 // Log this exception if necessary.
-                Logger.Log($"Error parsing network data - {e}");
+                Logger.LogError($"Error parsing network data - {e}");
                 return null;
             }
 

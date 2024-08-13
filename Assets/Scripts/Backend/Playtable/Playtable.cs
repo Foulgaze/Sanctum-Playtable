@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Newtonsoft.Json;
 
 
 public class Playtable
@@ -82,6 +84,11 @@ public class Playtable
         return player != null && this._players.Remove(player);
     }
 
+    public Dictionary<string,string> GetPlayers()
+    {
+        return this._players.ToDictionary(player => player.Uuid,player => player.Name);
+    }
+
     private void BoardChanged(object? sender, PropertyChangedEventArgs e)
     {
         boardChanged(sender, e);
@@ -116,8 +123,6 @@ public class Playtable
             cardNames.Sort();
             CardContainerCollection library = player.GetCardContainer(CardZone.Library);
             List<Card> cards = this.cardFactory.LoadCardNames(cardNames);
-            List<List<int>> cardIds = new(){cards.Select(card => card.Id).ToList()};
-
             boardChanged(library, new PropertyChangedEventArgs(string.Empty));
         }
     }

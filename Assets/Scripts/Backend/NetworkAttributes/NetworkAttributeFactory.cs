@@ -31,7 +31,7 @@ public class NetworkAttributeFactory
         if (splitInstruction.Length != 2)
         {
             // Log Error;
-            Logger.Log($"Invalid network attribute, cannot split with \'|\' - {instruction}");
+            Logger.LogError($"Invalid network attribute, cannot split with \'|\' - {instruction}");
             return;
         }
         string id = splitInstruction[0];
@@ -40,7 +40,7 @@ public class NetworkAttributeFactory
         if (attribute == null)
         {
             // Log Error: Attribute with given ID not found
-            Logger.Log($"Attribute with id {id} not found");
+            Logger.LogError($"Attribute with id {id} not found");
             return;
         }
 
@@ -55,7 +55,7 @@ public class NetworkAttributeFactory
         }
         catch
         {
-            Logger.Log($"Could not deserialize {serializedNewValue}, skipping");
+            Logger.LogError($"Could not deserialize {serializedNewValue}, skipping");
             // Bad NetworkAttribute, skip
         }
 

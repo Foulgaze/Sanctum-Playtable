@@ -51,18 +51,9 @@ public class CardContainerCollection
         this.CardFactory = cardFactory;
     }
 
-    public void SetCollectionValue(string rawList)
+    public void SetCollectionValue(List<List<int>> newDeckList)
     {
-        List<List<int>> newDeckList;
-        try
-        {
-            newDeckList = JsonConvert.DeserializeObject<List<List<int>>>(rawList);
-        }
-        catch(Exception ex)
-        {
-            Logger.Log($"Could not parse decklist - {ex}");
-            return;
-        }
+        this.decklist = newDeckList;
         boardChanged(this, new PropertyChangedEventArgs("Decklist"));
     }
 

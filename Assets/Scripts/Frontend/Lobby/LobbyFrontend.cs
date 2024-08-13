@@ -18,10 +18,11 @@ public class LobbyFrontend : MonoBehaviour
 
 	void Start()
 	{
-		ChangeScreens(this.lobbyConnectMenuScreen);
+		this.ChangeScreens(this.lobbyConnectMenuScreen);
 		Lobby lobby = GameOrchestrator.Instance.serverListener.lobby;
 		this.lobbyConnectMenu.triedToJoinOrCreateLobby += this.OnChangeToLoadingScreen;
-		lobby.lobbyCreatedOrJoined += this.OnChangeToLobbyMenu;
+		GameOrchestrator.Instance.serverListener.lobbyCreatedOrJoined += this.OnChangeToLobbyMenu;
+		GameOrchestrator.Instance.GameStarted += this.OnChangeToGameStart;
 	}
 
 	private void ChangeScreens(Transform? screenToChangeTo = null)
@@ -31,6 +32,7 @@ public class LobbyFrontend : MonoBehaviour
 			if(screen == screenToChangeTo)
 			{
 				screen.gameObject.SetActive(true);
+				continue;
 			}
 			screen.gameObject.SetActive(false);
 		}
@@ -43,6 +45,11 @@ public class LobbyFrontend : MonoBehaviour
 	private void OnChangeToLobbyMenu()
 	{
 		this.ChangeScreens(this.lobbyMenuScreen);
+	}
+
+	private void OnChangeToGameStart()
+	{
+		this.ChangeScreens();
 	}
 
 

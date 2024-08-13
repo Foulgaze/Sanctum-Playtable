@@ -14,4 +14,9 @@ public class NetworkCommand
         this.opCode = opCode;
         this.instruction = instruction;
     }
+
+    public override string ToString()
+    {
+        return $"{(NetworkInstruction)this.opCode} - {this.instruction}";
+    }
 }
