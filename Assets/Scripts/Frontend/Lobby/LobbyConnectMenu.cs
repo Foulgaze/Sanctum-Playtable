@@ -29,17 +29,21 @@ public class LobbyConnectMenu : MonoBehaviour
         this.usernameBackground.gameObject.SetActive(false);
         this.createLobbyBtn.onClick.AddListener(() => 
         {
-            this.usernameBackground.gameObject.SetActive(true);
-            this.submitUsernameBtn.onClick.RemoveAllListeners();
-            this.submitUsernameBtn.onClick.AddListener(() => this.CreateLobby(usernameField, lobbySizeField));
+            this.SetupUsernameButton(() =>  this.CreateLobby(usernameField, lobbySizeField));
+
         });
         this.joinLobbyBtn.onClick.AddListener(() => 
         {
-            this.usernameBackground.gameObject.SetActive(true);
-            this.submitUsernameBtn.onClick.RemoveAllListeners();
-            this.submitUsernameBtn.onClick.AddListener( () => this.JoinLobby(usernameField, lobbyCodeField));
+            this.SetupUsernameButton(() => this.JoinLobby(usernameField, lobbyCodeField));
         });
+    }
 
+    public void SetupUsernameButton(Action action)
+    {
+        this.usernameBackground.gameObject.SetActive(true);
+        this.submitUsernameBtn.onClick.RemoveAllListeners();
+        this.submitUsernameBtn.onClick.AddListener( () => action());
+        this.submitUsernameBtn.onClick.AddListener(() => GameOrchestrator.Instance.uiHelper.DisableTransform(this.usernameBackground));
     }
 
     public void CreateLobby(TMP_InputField usernameField, TMP_InputField lobbySizeField)

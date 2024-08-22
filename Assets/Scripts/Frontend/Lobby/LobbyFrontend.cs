@@ -23,6 +23,7 @@ public class LobbyFrontend : MonoBehaviour
 		this.lobbyConnectMenu.triedToJoinOrCreateLobby += this.OnChangeToLoadingScreen;
 		GameOrchestrator.Instance.serverListener.lobbyCreatedOrJoined += this.OnChangeToLobbyMenu;
 		GameOrchestrator.Instance.GameStarted += this.OnChangeToGameStart;
+		GameOrchestrator.Instance.serverListener.problemConnectingToServer += (message) => this.ChangeScreens(this.lobbyConnectMenuScreen);
 	}
 
 	private void ChangeScreens(Transform? screenToChangeTo = null)
