@@ -19,21 +19,20 @@ public class LobbyMenu : MonoBehaviour
 
     void Start()
     {
-        Lobby lobby = GameOrchestrator.Instance.serverListener.lobby;
-        lobby.lobbyCodeChanged += this.OnLobbyCodeChanged;
-        lobby.playersInLobbyChanged += this.OnPlayerLobbyChange;
+         GameOrchestrator.Instance.serverListener.lobby.lobbyChanged += UpdateLobbyDisplay;
 
+    }
+
+    public void UpdateLobbyDisplay(LobbyConnection lobby)
+    {
+        this.OnPlayerLobbyChange(lobby.playerNames);
+        this.lobbyCodeText.text = lobby.code;
     }
 
     private void OnPlayerLobbyChange(List<string> players)
 	{
 		string currentPlayers = string.Join('\n',players);
 		playersInLobbyText.text = currentPlayers;
-	}
-
-	private void OnLobbyCodeChanged(object obj, EventArgs e)
-	{
-		this.lobbyCodeText.text = (string) obj;
 	}
 
     public void ChangeDecklistState()
@@ -51,17 +50,6 @@ public class LobbyMenu : MonoBehaviour
         }
         GameOrchestrator.Instance.clientPlayer.DeckListRaw.SetValue(deckListField.text);
         GameOrchestrator.Instance.clientPlayer.ReadiedUp.SetValue(!deckListField.interactable);
-    }
-
-    public void InitPlaytable(Playtable table)
-    {
-        Player? clientPlayer = table.GetPlayer(GameOrchestrator.Instance.serverListener.uuid);
-        if(clientPlayer is null)
-        {
-            Debug.LogError($"Could not find player of UUID - {GameOrchestrator.Instance.serverListener.uuid}");
-            return;
-        }
-        this.UpdatePlayerDecklist();
     }
 
     // Copied from SO \_0.0_/
