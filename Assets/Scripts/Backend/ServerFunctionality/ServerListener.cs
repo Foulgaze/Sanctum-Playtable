@@ -7,51 +7,52 @@ using System.Collections.Generic;
 using System;
 using System.Diagnostics;
 using System.ComponentModel;
-
-public enum NetworkInstruction
-{
-	CreateLobby, JoinLobby, PlayersInLobby, InvalidCommand, LobbyDescription, StartGame, NetworkAttribute, BoardUpdate, CardCreation, SpecialAction, Disconnect
-}
+using Sanctum_Core;
+    public enum NetworkInstruction
+    {
+        CreateLobby, JoinLobby, PlayersInLobby, InvalidCommand, LobbyDescription, StartGame, NetworkAttribute, CardCreation, SpecialAction, Disconnect
+    }
 public class ServerListener
 {
 	private readonly TcpClient client = new();
 	private readonly StringBuilder buffer = new();
-
-	public Playtable? playtable;
-
-	public readonly Lobby lobby;
+	public readonly LobbyConnection lobby = new();
 	public const int bufferSize = 4096;
 
-	public string? uuid = null;
-	private string? username = null;
-	
 	public event Action lobbyCreatedOrJoined = delegate{};
-
+	public event Action<string,string,Dictionary<string,string>> gameStarted = delegate{};
+	public event Action<string> networkAttributeChanged = delegate{};
 	private readonly string hostname;
 	private readonly int portNumber;
 
-	public ServerListener(string hostname,int portNumber, string pathToAssets)
+	public ServerListener(string hostname,int portNumber)
 	{
 		this.hostname = hostname;
 		this.portNumber = portNumber;
-		this.lobby = new(pathToAssets);
+		this.lobby.gameStarted += this.gameStarted;
 	}
 
-	public void PlaytableInit(Playtable table)
-	{
-		table.networkAttributeFactory.attributeValueChanged += (sender, args) => 
-		{this.SendMessage(NetworkInstruction.NetworkAttribute, $"{sender}|{args.PropertyName}");};
-		this.playtable = table;
-	}
+	// public void PlaytableInit(Playtable table)
+	// {
+	// 	table.networkAttributeFactory.attributeValueChanged += (attribute) => {this.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");};
+	// 	this.playtable = table;
+	// }
 
-	private void CheckForTCPConnect()
+	public bool ConnectToServer()
 	{
 		if(this.client.Connected)
 		{
-			return;
+			return true;
 		}
-		client.Connect(hostname,portNumber);
-		Logger.Log("Connecting");
+		try
+		{
+			this.client.Connect(hostname,portNumber);
+		}
+		catch
+		{
+			return false;
+		}
+		return true;
 	}
 
 	/// <summary>
@@ -61,8 +62,8 @@ public class ServerListener
 	/// <param name="lobbySize"> lobbysize</param>
 	public void CreateLobby(string username, int lobbySize)
 	{
-		this.CheckForTCPConnect();
-		this.username = username;
+		this.lobby.username = username;
+		this.lobby.size = lobbySize;
 		this.SendMessage(NetworkInstruction.CreateLobby, $"{lobbySize}|{username}");
 	}
 
@@ -73,9 +74,8 @@ public class ServerListener
 	/// <param name="lobbyCode">code of the lobby you are trying to connect to</param>
 	public void JoinToLobby(string username, string lobbyCode)
 	{
-		this.CheckForTCPConnect();
-		this.username = username;
-		this.lobby.LobbyCode = lobbyCode;
+		this.lobby.username = username;
+		this.lobby.code = lobbyCode;
 		this.SendMessage(NetworkInstruction.JoinLobby, $"{lobbyCode}|{username}");
 	}
 
@@ -94,13 +94,12 @@ public class ServerListener
 				return;
 			}
 			this.HandleServerCommand(command);
-
 		}while(true);
 	}
 
 	private void HandleServerCommand(NetworkCommand command)
 	{
-		Logger.Log($"Received:[{command}]");
+		UnityLogger.Log($"Received:[{command}]");
 		switch(command.opCode)
 		{
 			case (int)NetworkInstruction.CreateLobby:
@@ -108,7 +107,7 @@ public class ServerListener
 				break;
 			case (int)NetworkInstruction.JoinLobby:
 				this.HandleJoinLobby(command.instruction);
-				this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){this.username}));
+				this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){this.lobby.username}));
 				break;
 			case (int)NetworkInstruction.PlayersInLobby:
 				this.lobby.UpdatePlayersInLobby(command.instruction);
@@ -117,15 +116,7 @@ public class ServerListener
 				this.lobby.CreatePlaytable(command.instruction);
 				break;
 			case (int) NetworkInstruction.NetworkAttribute:
-				if(playtable == null)
-				{
-					Logger.LogError($"Null playtable for instruction - {command.instruction}");
-					break;
-				}
-				this.playtable.networkAttributeFactory.HandleNetworkedAttribute(command.instruction, new PropertyChangedEventArgs("instruction"));
-				break;
-			case (int) NetworkInstruction.BoardUpdate:
-				this.HandleBoardUpdate(command.instruction);
+				this.networkAttributeChanged(command.instruction);
 				break;
 			default:
 				break;
@@ -137,34 +128,15 @@ public class ServerListener
 		string[] data = instruction.Split('|');
 		if(data.Length != 2)
 		{
-			Logger.LogError($"Could not parse create lobby data - {instruction}");
+			UnityLogger.LogError($"Could not parse create lobby data - {instruction}");
 			return;
 		}
-		this.uuid = data[0];
-		string lobbyCode = data[1];
-		this.lobby.LobbyCode = lobbyCode;
-		this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){this.username}));
+		this.lobby.uuid = data[0];
+		this.lobby.code = data[1];
+		this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){lobby.username}));
 		this.lobbyCreatedOrJoined();
 	}
 
-	private void HandleBoardUpdate(string rawBoardUpdate)
-	{
-		if (!TryParseBoardUpdate(rawBoardUpdate, out string uuid, out CardZone boardZone, out List<List<int>> boardUpdate))
-		{
-			Logger.LogError($"Invalid board update - [{rawBoardUpdate}]");
-			return;
-		}
-
-		var player = playtable.GetPlayer(uuid);
-		if (player == null)
-		{
-			Logger.LogError($"Unable to find player with UUID - [{uuid}]");
-			return;
-		}
-
-		var collection = player.GetCardContainer(boardZone);
-		collection.SetCollectionValue(boardUpdate);
-	}
 
 	private bool TryParseBoardUpdate(string rawBoardUpdate, out string uuid, out CardZone boardZone, out List<List<int>> boardUpdate)
 	{
@@ -223,7 +195,7 @@ public class ServerListener
 
 	private void HandleJoinLobby(string instruction)
 	{
-		this.uuid = instruction;
+		this.lobby.uuid = instruction;
 		this.lobbyCreatedOrJoined();
 	}
 
@@ -242,7 +214,7 @@ public class ServerListener
 	/// <param name="payload">The string payload containing additional data for the command.</param>
 	public void SendMessage( NetworkInstruction instruction, string payload)
 	{
-		Logger.Log($"Sending:[{new NetworkCommand((int)instruction, payload)}]");
+		UnityLogger.Log($"Sending:[{new NetworkCommand((int)instruction, payload)}]");
 		string message = JsonConvert.SerializeObject(new NetworkCommand((int)instruction, payload));
 		byte[] data = Encoding.UTF8.GetBytes(AddMessageSize(message));
 		this.client.GetStream().Write(data, 0, data.Length);

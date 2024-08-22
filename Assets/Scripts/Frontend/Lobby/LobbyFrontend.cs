@@ -19,7 +19,7 @@ public class LobbyFrontend : MonoBehaviour
 	void Start()
 	{
 		this.ChangeScreens(this.lobbyConnectMenuScreen);
-		Lobby lobby = GameOrchestrator.Instance.serverListener.lobby;
+		LobbyConnection lobby = GameOrchestrator.Instance.serverListener.lobby;
 		this.lobbyConnectMenu.triedToJoinOrCreateLobby += this.OnChangeToLoadingScreen;
 		GameOrchestrator.Instance.serverListener.lobbyCreatedOrJoined += this.OnChangeToLobbyMenu;
 		GameOrchestrator.Instance.GameStarted += this.OnChangeToGameStart;

@@ -8,6 +8,10 @@ using UnityEngine.UI;
 public class LobbyConnectMenu : MonoBehaviour
 {
     [SerializeField]
+    private Button submitUsernameBtn;
+    [SerializeField]
+    private Transform usernameBackground;
+    [SerializeField]
     private Button createLobbyBtn;
     [SerializeField]
     private Button joinLobbyBtn;
@@ -22,8 +26,19 @@ public class LobbyConnectMenu : MonoBehaviour
 
     void Start()
     {
-        createLobbyBtn.onClick.AddListener(() => this.CreateLobby(usernameField, lobbySizeField));
-        joinLobbyBtn.onClick.AddListener(() => this.JoinLobby(usernameField, lobbyCodeField));
+        this.usernameBackground.gameObject.SetActive(false);
+        this.createLobbyBtn.onClick.AddListener(() => 
+        {
+            this.usernameBackground.gameObject.SetActive(true);
+            this.submitUsernameBtn.onClick.RemoveAllListeners();
+            this.submitUsernameBtn.onClick.AddListener(() => this.CreateLobby(usernameField, lobbySizeField));
+        });
+        this.joinLobbyBtn.onClick.AddListener(() => 
+        {
+            this.usernameBackground.gameObject.SetActive(true);
+            this.submitUsernameBtn.onClick.RemoveAllListeners();
+            this.submitUsernameBtn.onClick.AddListener( () => this.JoinLobby(usernameField, lobbyCodeField));
+        });
 
     }
 
@@ -38,6 +53,12 @@ public class LobbyConnectMenu : MonoBehaviour
 			Debug.LogError($"Invalid value for lobby size - {lobbySizeField.text}");
 			return;
 		}
+        bool connectedToServer = GameOrchestrator.Instance.serverListener.ConnectToServer();
+        if(!connectedToServer)
+        {
+            Debug.LogError($"Unable to connect to server");
+            return;
+        }
 		GameOrchestrator.Instance.serverListener.CreateLobby(usernameField.text, lobbySize);
         triedToJoinOrCreateLobby.Invoke();
 	}
@@ -46,6 +67,13 @@ public class LobbyConnectMenu : MonoBehaviour
 	{
         if(string.IsNullOrEmpty(usernameField.text) || string.IsNullOrEmpty(lobbyCodeField.text))
         {
+            Debug.LogError("Either username or lobbycode is empty");
+            return;
+        }
+        bool connectedToServer = GameOrchestrator.Instance.serverListener.ConnectToServer();
+        if(!connectedToServer)
+        {
+            Debug.LogError($"Unable to connect to server");
             return;
         }
 		GameOrchestrator.Instance.serverListener.JoinToLobby(usernameField.text, lobbyCodeField.text);

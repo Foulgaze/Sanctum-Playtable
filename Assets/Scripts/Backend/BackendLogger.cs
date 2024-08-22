@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Logger
+public class UnityLogger
 {
 	public static void LogError(string message)
 	{
