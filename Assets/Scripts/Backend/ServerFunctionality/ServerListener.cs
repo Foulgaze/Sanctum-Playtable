@@ -22,6 +22,7 @@ public class ServerListener
 	public event Action lobbyCreatedOrJoined = delegate{};
 	public event Action<string,string,Dictionary<string,string>> gameStarted = delegate{};
 	public event Action<string> networkAttributeChanged = delegate{};
+	public event Action<string?> problemConnectingToServer = delegate{};
 	private readonly string hostname;
 	private readonly int portNumber;
 
@@ -117,6 +118,9 @@ public class ServerListener
 				break;
 			case (int) NetworkInstruction.NetworkAttribute:
 				this.networkAttributeChanged(command.instruction);
+				break;
+			case (int) NetworkInstruction.InvalidCommand:
+				this.problemConnectingToServer(command.instruction);
 				break;
 			default:
 				break;

@@ -7,6 +7,8 @@ using UnityEngine;
 public class GameOrchestrator : MonoBehaviour
 {
 	public static GameOrchestrator Instance { get; private set; }
+
+    public UIHelper uiHelper;
     public ServerListener serverListener;
     private const int serverPort = 51522;
     private Dictionary<string,string> uuidToName = new();
