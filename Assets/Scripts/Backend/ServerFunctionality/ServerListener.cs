@@ -140,33 +140,6 @@ public class ServerListener
 		this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){lobby.username}));
 		this.lobbyCreatedOrJoined();
 	}
-
-
-	private bool TryParseBoardUpdate(string rawBoardUpdate, out string uuid, out CardZone boardZone, out List<List<int>> boardUpdate)
-	{
-		uuid = string.Empty;
-		boardZone = default;
-		boardUpdate = null;
-
-		var data = rawBoardUpdate.Split('|');
-		if (data.Length != 2)
-		{
-			return false;
-		}
-
-		if (!TryParseUUIDAndZone(data[0], out uuid, out boardZone))
-		{
-			return false;
-		}
-
-		if (!TryParseBoardData(data[1], out boardUpdate))
-		{
-			return false;
-		}
-
-		return true;
-	}
-
 	private bool TryParseUUIDAndZone(string rawUUIDAndZone, out string uuid, out CardZone boardZone)
 	{
 		uuid = string.Empty;
@@ -199,7 +172,19 @@ public class ServerListener
 
 	private void HandleJoinLobby(string instruction)
 	{
+		string[] data = instruction.Split('|');
+		if(data.Length != 2)
+		{
+			Logger.LogError($"Unable to parse Join Lobby instruction - {instruction}");
+			return;
+		}
+		if(!int.TryParse(data[1], out int lobbySize))
+		{
+			Logger.LogError($"Invalid lobby size - {instruction} - {data[1]}");
+			return;
+		}
 		this.lobby.uuid = instruction;
+		this.lobby.size = lobbySize;
 		this.lobbyCreatedOrJoined();
 	}
 

@@ -8,8 +8,6 @@ using UnityEngine;
 public class LobbyMenu : MonoBehaviour
 {
     [SerializeField]
-    private TextMeshProUGUI playersInLobbyText;
-    [SerializeField]
     private TextMeshProUGUI lobbyCodeText;
     [SerializeField]
     private TMP_InputField deckListField;
@@ -17,6 +15,14 @@ public class LobbyMenu : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI readyUpBtnText;
 
+    [SerializeField]
+    private Transform connectedPlayerHolder;
+    [SerializeField]
+    private Transform connectedPlayerPrefab;
+    [SerializeField]
+    private TextMeshProUGUI playerConnectedCount;
+
+    private string lobbyCode;
     void Start()
     {
          GameOrchestrator.Instance.serverListener.lobby.lobbyChanged += UpdateLobbyDisplay;
@@ -26,13 +32,23 @@ public class LobbyMenu : MonoBehaviour
     public void UpdateLobbyDisplay(LobbyConnection lobby)
     {
         this.OnPlayerLobbyChange(lobby.playerNames);
-        this.lobbyCodeText.text = lobby.code;
+        this.playerConnectedCount.text = $"Connected Players - ({lobby.playerNames}/{lobby.size})";
+        this.lobbyCode = lobby.code;
+        this.lobbyCodeText.text = $"Lobby Code : {lobby.code}";
     }
 
     private void OnPlayerLobbyChange(List<string> players)
 	{
-		string currentPlayers = string.Join('\n',players);
-		playersInLobbyText.text = currentPlayers;
+		foreach(Transform child in this.connectedPlayerHolder)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach(string playerName in players)
+        {
+            Transform playerConnected = Instantiate(this.connectedPlayerPrefab, this.connectedPlayerHolder);
+            TextMeshProUGUI playerNameText = playerConnected.GetChild(0).GetComponent<TextMeshProUGUI>();
+            playerNameText.text = playerName;
+        }
 	}
 
     public void ChangeDecklistState()
@@ -56,7 +72,7 @@ public class LobbyMenu : MonoBehaviour
     public void CopyLobbyCodeToClipboard()
     {
         TextEditor te = new TextEditor(); 
-        te.text = lobbyCodeText.text; 
+        te.text = this.lobbyCode; 
         te.SelectAll(); 
         te.Copy();
     }
