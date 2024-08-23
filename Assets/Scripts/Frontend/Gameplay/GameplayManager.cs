@@ -112,6 +112,8 @@ public class GameplayManager : MonoBehaviour
 
 	private void SetupClientListeners()
 	{
+		clientHealth.text = GameOrchestrator.Instance.clientPlayer.Health.Value.ToString(); 
+		clientName.text = GameOrchestrator.Instance.clientPlayer.Name;
 		GameOrchestrator.Instance.clientPlayer.Health.nonNetworkChange += (attribute) => clientHealth.text = ((NetworkAttribute<int>)attribute).Value.ToString();
 		this.clientHealth.onEndEdit.AddListener((rawHealth) => GameOrchestrator.Instance.clientPlayer.Health.SetValue(int.Parse(rawHealth)));
 
@@ -121,6 +123,7 @@ public class GameplayManager : MonoBehaviour
 
 	private void SetupOpponentListeners()
 	{
+		RenderOpponent();
 		if(this.opponentUUIDs.Count == 0)
 		{
 			opponentDescriptor.gameObject.SetActive(false);
@@ -138,6 +141,7 @@ public class GameplayManager : MonoBehaviour
 			opponentHealth.text = ((NetworkAttribute<int>)attribute).Value.ToString();
 		}
 	}
+
 	private void RenderOpponent()
 	{
 		Player opponent = this.currentOpponentSelector.currentOpponent();
