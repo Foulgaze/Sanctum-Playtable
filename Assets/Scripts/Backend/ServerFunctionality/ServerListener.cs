@@ -179,12 +179,12 @@ public class ServerListener
 		string[] data = instruction.Split('|');
 		if(data.Length != 2)
 		{
-			Logger.LogError($"Unable to parse Join Lobby instruction - {instruction}");
+			UnityLogger.LogError($"Unable to parse Join Lobby instruction - {instruction}");
 			return;
 		}
 		if(!int.TryParse(data[1], out int lobbySize))
 		{
-			Logger.LogError($"Invalid lobby size - {instruction} - {data[1]}");
+			UnityLogger.LogError($"Invalid lobby size - {instruction} - {data[1]}");
 			return;
 		}
 		this.lobby.uuid = data[0];
