@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using Sanctum_Core;
@@ -41,6 +42,10 @@ public class LobbyConnection
 			UnityLogger.LogError($"Unable to parse - {rawPlayerDict}");
 			return;
 		}
-		this.gameStarted.Invoke(this.uuid, this.username, playerDict);
+		if(this.uuid == null || this.username == null)
+		{
+			UnityLogger.LogError($"Either uuid or playname was null - {this.uuid} - {this.username}");
+		}
+		this.gameStarted(this.uuid, this.username, playerDict);
 	}
 }

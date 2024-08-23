@@ -30,7 +30,7 @@ public class ServerListener
 	{
 		this.hostname = hostname;
 		this.portNumber = portNumber;
-		this.lobby.gameStarted += this.gameStarted;
+		this.lobby.gameStarted += (uuid,name,playtable) => this.gameStarted.Invoke(uuid,name,playtable);
 	}
 
 	// public void PlaytableInit(Playtable table)
@@ -39,6 +39,10 @@ public class ServerListener
 	// 	this.playtable = table;
 	// }
 
+	public void NetworkAttributeChanged(NetworkAttribute attribute)
+	{
+		this.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");
+	}
 	public bool ConnectToServer()
 	{
 		if(this.client.Connected)
@@ -183,7 +187,7 @@ public class ServerListener
 			Logger.LogError($"Invalid lobby size - {instruction} - {data[1]}");
 			return;
 		}
-		this.lobby.uuid = instruction;
+		this.lobby.uuid = data[0];
 		this.lobby.size = lobbySize;
 		this.lobbyCreatedOrJoined();
 	}

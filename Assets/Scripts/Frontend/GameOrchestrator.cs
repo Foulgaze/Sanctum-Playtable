@@ -10,15 +10,16 @@ public class GameOrchestrator : MonoBehaviour
 
     public UIHelper uiHelper;
     public ServerListener serverListener;
+    [SerializeField]
+    private GameplayManager manager;
     private const int serverPort = 51522;
-    private Dictionary<string,string> uuidToName = new();
+    public Dictionary<string,string> uuidToName = new();
 
     public event Action<Playtable> playtableCreated = delegate { };
-    public event Action GameStarted = delegate { };
-    
+    public event Action playtableGameStarted = delegate { };    
     public Playtable? playtable = null;
     public Player clientPlayer;
-
+    [HideInInspector]
     public bool hasGameStarted = false;
 	private void Awake() 
     {         
@@ -37,6 +38,7 @@ public class GameOrchestrator : MonoBehaviour
     {
         Debug.developerConsoleVisible = true;
         serverListener = new(IPAddress.Loopback.ToString(),serverPort);
+        manager.playtableCreated += (playtable) => playtableCreated?.Invoke(playtable);
     }
 
     void Update()
