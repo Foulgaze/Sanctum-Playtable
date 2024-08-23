@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sanctum_Core;
 using TMPro;
 using UnityEngine;
 
@@ -22,9 +23,16 @@ public class LobbyFrontend : MonoBehaviour
 		LobbyConnection lobby = GameOrchestrator.Instance.serverListener.lobby;
 		this.lobbyConnectMenu.triedToJoinOrCreateLobby += this.OnChangeToLoadingScreen;
 		GameOrchestrator.Instance.serverListener.lobbyCreatedOrJoined += this.OnChangeToLobbyMenu;
-		GameOrchestrator.Instance.GameStarted += this.OnChangeToGameStart;
+		GameOrchestrator.Instance.playtableGameStarted += this.OnChangeToGameStart;
 		GameOrchestrator.Instance.serverListener.problemConnectingToServer += (message) => this.ChangeScreens(this.lobbyConnectMenuScreen);
+		GameOrchestrator.Instance.playtableCreated += OnPlaytableCreated;
 	}
+
+	private void OnPlaytableCreated(Playtable table)
+	{
+		table.GameStarted.nonNetworkChange += (_) => ChangeScreens(null);
+	}
+
 
 	private void ChangeScreens(Transform? screenToChangeTo = null)
 	{
