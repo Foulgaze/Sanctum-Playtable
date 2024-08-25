@@ -8,34 +8,6 @@ using UnityEngine.UI;
 
 public class GameplayManager : MonoBehaviour
 {
-	private class OpponentRotator
-	{
-		private List<string> opponents;
-		int currentIndex = 0;
-		private Playtable table;
-		public OpponentRotator(List<string> opponents, Playtable table)
-		{
-			this.opponents = opponents;
-			this.table = table;
-			this.opponents.Sort();
-		}
-
-		public Player currentOpponent()
-		{
-			return this.table.GetPlayer(this.opponents[currentIndex]);
-		}
-
-		public void Left()
-		{
-			this.currentIndex = this.currentIndex - 1 < 0 ? this.opponents.Count - 1 : this.currentIndex - 1;
-		}
-
-		public void Right()
-		{
-			this.currentIndex  += 1;
-			this.currentIndex %= opponents.Count;
-		}
-	}
 
 	[SerializeField] private Transform mainGameScreen;
 
@@ -48,7 +20,7 @@ public class GameplayManager : MonoBehaviour
 	[SerializeField] private Button healthIncreaseBtn;
 	[SerializeField] private Button healthDecreaseBtn;
 
-	private OpponentRotator currentOpponentSelector;
+	public OpponentRotator? currentOpponentSelector = null;
 	private Playtable playtable;
 	private List<string> opponentUUIDs;
 	private string pathToResources;
@@ -56,12 +28,12 @@ public class GameplayManager : MonoBehaviour
 	
 	void Start()
 	{
-		GameOrchestrator.Instance.serverListener.gameStarted += OnGameStarted;
+		GameOrchestrator.Instance.serverListener.onLobbyFilled += OnLobbyFilled;
 		pathToResources = $"{Application.streamingAssetsPath}/CSVs/";
 		mainGameScreen.gameObject.SetActive(false);
 	}
 	
-	private void OnGameStarted(string uuid, string name, Dictionary<string, string> players)
+	private void OnLobbyFilled(string uuid, string name, Dictionary<string, string> players)
 	{
 		this.InitializePlaytable(players);
 		this.AssignPlayerRoles(uuid, players);
@@ -71,7 +43,7 @@ public class GameplayManager : MonoBehaviour
 
 	private void InitializePlaytable(Dictionary<string, string> players)
 	{
-		this.playtable = new Playtable(players.Count, $"{this.pathToResources}/cards.csv", $"{this.pathToResources}/tokens.csv", isSlavePlaytable: true);
+		this.playtable = new Playtable(players.Count, $"{this.pathToResources}/cards.csv", $"{this.pathToResources}/tokens.csv", isSlave: true);
 		players.Keys.ToList().ForEach(key => this.playtable.AddPlayer(key, players[key]));
 		GameOrchestrator.Instance.playtable = this.playtable;
 	}
@@ -94,7 +66,7 @@ public class GameplayManager : MonoBehaviour
 	private void SetupOpponentSelector(string uuid, Dictionary<string, string> players)
 	{
 		this.opponentUUIDs = players.Keys.Where(key => key != uuid).ToList();
-		this.currentOpponentSelector = new(this.opponentUUIDs, this.playtable);
+		this.currentOpponentSelector = this.opponentUUIDs.Count == 0 ? null : new(this.opponentUUIDs, this.playtable);
 	}
 
 	private void OnGameStarted(NetworkAttribute gameStarted)
@@ -126,6 +98,7 @@ public class GameplayManager : MonoBehaviour
 		RenderOpponent();
 		if(this.opponentUUIDs.Count == 0)
 		{
+			UnityLogger.Log("Disabled Descriptor");
 			opponentDescriptor.gameObject.SetActive(false);
 			return;
 		}
@@ -144,6 +117,10 @@ public class GameplayManager : MonoBehaviour
 
 	private void RenderOpponent()
 	{
+		if(currentOpponentSelector == null)
+		{
+			return;
+		}
 		Player opponent = this.currentOpponentSelector.currentOpponent();
 		this.opponentName.text = opponent.Name;
 		this.opponentHealth.text = opponent.Health.Value.ToString();

@@ -14,13 +14,13 @@ using Sanctum_Core;
     }
 public class ServerListener
 {
-	private readonly TcpClient client = new();
+	private TcpClient client = new();
 	private readonly StringBuilder buffer = new();
 	public readonly LobbyConnection lobby = new();
 	public const int bufferSize = 4096;
 
 	public event Action lobbyCreatedOrJoined = delegate{};
-	public event Action<string,string,Dictionary<string,string>> gameStarted = delegate{};
+	public event Action<string,string,Dictionary<string,string>> onLobbyFilled = delegate{};
 	public event Action<string> networkAttributeChanged = delegate{};
 	public event Action<string?> problemConnectingToServer = delegate{};
 	private readonly string hostname;
@@ -30,7 +30,7 @@ public class ServerListener
 	{
 		this.hostname = hostname;
 		this.portNumber = portNumber;
-		this.lobby.gameStarted += (uuid,name,playtable) => this.gameStarted.Invoke(uuid,name,playtable);
+		this.lobby.onLobbyFilled += (uuid,name,playtable) => this.onLobbyFilled.Invoke(uuid,name,playtable);
 	}
 
 	// public void PlaytableInit(Playtable table)
@@ -124,6 +124,7 @@ public class ServerListener
 				this.networkAttributeChanged(command.instruction);
 				break;
 			case (int) NetworkInstruction.InvalidCommand:
+				client = new();
 				this.problemConnectingToServer(command.instruction);
 				break;
 			default:
@@ -144,36 +145,6 @@ public class ServerListener
 		this.lobby.UpdatePlayersInLobby(JsonConvert.SerializeObject(new List<string>(){lobby.username}));
 		this.lobbyCreatedOrJoined();
 	}
-	private bool TryParseUUIDAndZone(string rawUUIDAndZone, out string uuid, out CardZone boardZone)
-	{
-		uuid = string.Empty;
-		boardZone = default;
-
-		var uuidBoardData = rawUUIDAndZone.Split('-');
-		if (uuidBoardData.Length != 2 || !int.TryParse(uuidBoardData[1], out int boardId) || !EnumExtensions.IsDefined<CardZone>((CardZone)boardId))
-		{
-			return false;
-		}
-
-		uuid = uuidBoardData[0];
-		boardZone = (CardZone)boardId;
-		return true;
-	}
-
-	private bool TryParseBoardData(string rawBoardData, out List<List<int>> boardUpdate)
-	{
-		boardUpdate = null;
-		try
-		{
-			boardUpdate = JsonConvert.DeserializeObject<List<List<int>>>(rawBoardData);
-			return boardUpdate != null;
-		}
-		catch (JsonException)
-		{
-			return false;
-		}
-	}
-
 	private void HandleJoinLobby(string instruction)
 	{
 		string[] data = instruction.Split('|');

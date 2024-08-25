@@ -7,20 +7,13 @@ using UnityEngine.UI;
 
 public class LobbyConnectMenu : MonoBehaviour
 {
-    [SerializeField]
-    private Button submitUsernameBtn;
-    [SerializeField]
-    private Transform usernameBackground;
-    [SerializeField]
-    private Button createLobbyBtn;
-    [SerializeField]
-    private Button joinLobbyBtn;
-    [SerializeField]
-    private TMP_InputField usernameField;
-    [SerializeField]
-    private TMP_InputField lobbySizeField;
-    [SerializeField]
-    private TMP_InputField lobbyCodeField;
+    [SerializeField] private Button submitUsernameBtn;
+    [SerializeField] private Transform usernameBackground;
+    [SerializeField] private Button createLobbyBtn;
+    [SerializeField] private Button joinLobbyBtn;
+    [SerializeField] private TMP_InputField usernameField;
+    [SerializeField] private TMP_InputField lobbySizeField;
+    [SerializeField] private TMP_InputField lobbyCodeField;
 
     public event Action triedToJoinOrCreateLobby = delegate{};
 
@@ -52,7 +45,7 @@ public class LobbyConnectMenu : MonoBehaviour
         {
             return;
         }
-		if(!int.TryParse(lobbySizeField.text, out int lobbySize))
+		if(!int.TryParse(lobbySizeField.text, out int lobbySize) || lobbySize < 1)
 		{
 			Debug.LogError($"Invalid value for lobby size - {lobbySizeField.text}");
 			return;

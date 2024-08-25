@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class GenericCardComponents : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI name;
-    [SerializeField] TextMeshProUGUI manaCost;
-    [SerializeField] TextMeshProUGUI type;
-    [SerializeField] TextMeshProUGUI effect;
+    public TextMeshProUGUI name;
+    public TextMeshProUGUI manaCost;
+    public TextMeshProUGUI type;
+    public TextMeshProUGUI description;
 }

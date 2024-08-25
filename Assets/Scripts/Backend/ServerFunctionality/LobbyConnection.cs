@@ -10,7 +10,7 @@ public class LobbyConnection
 	public int? size = null;
 	public string? code = null;
 	public List<string> playerNames = new();
-	public event Action<string,string,Dictionary<string,string>> gameStarted;
+	public event Action<string,string,Dictionary<string,string>> onLobbyFilled;
 	public event Action<LobbyConnection> lobbyChanged = delegate{};
 	public string? uuid = null;
 	public string? username = null;
@@ -46,6 +46,6 @@ public class LobbyConnection
 		{
 			UnityLogger.LogError($"Either uuid or playname was null - {this.uuid} - {this.username}");
 		}
-		this.gameStarted(this.uuid, this.username, playerDict);
+		this.onLobbyFilled(this.uuid, this.username, playerDict);
 	}
 }

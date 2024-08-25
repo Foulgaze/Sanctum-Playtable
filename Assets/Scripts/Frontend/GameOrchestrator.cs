@@ -11,7 +11,7 @@ public class GameOrchestrator : MonoBehaviour
     public UIHelper uiHelper;
     public ServerListener serverListener;
     [SerializeField]
-    private GameplayManager manager;
+    public GameplayManager manager;
     private const int serverPort = 51522;
     public Dictionary<string,string> uuidToName = new();
 

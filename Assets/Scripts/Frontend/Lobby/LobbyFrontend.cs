@@ -8,14 +8,10 @@ using UnityEngine;
 public class LobbyFrontend : MonoBehaviour 
 {
 	
-	[SerializeField]
-	private Transform lobbyConnectMenuScreen;
-	[SerializeField]
-	private Transform lobbyLoadingScreen;
-	[SerializeField]
-	private Transform lobbyMenuScreen;
-	[SerializeField]
-	private LobbyConnectMenu lobbyConnectMenu;
+	[SerializeField] private Transform lobbyConnectMenuScreen;
+	[SerializeField] private Transform lobbyLoadingScreen;
+	[SerializeField] private Transform lobbyMenuScreen;
+	[SerializeField] private LobbyConnectMenu lobbyConnectMenu;
 
 	void Start()
 	{
