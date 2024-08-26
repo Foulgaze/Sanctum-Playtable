@@ -50,7 +50,6 @@ public class CardFactory : MonoBehaviour
 
 	public Transform GetCardImage(int cardId)
 	{
-		UnityLogger.Log($"Setting up card id - {cardId}");
 		if(idToCardTransform.ContainsKey(cardId))
 		{
 			return Instantiate(idToCardTransform[cardId]);

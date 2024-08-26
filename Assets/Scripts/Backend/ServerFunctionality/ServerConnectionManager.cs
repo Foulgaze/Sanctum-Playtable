@@ -8,7 +8,7 @@ using System;
 using Sanctum_Core;
 public enum NetworkInstruction
 {
-	CreateLobby, JoinLobby, PlayersInLobby, InvalidCommand, LobbyDescription, StartGame, NetworkAttribute, CardCreation, SpecialAction, Disconnect
+	CreateLobby, JoinLobby, PlayersInLobby, InvalidCommand, LobbyDescription, StartGame, NetworkAttribute, BoardUpdate, CardCreation, SpecialAction, Disconnect
 }
 public class ServerConnectionManager
 {

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 
@@ -73,23 +75,20 @@ public class BoardController : MonoBehaviour
 
     public void OnCardRemoved(NetworkAttribute attribute, CardContainerCollection collection)
     {
+        List<List<int>> cardsInCollection = collection.boardState.Value;
         List<int> removedCardIds = ((NetworkAttribute<List<int>>)attribute).Value;
-        foreach(int removedId in removedCardIds)
+        RemoveNumbers(cardsInCollection, removedCardIds);
+        collection.boardState.NonNetworkedSet(cardsInCollection);
+    }
+
+    private void RemoveNumbers(List<List<int>> listOfLists, List<int> numbersToRemove)
+    {
+        HashSet<int> numbers = new HashSet<int>(numbersToRemove);
+        // Iterate through each sublist
+        foreach (var sublist in listOfLists)
         {
-            collection.RemoveCardFromContainer(removedId, networkChange: false);
-        }
-        if(!GameOrchestrator.Instance.IsRenderedAttribute(attribute))
-        {
-            return;
-        }
-        Player currentOpponent = GameOrchestrator.Instance.opponentRotator.GetCurrentOpponent();
-        if(currentOpponent.GetCardContainer(collection.Zone) == collection)
-        {
-            clientZoneToCardContainer[collection.Zone].UpdateHolder(collection.ToList());
-        }
-        else
-        {
-            clientZoneToCardContainer[collection.Zone].UpdateHolder(collection.ToList());
+            // Remove each number in numbersToRemove from the current sublist
+            sublist.RemoveAll(num => numbers.Contains(num));
         }
     }
 }

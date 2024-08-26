@@ -38,17 +38,16 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
-        UnityLogger.Log("Updating Holder");
-
+        UnityLogger.Log($"Description - {boardDescription.Count}");
         nextCardPosition = transform.position + new Vector3(0,extents.y,0);
-        cardTransforms.ForEach(prefab => Destroy(prefab));
+        cardTransforms.ForEach(prefab => Destroy(prefab.gameObject));
         cardTransforms.Clear();
         if(boardDescription.Count == 0 || boardDescription[0].Count == 0)
         {
             return;
         }
         List<int> cardIds = boardDescription[0];
-        UnityLogger.Log($"Rendering {cardIds.Count} cards"); 
+        UnityLogger.Log($"Card ids - {cardIds.Count}");
         for(int i = 0; i < cardIds.Count; ++i)
         {
             int cardId = cardIds[i];

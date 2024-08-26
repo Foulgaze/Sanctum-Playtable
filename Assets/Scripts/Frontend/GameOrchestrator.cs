@@ -76,12 +76,20 @@ public class GameOrchestrator : MonoBehaviour
         CardFactory.Instance.playtable = this.playtable;
     }
 
+    public bool isClientAttribute(NetworkAttribute attribute)
+    {
+        string attributeUUID = this.GetUUIDFromAttributeID(attribute);
+        return attributeUUID == lobbyManager.lobbyInfo.clientUUID;
+    }
+
+    public bool isOpponentAttribute(NetworkAttribute attribute)
+    {
+        string attributeUUID = this.GetUUIDFromAttributeID(attribute);
+        return !this.opponentRotator.HasOpponents() ? false : opponentRotator.GetCurrentOpponent().Uuid == attributeUUID;
+    }
     public bool IsRenderedAttribute(NetworkAttribute attribute)
     {
-        string attributeUUID = this.GetUUIDFromAttributeID(attribute);;
-        bool isClientAttribute = attributeUUID == lobbyManager.lobbyInfo.clientUUID;
-        bool isOpponentAttribute = !this.opponentRotator.HasOpponents() ? false : opponentRotator.GetCurrentOpponent().Uuid == attributeUUID;
-        return isOpponentAttribute || isClientAttribute;
+        return isOpponentAttribute(attribute) || isClientAttribute(attribute);
     }
 
     public string GetUUIDFromAttributeID(NetworkAttribute attribute)
@@ -91,6 +99,10 @@ public class GameOrchestrator : MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.G))
+        {
+            serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Mill}|10");
+        }
         serverListener.ReadServerData();
     }	
 }
