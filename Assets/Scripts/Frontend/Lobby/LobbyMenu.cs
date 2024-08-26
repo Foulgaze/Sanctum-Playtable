@@ -5,9 +5,10 @@ using System.Linq;
 using Sanctum_Core;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
+using static LobbyManager;
 
 public class LobbyMenu : MonoBehaviour
 {
@@ -15,96 +16,67 @@ public class LobbyMenu : MonoBehaviour
     [SerializeField] private TMP_InputField deckListField;
 
     [SerializeField] private TextMeshProUGUI readyUpBtnText;
+    [SerializeField] private Button readyUpBtn;
 
     [SerializeField] private Transform connectedPlayerHolder;
     [SerializeField] private Transform connectedPlayerPrefab;
     [SerializeField] private TextMeshProUGUI playerConnectedCount;
-    private string lobbyCode;
-    private List<Transform> playerConnectionPrefabs = new();
-    void Start()
-    {
-         GameOrchestrator.Instance.serverListener.lobby.lobbyChanged += UpdateLobbyDisplay;
-         GameOrchestrator.Instance.playtableCreated += OnPlaytableCreated;
-    }
 
-    public void UpdateLobbyDisplay(LobbyConnection lobby)
+    private readonly Color notReady = new Color(0.92f, 0.63f, 0.63f, 1f);
+    private readonly Color ready = new Color(0.63f, 0.92f, 0.63f, 1f);
+    private string lobbyCode;
+    private Dictionary<string, Transform> playerConnectionPrefabs = new();
+
+    /// <summary>
+    /// Updates the lobby menu screen with the current lobby status
+    /// </summary>
+    /// <param name="lobby">Contains all the values for the lobby</param>
+    public void UpdateLobbyDisplay(LobbyInfo lobby)
     {
-        this.OnPlayerLobbyChange(lobby.playerNames);
+        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => Destroy(transform.gameObject));
+        this.playerConnectionPrefabs.Clear();
+        Dictionary<string,string> fauxUUIDToName = new();
+        for(int i = 0; i < lobby.playerNames.Count; ++i)
+        {
+            fauxUUIDToName[i.ToString()] = lobby.playerNames[i];
+        }
+        this.CreatePlayerReadyIcons(fauxUUIDToName);
         this.playerConnectedCount.text = $"Connected Players - ({lobby.playerNames.Count}/{lobby.size})";
         this.lobbyCode = lobby.code;
         this.lobbyCodeText.text = $"Lobby Code : {lobby.code}";
     }
 
-    public void OnPlaytableCreated(Playtable table)
+    /// <summary>
+    /// Sets up icons for player ready status and setup player decklist
+    /// </summary>
+    /// <param name="table"> Created playtable</param>
+    /// <param name="clientPlayer">The client connected to server</param>
+    /// <param name="uuidToName">Dictionary of all players</param>
+    public void OnPlaytableCreated(Playtable table, Player clientPlayer, Dictionary<string,string> uuidToName)
     {
-        this.UpdatePlayerReadyStatus();
-        var uuidToName = GameOrchestrator.Instance.uuidToName;
-        uuidToName.Keys.ToList().ForEach(key => 
-        {
-            Player player = table.GetPlayer(key);
-            player.ReadiedUp.nonNetworkChange += OnPlayerChange;
-        });
-        List<string> uuids = uuidToName.Keys.ToList();
-        OnPlayerInPlaytableReadyStatusChange();
-    }
-
-    private void OnPlayerChange(NetworkAttribute _)
-    {
-        OnPlayerInPlaytableReadyStatusChange();
-    }
-
-    private void UpdatePlayerReadyStatus()
-    {
-        GameOrchestrator.Instance.clientPlayer.DeckListRaw.SetValue(deckListField.text);
-        GameOrchestrator.Instance.clientPlayer.ReadiedUp.SetValue(!deckListField.IsInteractable());
-    }
-
-    private void OnPlayerInPlaytableReadyStatusChange()
-    {
-        var uuidToName = GameOrchestrator.Instance.uuidToName;
-        Playtable table = GameOrchestrator.Instance.playtable;
-        List<string> uuids = uuidToName.Keys.ToList();
-        this.OnPlayerLobbyChange(uuids.Select(uuid => uuidToName[uuid]).ToList());
-        for(int i = 0; i < uuids.Count; ++i)
-        {
-            string uuid = uuids[i];
-            Player player = (Player)table.GetPlayer(uuid);
-            this.playerConnectionPrefabs[i].GetComponent<UnityEngine.UI.Image>().color = player.ReadiedUp.Value ? new Color(0.63f, 0.92f, 0.63f, 1f) : new Color(0.92f, 0.63f, 0.63f, 1f);
-        }
-    }
-
-    private void OnPlayerLobbyChange(List<string> players)
-	{
-		foreach(Transform prefab in this.playerConnectionPrefabs)
-        {
-            Destroy(prefab.gameObject);
-        }
+        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => Destroy(transform.gameObject));
         this.playerConnectionPrefabs.Clear();
-        foreach(string playerName in players)
-        {
-            Transform playerConnected = Instantiate(this.connectedPlayerPrefab, this.connectedPlayerHolder);
-            TextMeshProUGUI playerNameText = playerConnected.GetChild(0).GetComponent<TextMeshProUGUI>();
-            playerNameText.text = playerName;
-            playerConnectionPrefabs.Add(playerConnected);
-        }
-	}
+        this.playerConnectedCount.text = $"Connected Players - ({uuidToName.Count}/{uuidToName.Count})";
+        clientPlayer.DeckListRaw.SetValue(deckListField.text);
+        clientPlayer.ReadiedUp.SetValue(!deckListField.IsInteractable());
+        uuidToName.Keys.ToList().ForEach(key => 
+        {   
+            Player player = table.GetPlayer(key);
+            player.ReadiedUp.nonNetworkChange += OnPlayerInPlaytableReadyStatusChange;
+        });
+        this.readyUpBtn.onClick.AddListener(() => this.UpdatePlayerDecklist(clientPlayer.DeckListRaw, clientPlayer.ReadiedUp));
+        this.CreatePlayerReadyIcons(uuidToName);
+        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => transform.GetComponent<UnityEngine.UI.Image>().color = notReady);
+        OnPlayerInPlaytableReadyStatusChange(clientPlayer.ReadiedUp);
+    }
 
+    /// <summary>
+    /// Inverts the decklist editablility. Changes button text as a result
+    /// </summary>
     public void ChangeDecklistState()
     {
         deckListField.interactable = !deckListField.interactable;
         readyUpBtnText.text = deckListField.interactable ? "Ready Up" : "Unready";
-        this.UpdatePlayerDecklist();
-    }
-
-    private void UpdatePlayerDecklist()
-    {
-        if(GameOrchestrator.Instance.playtable == null)
-        {
-            return;
-        }
-        UnityLogger.Log("Updating Decklist status");
-        GameOrchestrator.Instance.clientPlayer.DeckListRaw.SetValue(deckListField.text);
-        GameOrchestrator.Instance.clientPlayer.ReadiedUp.SetValue(!deckListField.interactable);
     }
 
     // Copied from SO \_0.0_/
@@ -116,4 +88,26 @@ public class LobbyMenu : MonoBehaviour
         te.Copy();
     }
 
+    private void OnPlayerInPlaytableReadyStatusChange(NetworkAttribute attribute)
+    {
+        string uuid = GameOrchestrator.Instance.GetUUIDFromAttributeID(attribute); // ignore 4 - from uuid. 
+        this.playerConnectionPrefabs[uuid].GetComponent<UnityEngine.UI.Image>().color = ((NetworkAttribute<bool>)attribute).Value ? ready : notReady;
+    }
+
+    private void CreatePlayerReadyIcons(Dictionary<string,string> uuidToName)
+	{
+        foreach(var pair in uuidToName)
+        {
+            Transform playerConnected = Instantiate(this.connectedPlayerPrefab, this.connectedPlayerHolder);
+            TextMeshProUGUI playerNameText = playerConnected.GetChild(0).GetComponent<TextMeshProUGUI>();
+            playerNameText.text = pair.Value;
+            playerConnectionPrefabs[pair.Key] = playerConnected;
+        }
+	}
+
+    private void UpdatePlayerDecklist(NetworkAttribute deckListRaw, NetworkAttribute readiedUp)
+    {
+        deckListRaw.SetValue(deckListField.text);
+        readiedUp.SetValue(!deckListField.interactable);
+    }
 }
