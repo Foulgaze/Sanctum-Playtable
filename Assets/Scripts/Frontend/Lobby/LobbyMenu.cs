@@ -21,6 +21,9 @@ public class LobbyMenu : MonoBehaviour
     [SerializeField] private Transform connectedPlayerHolder;
     [SerializeField] private Transform connectedPlayerPrefab;
     [SerializeField] private TextMeshProUGUI playerConnectedCount;
+
+    private readonly Color notReady = new Color(0.92f, 0.63f, 0.63f, 1f);
+    private readonly Color ready = new Color(0.63f, 0.92f, 0.63f, 1f);
     private string lobbyCode;
     private Dictionary<string, Transform> playerConnectionPrefabs = new();
 
@@ -30,7 +33,8 @@ public class LobbyMenu : MonoBehaviour
     /// <param name="lobby">Contains all the values for the lobby</param>
     public void UpdateLobbyDisplay(LobbyInfo lobby)
     {
-        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => Destroy(transform));
+        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => Destroy(transform.gameObject));
+        this.playerConnectionPrefabs.Clear();
         Dictionary<string,string> fauxUUIDToName = new();
         for(int i = 0; i < lobby.playerNames.Count; ++i)
         {
@@ -50,7 +54,9 @@ public class LobbyMenu : MonoBehaviour
     /// <param name="uuidToName">Dictionary of all players</param>
     public void OnPlaytableCreated(Playtable table, Player clientPlayer, Dictionary<string,string> uuidToName)
     {
-        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => Destroy(transform));
+        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => Destroy(transform.gameObject));
+        this.playerConnectionPrefabs.Clear();
+        this.playerConnectedCount.text = $"Connected Players - ({uuidToName.Count}/{uuidToName.Count})";
         clientPlayer.DeckListRaw.SetValue(deckListField.text);
         clientPlayer.ReadiedUp.SetValue(!deckListField.IsInteractable());
         uuidToName.Keys.ToList().ForEach(key => 
@@ -60,6 +66,7 @@ public class LobbyMenu : MonoBehaviour
         });
         this.readyUpBtn.onClick.AddListener(() => this.UpdatePlayerDecklist(clientPlayer.DeckListRaw, clientPlayer.ReadiedUp));
         this.CreatePlayerReadyIcons(uuidToName);
+        this.playerConnectionPrefabs.Values.ToList().ForEach(transform => transform.GetComponent<UnityEngine.UI.Image>().color = notReady);
         OnPlayerInPlaytableReadyStatusChange(clientPlayer.ReadiedUp);
     }
 
@@ -83,8 +90,8 @@ public class LobbyMenu : MonoBehaviour
 
     private void OnPlayerInPlaytableReadyStatusChange(NetworkAttribute attribute)
     {
-        string uuid = attribute.Id.Split('-')[0];
-        this.playerConnectionPrefabs[uuid].GetComponent<UnityEngine.UI.Image>().color = ((NetworkAttribute<bool>)attribute).Value ? new Color(0.63f, 0.92f, 0.63f, 1f) : new Color(0.92f, 0.63f, 0.63f, 1f);
+        string uuid = GameOrchestrator.Instance.GetUUIDFromAttributeID(attribute); // ignore 4 - from uuid. 
+        this.playerConnectionPrefabs[uuid].GetComponent<UnityEngine.UI.Image>().color = ((NetworkAttribute<bool>)attribute).Value ? ready : notReady;
     }
 
     private void CreatePlayerReadyIcons(Dictionary<string,string> uuidToName)

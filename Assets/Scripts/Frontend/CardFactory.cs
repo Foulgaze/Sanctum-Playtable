@@ -7,7 +7,7 @@ using UnityEngine;
 public class CardFactory : MonoBehaviour
 {
 	public static CardFactory Instance { get; private set; }
-	private Dictionary<int, Transform> idToCardTransform = new Dictionary<int, Transform>();
+	private Dictionary<int, Transform> idToCardTransform = new();
 	public Transform cardOnFieldPrefab;
 	public Transform cardPilePrefab;
 	public Transform cardImagePrefab;
@@ -39,8 +39,10 @@ public class CardFactory : MonoBehaviour
 	public Card GetCard(int id)
 	{
 		Card? card = playtable.cardFactory.GetCard(id);
+
 		if(card == null)
 		{
+			UnityLogger.LogError($"Unable to find card of Id - {id}");
 			throw new Exception($"Unable to find card of Id - {id}");
 		}
 		return card;
@@ -48,11 +50,13 @@ public class CardFactory : MonoBehaviour
 
 	public Transform GetCardImage(int cardId)
 	{
+		UnityLogger.Log($"Setting up card id - {cardId}");
 		if(idToCardTransform.ContainsKey(cardId))
 		{
 			return Instantiate(idToCardTransform[cardId]);
 		}
 		Card card = GetCard(cardId);
+
 		Transform newCardImage = Instantiate(cardImagePrefab);
 		newCardImage.transform.position = new Vector3(1000,1000,1000);
 		SetupCardForHandOrPile(card, newCardImage);

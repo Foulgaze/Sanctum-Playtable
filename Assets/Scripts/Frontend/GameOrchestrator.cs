@@ -56,14 +56,14 @@ public class GameOrchestrator : MonoBehaviour
         this.connectToLobbyMenu.joinLobby += this.lobbyManager.JoinLobby;
         this.connectToLobbyMenu.createLobby += this.lobbyManager.CreateLobby;
         this.serverListener.onNetworkCommandReceived[NetworkInstruction.JoinLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
-        this.serverListener.onNetworkCommandReceived[NetworkInstruction.StartGame] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.CreateLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
     }
 
     public void OnLobbyFilled(LobbyInfo info,  Dictionary<string, string> players)
 	{
 		this.playtable = new Playtable(players.Count, $"{this.pathToCSVs}/cards.csv", $"{this.pathToCSVs}/tokens.csv", isSlave: true);
-        Player clientPlayer = this.playtable.GetPlayer(this.lobbyManager.lobbyInfo.clientUUID);
 		players.Keys.ToList().ForEach(key => this.playtable.AddPlayer(key, players[key]));
+        Player clientPlayer = this.playtable.GetPlayer(this.lobbyManager.lobbyInfo.clientUUID);
 		this.playtable.networkAttributeFactory.attributeValueChanged += (attribute) => this.serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");
 		this.serverListener.onNetworkCommandReceived[NetworkInstruction.NetworkAttribute] += this.playtable.networkAttributeFactory.HandleNetworkedAttribute;
         List<string> opponentUUIDs = players.Keys.Where(uuid => this.lobbyManager.lobbyInfo.clientUUID != uuid).ToList();
@@ -78,10 +78,15 @@ public class GameOrchestrator : MonoBehaviour
 
     public bool IsRenderedAttribute(NetworkAttribute attribute)
     {
-        string attributeUUID = attribute.Id.Split('|')[0];
+        string attributeUUID = this.GetUUIDFromAttributeID(attribute);;
         bool isClientAttribute = attributeUUID == lobbyManager.lobbyInfo.clientUUID;
         bool isOpponentAttribute = !this.opponentRotator.HasOpponents() ? false : opponentRotator.GetCurrentOpponent().Uuid == attributeUUID;
         return isOpponentAttribute || isClientAttribute;
+    }
+
+    public string GetUUIDFromAttributeID(NetworkAttribute attribute)
+    {
+        return string.Join('-', attribute.Id.Split('-'), 0, 5);
     }
 
     void Update()

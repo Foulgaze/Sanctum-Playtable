@@ -18,17 +18,14 @@ public class PlayerDescriptionController : MonoBehaviour
 
 	public OpponentRotator rotator;
 
-	void Start()
-	{
-	}
 	public void InitializeDescriptions(Playtable table, Player clientPlayer, OpponentRotator rotator)
 	{
 		this.rotator = rotator;
-		this.InitialzieClientListeners(clientPlayer);
+		this.InitializeClientListeners(clientPlayer);
 		this.SetupOpponentListeners(table, clientPlayer, rotator);
 	}
 
-	public void InitialzieClientListeners(Player clientPlayer)
+	public void InitializeClientListeners(Player clientPlayer)
 	{
 		this.clientHealth.text = clientPlayer.Health.Value.ToString(); 
 		this.clientName.text = clientPlayer.Name;

@@ -10,6 +10,11 @@ public class LobbyManager
 		public string clientUUID;
 		public string clientUsername;
 		public List<string> playerNames = new();
+
+        public override string ToString()
+        {
+            return $"Size : {size} - Code : {code} - UUID : {clientUUID} - Username : {clientUsername}";
+        }
     }
 
 	public LobbyInfo lobbyInfo = new();

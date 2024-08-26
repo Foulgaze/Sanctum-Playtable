@@ -44,6 +44,7 @@ public class ScreenChanger : MonoBehaviour
 
 	public void OnChangeToLobbyMenu()
 	{
+		Debug.Log("Changing");
 		this.ChangeScreens(this.lobbyMenuScreen);
 	}
 
