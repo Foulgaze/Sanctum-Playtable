@@ -5,74 +5,91 @@ using UnityEngine;
 
 public class BoardController : MonoBehaviour
 {
-    [SerializeField] Transform clientLibrary;
-    [SerializeField] Transform clientGraveyard;
-    [SerializeField] Transform clientExile;
-    [SerializeField] Transform opponentLibrary;
-    [SerializeField] Transform opponentGraveyard;
-    [SerializeField] Transform opponentExile;
+    [SerializeField] private Transform clientLibrary;
+    [SerializeField] private Transform clientGraveyard;
+    [SerializeField] private Transform clientExile;
+    [SerializeField] private Transform opponentLibrary;
+    [SerializeField] private Transform opponentGraveyard;
+    [SerializeField] private Transform opponentExile;
 
+    Dictionary<CardZone, IPhysicalCardContainer> clientZoneToCardContainer;
+    Dictionary<CardZone, IPhysicalCardContainer> opponentZoneToCardContainer;
     void Start()
     {
-        GameOrchestrator.Instance.playtableCreated += SetupListeners;
-        SetZone(clientLibrary, CardZone.Library);
-        SetZone(clientGraveyard, CardZone.Graveyard);
-        SetZone(clientExile, CardZone.Exile);
-        SetZone(opponentLibrary, CardZone.Library);
-        SetZone(opponentGraveyard, CardZone.Graveyard);
-        SetZone(opponentExile, CardZone.Exile);
+        clientZoneToCardContainer = new()
+        {
+            {CardZone.Library , clientLibrary.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.Graveyard , clientGraveyard.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.Exile , clientExile.GetComponent<IPhysicalCardContainer>()},
+        };
+        opponentZoneToCardContainer = new()
+        {
+            {CardZone.Library , opponentLibrary.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.Graveyard , opponentGraveyard.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.Exile , opponentExile.GetComponent<IPhysicalCardContainer>()},
+        };
+        SetupZones(clientZoneToCardContainer);
+        SetupZones(opponentZoneToCardContainer);
     }
 
-    private void SetZone( Transform cardHolder,CardZone zone)
+    private void SetupZones(  Dictionary<CardZone, IPhysicalCardContainer> zoneToContainer)
     {
-        cardHolder.GetComponent<CardHolder>().SetZone(zone);
+        foreach (var (zone, container) in zoneToContainer)
+        {
+            container.SetZone(zone);
+        }
     }
 
-    private void SetupListeners(Playtable table)
+    public void SetupListeners(Playtable table, Player clientPlayer, Dictionary<string,string> uuidToName)
     {
         UnityLogger.Log("Setting up listeners");
-        Player clientPlayer = GameOrchestrator.Instance.clientPlayer;
-
-        foreach (string uuid in GameOrchestrator.Instance.uuidToName.Keys)
+        foreach (string uuid in uuidToName.Keys)
         {
             Player player = table.GetPlayer(uuid);
 
-            if (player == null)
-            {
-                UnityLogger.LogError($"Player with UUID {uuid} not found in the table.");
-                continue;
-            }
-
             if (clientPlayer == player)
             {
-                RegisterListeners(player, clientLibrary, clientGraveyard, clientExile);
+                this.RegisterCardZoneListeners(clientZoneToCardContainer, player);
             }
             else
             {
-                RegisterListeners(player, opponentLibrary, opponentGraveyard, opponentExile);
+                this.RegisterCardZoneListeners(opponentZoneToCardContainer, player);
+            }
+            foreach (CardZone zone in CardZone.GetValues(typeof(CardZone)))
+            {
+                CardContainerCollection collection = player.GetCardContainer(zone);
+                collection.removeCardIds.nonNetworkChange += (attribute) => OnCardRemoved(attribute, collection);
             }
         }
     }
-
-    private void RegisterListeners(Player player, Transform library, Transform graveyard, Transform exile)
+    private void RegisterCardZoneListeners(Dictionary<CardZone,IPhysicalCardContainer> zoneToContainer, Player player)
     {
-        RegisterCardZoneListeners(player, CardZone.Library, library);
-        RegisterCardZoneListeners(player, CardZone.Graveyard, graveyard);
-        RegisterCardZoneListeners(player, CardZone.Exile, exile);
+        foreach(var kvp in zoneToContainer)
+        {
+            var cardContainer = player.GetCardContainer(kvp.Key);
+            cardContainer.boardState.nonNetworkChange += kvp.Value.OnCardAdded;
+        }
     }
 
-    private void RegisterCardZoneListeners(Player player, CardZone zone, Transform container)
+    public void OnCardRemoved(NetworkAttribute attribute, CardContainerCollection collection)
     {
-        var cardHolder = container.GetComponent<CardHolder>();
-        var cardContainer = player.GetCardContainer(zone);
-
-        if (cardHolder == null)
+        List<int> removedCardIds = ((NetworkAttribute<List<int>>)attribute).Value;
+        foreach(int removedId in removedCardIds)
         {
-            UnityLogger.LogError($"CardHolder component missing on {container.name}");
+            collection.RemoveCardFromContainer(removedId, networkChange: false);
+        }
+        if(!GameOrchestrator.Instance.IsRenderedAttribute(attribute))
+        {
             return;
         }
-
-        cardContainer.boardState.nonNetworkChange += cardHolder.OnCardAdded;
-        cardContainer.removeCardIds.nonNetworkChange += cardHolder.OnCardRemoved;
+        Player currentOpponent = GameOrchestrator.Instance.opponentRotator.GetCurrentOpponent();
+        if(currentOpponent.GetCardContainer(collection.Zone) == collection)
+        {
+            clientZoneToCardContainer[collection.Zone].UpdateHolder(collection.ToList());
+        }
+        else
+        {
+            clientZoneToCardContainer[collection.Zone].UpdateHolder(collection.ToList());
+        }
     }
 }

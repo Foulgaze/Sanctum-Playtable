@@ -1,31 +1,41 @@
+using System;
 using System.Collections.Generic;
 using Sanctum_Core;
 
 public class OpponentRotator
 {
-	private List<string> opponents;
+	public List<string> opponentUUIDs;
+	public Action<Player> onPlayerChanged;
 	int currentIndex = 0;
 	private Playtable table;
 	public OpponentRotator(List<string> opponents, Playtable table)
 	{
-		this.opponents = opponents;
+		this.opponentUUIDs = opponents;
 		this.table = table;
-		this.opponents.Sort();
+		this.opponentUUIDs.Sort();
 	}
 
-	public Player currentOpponent()
+	public bool HasOpponents()
 	{
-		return this.table.GetPlayer(this.opponents[currentIndex]);
+		return this.opponentUUIDs.Count != 0;
+	}
+
+	public Player GetCurrentOpponent()
+	{
+		return this.table.GetPlayer(this.opponentUUIDs[currentIndex]);
 	}
 
 	public void Left()
 	{
-		this.currentIndex = this.currentIndex - 1 < 0 ? this.opponents.Count - 1 : this.currentIndex - 1;
+		this.currentIndex = this.currentIndex - 1 < 0 ? this.opponentUUIDs.Count - 1 : this.currentIndex - 1;
+		this.onPlayerChanged(GetCurrentOpponent());
 	}
 
 	public void Right()
 	{
 		this.currentIndex  += 1;
-		this.currentIndex %= opponents.Count;
+		this.currentIndex %= opponentUUIDs.Count;
+		this.onPlayerChanged(GetCurrentOpponent());
+
 	}
 }

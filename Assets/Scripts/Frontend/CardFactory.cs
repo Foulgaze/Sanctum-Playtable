@@ -11,6 +11,7 @@ public class CardFactory : MonoBehaviour
 	public Transform cardOnFieldPrefab;
 	public Transform cardPilePrefab;
 	public Transform cardImagePrefab;
+	public Playtable playtable;
 	
 	private void Awake() 
     {         
@@ -37,7 +38,7 @@ public class CardFactory : MonoBehaviour
 
 	public Card GetCard(int id)
 	{
-		Card? card = GameOrchestrator.Instance.playtable.cardFactory.GetCard(id);
+		Card? card = playtable.cardFactory.GetCard(id);
 		if(card == null)
 		{
 			throw new Exception($"Unable to find card of Id - {id}");

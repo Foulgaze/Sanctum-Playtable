@@ -1,26 +1,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Sanctum_Core;
 using UnityEngine;
+using static LobbyManager;
 public class GameOrchestrator : MonoBehaviour
 {
+    [SerializeField] private PlayerDescriptionController playerDescriptionController;
+    [SerializeField] private LobbyMenu lobbyMenu;
+    [SerializeField] private ScreenChanger lobbyScreenChanger;
+    [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
+    [SerializeField] private BoardController boardController;
 	public static GameOrchestrator Instance { get; private set; }
+    private LobbyManager lobbyManager = new();
+    private ServerConnectionManager serverListener;
+    private string pathToCSVs;
+    private const int ServerPort = 51522;
+    private Playtable playtable;
+    public OpponentRotator opponentRotator;
 
-    public UIHelper uiHelper;
-    public ServerListener serverListener;
-    [SerializeField]
-    public GameplayManager manager;
-    private const int serverPort = 51522;
-    public Dictionary<string,string> uuidToName = new();
-
-    public event Action<Playtable> playtableCreated = delegate { };
-    public event Action playtableGameStarted = delegate { };    
-    public Playtable? playtable = null;
-    public Player clientPlayer;
-    [HideInInspector]
-    public bool hasGameStarted = false;
 	private void Awake() 
     {         
         if (Instance != null && Instance != this) 
@@ -37,8 +37,51 @@ public class GameOrchestrator : MonoBehaviour
     private void Init()
     {
         Debug.developerConsoleVisible = true;
-        serverListener = new(IPAddress.Loopback.ToString(),serverPort);
-        manager.playtableCreated += (playtable) => playtableCreated?.Invoke(playtable);
+        this.serverListener = new(IPAddress.Loopback.ToString(),ServerPort);
+        this.pathToCSVs = $"{Application.streamingAssetsPath}/CSVs/";
+        this.InitListeners();
+    }
+
+    private void InitListeners()
+    {
+        this.lobbyManager.sendNetworkCommand += this.serverListener.SendMessage;
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.CreateLobby] += this.lobbyManager.HandleCreateLobby;
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.JoinLobby] += this.lobbyManager.HandleJoinLobby;
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.PlayersInLobby] += this.lobbyManager.HandePlayersInLobby;
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.StartGame] += this.lobbyManager.ParsePlayersInLobby;
+        this.lobbyManager.onLobbyChanged += this.lobbyMenu.UpdateLobbyDisplay;
+        this.lobbyManager.onLobbyFilled += this.OnLobbyFilled;
+        this.connectToLobbyMenu.joinLobby += (_, _) => this.lobbyScreenChanger.OnChangeToLoadingScreen();
+        this.connectToLobbyMenu.createLobby += (_, _) => this.lobbyScreenChanger.OnChangeToLoadingScreen();
+        this.connectToLobbyMenu.joinLobby += this.lobbyManager.JoinLobby;
+        this.connectToLobbyMenu.createLobby += this.lobbyManager.CreateLobby;
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.JoinLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
+        this.serverListener.onNetworkCommandReceived[NetworkInstruction.StartGame] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
+    }
+
+    public void OnLobbyFilled(LobbyInfo info,  Dictionary<string, string> players)
+	{
+		this.playtable = new Playtable(players.Count, $"{this.pathToCSVs}/cards.csv", $"{this.pathToCSVs}/tokens.csv", isSlave: true);
+        Player clientPlayer = this.playtable.GetPlayer(this.lobbyManager.lobbyInfo.clientUUID);
+		players.Keys.ToList().ForEach(key => this.playtable.AddPlayer(key, players[key]));
+		this.playtable.networkAttributeFactory.attributeValueChanged += (attribute) => this.serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");
+		this.serverListener.onNetworkCommandReceived[NetworkInstruction.NetworkAttribute] += this.playtable.networkAttributeFactory.HandleNetworkedAttribute;
+        List<string> opponentUUIDs = players.Keys.Where(uuid => this.lobbyManager.lobbyInfo.clientUUID != uuid).ToList();
+        this.lobbyScreenChanger.OnPlaytableCreated(this.playtable);
+        this.opponentRotator = new(opponentUUIDs, this.playtable);
+        this.playerDescriptionController.InitializeDescriptions(this.playtable,clientPlayer, opponentRotator);
+        this.lobbyMenu.OnPlaytableCreated(this.playtable, this.playtable.GetPlayer(lobbyManager.lobbyInfo.clientUUID), players);
+        this.playtable.GameStarted.nonNetworkChange += (_) => this.lobbyScreenChanger.OnChangeToGameStart();
+        boardController.SetupListeners(this.playtable, clientPlayer, players);
+        CardFactory.Instance.playtable = this.playtable;
+    }
+
+    public bool IsRenderedAttribute(NetworkAttribute attribute)
+    {
+        string attributeUUID = attribute.Id.Split('|')[0];
+        bool isClientAttribute = attributeUUID == lobbyManager.lobbyInfo.clientUUID;
+        bool isOpponentAttribute = !this.opponentRotator.HasOpponents() ? false : opponentRotator.GetCurrentOpponent().Uuid == attributeUUID;
+        return isOpponentAttribute || isClientAttribute;
     }
 
     void Update()

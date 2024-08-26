@@ -893,6 +893,7 @@ MonoBehaviour:
   lobbyConnectMenuScreen: {fileID: 1225395324}
   lobbyLoadingScreen: {fileID: 320138536}
   lobbyMenuScreen: {fileID: 557593758}
+  gameplayScreen: {fileID: 1998041330}
   lobbyConnectMenu: {fileID: 604468248}
 --- !u!114 &288914911
 MonoBehaviour:
@@ -906,9 +907,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678e9befdd67a640b5ef0be1e7d1d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiHelper: {fileID: 288914913}
-  manager: {fileID: 890522703}
-  hasGameStarted: 0
+  playerDescriptionController: {fileID: 890522703}
+  lobbyMenu: {fileID: 604468249}
+  lobbyScreenChanger: {fileID: 288914910}
+  connectToLobbyMenu: {fileID: 604468248}
+  boardController: {fileID: 288914915}
 --- !u!4 &288914912
 Transform:
   m_ObjectHideFlags: 0
@@ -1218,7 +1221,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &320138536
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2103,7 +2106,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &557593758
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2457,6 +2460,7 @@ MonoBehaviour:
   lobbyCodeText: {fileID: 207193439}
   deckListField: {fileID: 1704307834}
   readyUpBtnText: {fileID: 387180234}
+  readyUpBtn: {fileID: 2052712194}
   connectedPlayerHolder: {fileID: 221712766}
   connectedPlayerPrefab: {fileID: 5299917432852803782, guid: 5a582e9f398b98d4d9218e3a9d38c6f8, type: 3}
   playerConnectedCount: {fileID: 85623735}
@@ -4008,10 +4012,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 890522701}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce26793695959594cbf59721f74ad519, type: 3}
+  m_Script: {fileID: 11500000, guid: d6eacd2394b695f4ba02457846dcce31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainGameScreen: {fileID: 1998041330}
   opponentDescriptor: {fileID: 654017120}
   opponentName: {fileID: 1536677042}
   opponentHealth: {fileID: 1995396536}
@@ -4993,19 +4996,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1126566796}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 288914909}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &1158251464
 GameObject:
   m_ObjectHideFlags: 0
@@ -5351,7 +5342,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1225395324
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5838,7 +5829,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1313988171
 RectTransform:
   m_ObjectHideFlags: 0

@@ -5,14 +5,14 @@ using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 
-public interface CardHolder
+public interface IPhysicalCardContainer
 {
     public CardZone GetZone();
     public void SetZone(CardZone zone);
     public void OnCardAdded(NetworkAttribute attribute);
-    public void OnCardRemoved(NetworkAttribute attribute);
+    public void UpdateHolder(List<List<int>> boardDescription);
 }
-public class PileController : MonoBehaviour, CardHolder
+public class PileController : MonoBehaviour, IPhysicalCardContainer
 {
     private CardZone zone;
     private Vector3 extents;
@@ -25,33 +25,10 @@ public class PileController : MonoBehaviour, CardHolder
         extents = this.transform.GetComponent<MeshRenderer>().bounds.extents;
         cardTopperExtents = CardFactory.Instance.cardPilePrefab.GetComponent<MeshRenderer>().bounds.extents;
     }
-    private bool IsOpponentOrClientAttribute(NetworkAttribute attribute)
-    {
-        bool isClientAttribute = GameOrchestrator.Instance.clientPlayer.GetCardContainer(this.zone).boardState == attribute;
-        OpponentRotator? rotator = GameOrchestrator.Instance.manager.currentOpponentSelector;
-        bool isCurrentOpponentAttribute = rotator == null ? false : rotator.currentOpponent().GetCardContainer(zone).boardState == attribute;
-
-
-        return isClientAttribute || isCurrentOpponentAttribute;
-    }
-    public void OnCardRemoved(NetworkAttribute attribute)
-    {
-        if(!IsOpponentOrClientAttribute(attribute))
-        {
-            return;
-        }
-        List<int> removedCardIds = ((NetworkAttribute<List<int>>)attribute).Value;
-        CardContainerCollection collection = GameOrchestrator.Instance.clientPlayer.GetCardContainer(this.zone);
-        foreach(int removedId in removedCardIds)
-        {
-            collection.RemoveCardFromContainer(removedId, networkChange: false);
-        }
-        UpdateHolder(collection.ToList());
-    }
+    
     public void OnCardAdded(NetworkAttribute attribute)
     {
-        UnityLogger.Log($"On Card Added - {!IsOpponentOrClientAttribute(attribute)}");
-        if(!IsOpponentOrClientAttribute(attribute))
+        if(!GameOrchestrator.Instance.IsRenderedAttribute(attribute))
         {
             return;
         }
@@ -126,4 +103,5 @@ public class PileController : MonoBehaviour, CardHolder
     {
         this.zone = zone;
     }
+
 }
