@@ -10,9 +10,15 @@ public class BoardController : MonoBehaviour
     [SerializeField] private Transform clientLibrary;
     [SerializeField] private Transform clientGraveyard;
     [SerializeField] private Transform clientExile;
+    [SerializeField] private Transform clientMainField;
+    [SerializeField] private Transform clientLeftField;
+    [SerializeField] private Transform clientRightField;
     [SerializeField] private Transform opponentLibrary;
     [SerializeField] private Transform opponentGraveyard;
     [SerializeField] private Transform opponentExile;
+    [SerializeField] private Transform opponentMainField;
+    [SerializeField] private Transform opponentLeftField;
+    [SerializeField] private Transform opponentRightField;
 
     Dictionary<CardZone, IPhysicalCardContainer> clientZoneToCardContainer;
     Dictionary<CardZone, IPhysicalCardContainer> opponentZoneToCardContainer;
@@ -23,12 +29,18 @@ public class BoardController : MonoBehaviour
             {CardZone.Library , clientLibrary.GetComponent<IPhysicalCardContainer>()},
             {CardZone.Graveyard , clientGraveyard.GetComponent<IPhysicalCardContainer>()},
             {CardZone.Exile , clientExile.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.MainField , clientMainField.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.LeftField , clientLeftField.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.RightField , clientRightField.GetComponent<IPhysicalCardContainer>()},
         };
         opponentZoneToCardContainer = new()
         {
             {CardZone.Library , opponentLibrary.GetComponent<IPhysicalCardContainer>()},
             {CardZone.Graveyard , opponentGraveyard.GetComponent<IPhysicalCardContainer>()},
             {CardZone.Exile , opponentExile.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.MainField , opponentMainField.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.LeftField , opponentLeftField.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.RightField , opponentRightField.GetComponent<IPhysicalCardContainer>()},
         };
         SetupZones(clientZoneToCardContainer);
         SetupZones(opponentZoneToCardContainer);
