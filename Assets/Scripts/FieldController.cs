@@ -61,7 +61,10 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
             Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId);
             cardsOnField.Add(onFieldCard.gameObject);
             onFieldCard.localScale = new Vector3(cardWidth, onFieldCard.localScale.y, cardWidth * 1/widthToHeightRatio);
-            onFieldCard.transform.position = centerPosition;
+            onFieldCard.position = centerPosition;
+            onFieldCard.SetParent(transform);
+            onFieldCard.rotation = transform.parent.rotation;
+
             centerPosition += new Vector3(offsetX, onFieldCard.localScale.y,-offsetZ);
         }
     }

@@ -1,17 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 
-public interface IPhysicalCardContainer
-{
-    public CardZone GetZone();
-    public void SetZone(CardZone zone);
-    public void OnCardAdded(NetworkAttribute attribute);
-    public void UpdateHolder(List<List<int>> boardDescription);
-}
+
 public class PileController : MonoBehaviour, IPhysicalCardContainer
 {
     private CardZone zone;
@@ -38,29 +33,31 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
-        UnityLogger.Log($"Description - {boardDescription.Count}");
-        nextCardPosition = transform.position + new Vector3(0,extents.y,0);
+        ResetCardTransforms();
+
+        if (boardDescription.Count == 0 || boardDescription[0].Count == 0)
+            return;
+
+        boardDescription[0].ForEach(InstantiateCardTopper);
+        if (cardTransforms.Count != 0)
+            PrepareTopCard(cardTransforms.Last(), boardDescription[0].Last());
+    }
+
+    private void ResetCardTransforms()
+    {
+        nextCardPosition = transform.position + new Vector3(0, extents.y, 0);
         cardTransforms.ForEach(prefab => Destroy(prefab.gameObject));
         cardTransforms.Clear();
-        if(boardDescription.Count == 0 || boardDescription[0].Count == 0)
-        {
-            return;
-        }
-        List<int> cardIds = boardDescription[0];
-        UnityLogger.Log($"Card ids - {cardIds.Count}");
-        for(int i = 0; i < cardIds.Count; ++i)
-        {
-            int cardId = cardIds[i];
-            Transform cardTopper = Instantiate(CardFactory.Instance.cardPilePrefab);
-            cardTopper.localScale = new Vector3(extents.x*2,cardTopperExtents.y,extents.z*2 );
-            cardTopper.position = GetNextCardPosition();
-            cardTransforms.Add(cardTopper);
-            if(i == cardIds.Count - 1)
-            {
-                PrepareTopCard(cardTopper, cardId);
-                break;
-            }
-        }
+    }
+
+    private void InstantiateCardTopper(int cardId)
+    {
+        Transform cardTopper = Instantiate(CardFactory.Instance.cardPilePrefab);
+        cardTopper.localScale = new Vector3(extents.x * 2, cardTopperExtents.y, extents.z * 2);
+        cardTopper.position = GetNextCardPosition();
+        cardTopper.SetParent(transform);
+        cardTopper.rotation = transform.parent.rotation;
+        cardTransforms.Add(cardTopper);
     }
 
     private Vector3 GetNextCardPosition()
