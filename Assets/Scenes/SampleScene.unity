@@ -969,9 +969,15 @@ MonoBehaviour:
   clientLibrary: {fileID: 1334361759}
   clientGraveyard: {fileID: 1206787311}
   clientExile: {fileID: 714597892}
+  clientMainField: {fileID: 1931724519}
+  clientLeftField: {fileID: 1014707795}
+  clientRightField: {fileID: 1849784185}
   opponentLibrary: {fileID: 642680023}
   opponentGraveyard: {fileID: 2112841592}
   opponentExile: {fileID: 1232769211}
+  opponentMainField: {fileID: 1412170170}
+  opponentLeftField: {fileID: 1712766785}
+  opponentRightField: {fileID: 875261446}
 --- !u!1 &296402555
 GameObject:
   m_ObjectHideFlags: 0
@@ -3872,6 +3878,7 @@ GameObject:
   - component: {fileID: 875261449}
   - component: {fileID: 875261448}
   - component: {fileID: 875261447}
+  - component: {fileID: 875261450}
   m_Layer: 0
   m_Name: artifactField
   m_TagString: Untagged
@@ -3965,6 +3972,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 875261445}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &875261450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 875261445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9999b51313ee94fb0a3bc02400c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultCardCount: 3
 --- !u!1 &890522701
 GameObject:
   m_ObjectHideFlags: 0
@@ -4107,7 +4127,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 66.95
+  m_fontSize: 1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4471,6 +4491,7 @@ GameObject:
   - component: {fileID: 1014707798}
   - component: {fileID: 1014707797}
   - component: {fileID: 1014707796}
+  - component: {fileID: 1014707799}
   m_Layer: 0
   m_Name: landField
   m_TagString: Untagged
@@ -4564,6 +4585,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1014707794}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1014707799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014707794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9999b51313ee94fb0a3bc02400c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultCardCount: 3
 --- !u!1 &1029240880
 GameObject:
   m_ObjectHideFlags: 0
@@ -4825,7 +4859,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 35.9
+  m_fontSize: 18
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6513,6 +6547,7 @@ GameObject:
   - component: {fileID: 1412170173}
   - component: {fileID: 1412170172}
   - component: {fileID: 1412170171}
+  - component: {fileID: 1412170174}
   m_Layer: 0
   m_Name: mainField
   m_TagString: Untagged
@@ -6606,6 +6641,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1412170169}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1412170174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412170169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9999b51313ee94fb0a3bc02400c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultCardCount: 6
 --- !u!1 &1494948843
 GameObject:
   m_ObjectHideFlags: 0
@@ -7093,7 +7141,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 66.95
+  m_fontSize: 1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -8130,6 +8178,7 @@ GameObject:
   - component: {fileID: 1712766788}
   - component: {fileID: 1712766787}
   - component: {fileID: 1712766786}
+  - component: {fileID: 1712766789}
   m_Layer: 0
   m_Name: landField
   m_TagString: Untagged
@@ -8223,6 +8272,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1712766784}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1712766789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712766784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9999b51313ee94fb0a3bc02400c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultCardCount: 3
 --- !u!1 &1720401031
 GameObject:
   m_ObjectHideFlags: 0
@@ -8364,6 +8426,7 @@ GameObject:
   - component: {fileID: 1849784188}
   - component: {fileID: 1849784187}
   - component: {fileID: 1849784186}
+  - component: {fileID: 1849784189}
   m_Layer: 0
   m_Name: artifactField
   m_TagString: Untagged
@@ -8457,6 +8520,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849784184}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1849784189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849784184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9999b51313ee94fb0a3bc02400c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultCardCount: 3
 --- !u!1 &1871208319
 GameObject:
   m_ObjectHideFlags: 0
@@ -8645,6 +8721,7 @@ GameObject:
   - component: {fileID: 1931724522}
   - component: {fileID: 1931724521}
   - component: {fileID: 1931724520}
+  - component: {fileID: 1931724523}
   m_Layer: 0
   m_Name: mainField
   m_TagString: Untagged
@@ -8738,6 +8815,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1931724518}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1931724523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1931724518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca9999b51313ee94fb0a3bc02400c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultCardCount: 6
 --- !u!1 &1933084464
 GameObject:
   m_ObjectHideFlags: 0
@@ -8994,7 +9084,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 68.45
+  m_fontSize: 18
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1

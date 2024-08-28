@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 using static LobbyManager;
@@ -20,6 +21,7 @@ public class GameOrchestrator : MonoBehaviour
     private const int ServerPort = 51522;
     private Playtable playtable;
     public OpponentRotator opponentRotator;
+    private int insertCardID = 0;
 
 	private void Awake() 
     {         
@@ -102,6 +104,14 @@ public class GameOrchestrator : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.G))
         {
             serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Mill}|10");
+        }
+        if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.L))
+        {
+            serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{this.lobbyManager.lobbyInfo.clientUUID}-{(int)CardZone.MainField}-insert|{JsonConvert.SerializeObject(new InsertCardData(0,insertCardID++,null, false))}");
+        }
+        if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.D))
+        {
+            serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{this.lobbyManager.lobbyInfo.clientUUID}-{(int)CardZone.LeftField}-insert|{JsonConvert.SerializeObject(new InsertCardData(0,insertCardID++,null, false))}");
         }
         serverListener.ReadServerData();
     }	
