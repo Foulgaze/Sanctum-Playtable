@@ -113,6 +113,10 @@ public class GameOrchestrator : MonoBehaviour
         {
             serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{this.lobbyManager.lobbyInfo.clientUUID}-{(int)CardZone.LeftField}-insert|{JsonConvert.SerializeObject(new InsertCardData(0,insertCardID++,null, false))}");
         }
+        if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.N))
+        {
+            serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|1");
+        }
         serverListener.ReadServerData();
     }	
 }

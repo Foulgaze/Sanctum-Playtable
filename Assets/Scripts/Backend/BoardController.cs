@@ -13,6 +13,7 @@ public class BoardController : MonoBehaviour
     [SerializeField] private Transform clientMainField;
     [SerializeField] private Transform clientLeftField;
     [SerializeField] private Transform clientRightField;
+    [SerializeField] private Transform clientHand;
     [SerializeField] private Transform opponentLibrary;
     [SerializeField] private Transform opponentGraveyard;
     [SerializeField] private Transform opponentExile;
@@ -32,6 +33,7 @@ public class BoardController : MonoBehaviour
             {CardZone.MainField , clientMainField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.LeftField , clientLeftField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.RightField , clientRightField.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.Hand, clientHand.GetComponent<IPhysicalCardContainer>()},
         };
         opponentZoneToCardContainer = new()
         {
