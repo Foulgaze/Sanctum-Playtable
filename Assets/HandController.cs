@@ -52,7 +52,6 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         int cardCount = cardIds.Count;
         int handSize = cardIds.Count % 2 == 0 && cardIds.Count < defaultHandSize ? defaultHandSize + 1 : defaultHandSize;
         int bezierPointCount = Math.Max(cardCount, handSize);
-        
 
         Vector2 cardDimensions = CalculateCardDimensions();
         Vector3[] cardPositions = GenerateCardPositions(bezierPointCount);
@@ -62,11 +61,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
 
         for (int i = 0; i < cardCount; ++i, ++positionIndex)
         {
-            // if (ShouldSkipMiddlePoint(cardCount, positionIndex, bezierPointCount))
-            // {
-            //     ++positionIndex;
-            // }
-
+ 
             CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
         }
     }
@@ -106,18 +101,13 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         return middlePosition - cardCount / 2;
     }
 
-    private bool ShouldSkipMiddlePoint(int cardCount, int positionIndex, int bezierPointCount)
-    {
-        int middlePosition = bezierPointCount / 2;
-        return cardCount % 2 == 0 && positionIndex == middlePosition && cardCount < defaultHandSize;
-    }
-
     private void CreateAndPositionCard(int cardId, Vector3 position, float rotation, Vector2 cardDimensions)
     {
         Transform card = CardFactory.Instance.GetCardImage(cardId);
         card.GetComponent<RectTransform>().sizeDelta = cardDimensions;
         card.SetParent(transform);
         card.position = position;
+        card.GetChild(0).GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
         card.rotation = Quaternion.Euler(0, 0, 90 - rotation);
         card.GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
         cardTransforms.Add(card);
