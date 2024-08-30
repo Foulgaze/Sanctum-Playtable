@@ -21,7 +21,6 @@ public class BezierEquations
         List<Vector3> equidistantPoints = new List<Vector3>();
         float curveLength = EstimateCurveLength(p0, p1, p2);
         float desiredSpacing = curveLength / (numPoints - 1);
-
         float accumulatedLength = 0f;
         Vector3 previousPoint = p0;
         equidistantPoints.Add(p0);
@@ -32,20 +31,19 @@ public class BezierEquations
             float segmentLength = Vector3.Distance(previousPoint, currentPoint);
             accumulatedLength += segmentLength;
 
-            if (accumulatedLength >= desiredSpacing)
+            while (accumulatedLength >= desiredSpacing && equidistantPoints.Count < numPoints - 1)
             {
-                equidistantPoints.Add(currentPoint);
-                accumulatedLength = 0f;
+                float overshootRatio = (accumulatedLength - desiredSpacing) / segmentLength;
+                Vector3 newPoint = Vector3.Lerp(currentPoint, previousPoint, overshootRatio);
+                equidistantPoints.Add(newPoint);
+                accumulatedLength -= desiredSpacing;
             }
 
             previousPoint = currentPoint;
         }
 
-        // Ensure the last point is added
-        if (equidistantPoints.Count < numPoints)
-        {
-            equidistantPoints.Add(p2);
-        }
+        // Add the last point
+        equidistantPoints.Add(p2);
 
         return equidistantPoints.ToArray();
     }
