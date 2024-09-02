@@ -571,6 +571,7 @@ RectTransform:
   - {fileID: 866494481}
   - {fileID: 2131803834}
   - {fileID: 328561994}
+  - {fileID: 1595541202}
   m_Father: {fileID: 1998041330}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -952,6 +953,7 @@ MonoBehaviour:
   lobbyScreenChanger: {fileID: 288914910}
   connectToLobbyMenu: {fileID: 604468248}
   boardController: {fileID: 288914915}
+  handController: {fileID: 328561995}
 --- !u!4 &288914912
 Transform:
   m_ObjectHideFlags: 0
@@ -993,7 +995,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardOnFieldPrefab: {fileID: 7339549410264274588, guid: b432f849422aeb6489e20e0ad07e3efc, type: 3}
   cardPilePrefab: {fileID: 2028856195250915810, guid: 18a6aec22ff65694fb2f427ff3af66b8, type: 3}
-  cardImagePrefab: {fileID: 7682405528660092856, guid: 7c96ec919965a3a48b0ff8a20f51ac3a, type: 3}
+  cardImagePrefab: {fileID: 7885452660997004820, guid: 91a9fa0876aa64b4cb4fea151eca8f63, type: 3}
 --- !u!114 &288914915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,7 +1005,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 288914909}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9aab46b254bf9914288f36d440400944, type: 3}
+  m_Script: {fileID: 11500000, guid: 507fab7b10e3fdc4ba30390ebcc8ef42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   clientLibrary: {fileID: 1334361759}
@@ -1337,14 +1339,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 328561993}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c46357e96299fa499b2dcff5de5b5d7, type: 3}
+  m_Script: {fileID: 11500000, guid: ce44a833064df6b438a5d7ca5ffa0fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   leftHandLocation: {fileID: 910979231}
   middleHandLocation: {fileID: 866494481}
   rightHandLocation: {fileID: 2131803834}
-  zone: 0
   defaultHandSize: 7
+  handBox: {fileID: 1595541202}
 --- !u!1 &350843715
 GameObject:
   m_ObjectHideFlags: 0
@@ -2993,6 +2995,42 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 659655189}
   m_CullTransparentMesh: 1
+--- !u!1 &704578897
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 704578898}
+  m_Layer: 5
+  m_Name: DragHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &704578898
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704578897}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 890522702}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -3100,7 +3138,7 @@ GameObject:
   - component: {fileID: 714597894}
   - component: {fileID: 714597893}
   - component: {fileID: 714597896}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: exilePile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3973,7 +4011,7 @@ GameObject:
   - component: {fileID: 866494483}
   - component: {fileID: 866494482}
   m_Layer: 5
-  m_Name: middle
+  m_Name: centerOfHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4166,6 +4204,7 @@ GameObject:
   m_Component:
   - component: {fileID: 890522702}
   - component: {fileID: 890522703}
+  - component: {fileID: 890522704}
   m_Layer: 5
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -4186,6 +4225,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1998041330}
+  - {fileID: 704578898}
   m_Father: {fileID: 1701580862}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4213,6 +4253,20 @@ MonoBehaviour:
   clientHealth: {fileID: 1407428453}
   healthIncreaseBtn: {fileID: 756389826}
   healthDecreaseBtn: {fileID: 599900821}
+--- !u!114 &890522704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 890522701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cd4586e5e25d844b413c25c559bf24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventSystem: {fileID: 350843717}
+  dragParent: {fileID: 704578898}
 --- !u!1 &910979230
 GameObject:
   m_ObjectHideFlags: 0
@@ -4224,7 +4278,7 @@ GameObject:
   - component: {fileID: 910979231}
   - component: {fileID: 910979232}
   m_Layer: 5
-  m_Name: left
+  m_Name: leftHandEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4708,7 +4762,7 @@ GameObject:
   - component: {fileID: 1014707797}
   - component: {fileID: 1014707796}
   - component: {fileID: 1014707799}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: landField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5472,7 +5526,7 @@ GameObject:
   - component: {fileID: 1206787313}
   - component: {fileID: 1206787312}
   - component: {fileID: 1206787315}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: graveyardPile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6152,7 +6206,7 @@ GameObject:
   - component: {fileID: 1334361761}
   - component: {fileID: 1334361760}
   - component: {fileID: 1334361763}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: libraryPile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7679,6 +7733,82 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1561307208}
   m_CullTransparentMesh: 1
+--- !u!1 &1595541201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1595541202}
+  - component: {fileID: 1595541204}
+  - component: {fileID: 1595541203}
+  m_Layer: 5
+  m_Name: inHandBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1595541202
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595541201}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 188957982}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.25, y: 0}
+  m_AnchorMax: {x: 0.75, y: 0.14}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1595541203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595541201}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.3246647, g: 0.29872733, b: 0.46226418, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1595541204
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595541201}
+  m_CullTransparentMesh: 1
 --- !u!1 &1608888880
 GameObject:
   m_ObjectHideFlags: 0
@@ -8643,7 +8773,7 @@ GameObject:
   - component: {fileID: 1849784187}
   - component: {fileID: 1849784186}
   - component: {fileID: 1849784189}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: artifactField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8938,7 +9068,7 @@ GameObject:
   - component: {fileID: 1931724521}
   - component: {fileID: 1931724520}
   - component: {fileID: 1931724523}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: mainField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9884,7 +10014,7 @@ GameObject:
   - component: {fileID: 2131803834}
   - component: {fileID: 2131803835}
   m_Layer: 5
-  m_Name: right
+  m_Name: rightHandEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -14,6 +14,8 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private ScreenChanger lobbyScreenChanger;
     [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
     [SerializeField] private BoardController boardController;
+
+    public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
     private LobbyManager lobbyManager = new();
     private ServerConnectionManager serverListener;
@@ -97,6 +99,19 @@ public class GameOrchestrator : MonoBehaviour
     public string GetUUIDFromAttributeID(NetworkAttribute attribute)
     {
         return string.Join('-', attribute.Id.Split('-'), 0, 5);
+    }
+
+    public void MoveCard(CardZone zone, InsertCardData data)
+    {
+        Debug.Log($"Moving card to {zone}");
+        string uuid = lobbyManager.lobbyInfo.clientUUID;
+        CardContainerCollection collection = playtable.GetPlayer(uuid).GetCardContainer(zone);
+        collection.insertCardData.SetValue(data);
+    }
+
+    public void MouseInHandBox()
+    {
+
     }
 
     void Update()

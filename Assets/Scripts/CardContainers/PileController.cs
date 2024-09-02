@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Sanctum_Core;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -15,6 +16,7 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     private Vector3 nextCardPosition;
     private List<int> removedCardIds = new();
     List<Transform> cardTransforms = new();
+    private List<int> currentlyHeadCards = new();
     void Start()
     {
         extents = this.transform.GetComponent<MeshRenderer>().bounds.extents;
@@ -37,7 +39,7 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
 
         if (boardDescription.Count == 0 || boardDescription[0].Count == 0)
             return;
-
+        currentlyHeadCards = boardDescription[0];
         boardDescription[0].ForEach(InstantiateCardTopper);
         if (cardTransforms.Count != 0)
             PrepareTopCard(cardTransforms.Last(), boardDescription[0].Last());
@@ -98,4 +100,21 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
         this.zone = zone;
     }
 
+    public void AddCard(int cardId)
+    {
+        GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
+    }
+
+    public void RerenderContainer()
+    {
+        UpdateHolder(new List<List<int>>{currentlyHeadCards});
+    }
+
+    public void RemoveCard(int cardId)
+    {
+       if(currentlyHeadCards.Remove(cardId))
+       {
+            RerenderContainer();
+       }
+    }
 }

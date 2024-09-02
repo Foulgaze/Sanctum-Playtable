@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sanctum_Core;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,10 +11,14 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     [SerializeField] private Transform leftHandLocation;
     [SerializeField] private Transform middleHandLocation;
     [SerializeField] private Transform rightHandLocation;
-    public CardZone zone;
+    public readonly static float cardHeightToWidthRatio = 7f / 5f;
+    public int? currentHeldCardId {get; set;}= null;
+    private CardZone zone;
     public int defaultHandSize = 7;
-    private float percentageOfScreenForCardWidth = 0.1f;
+    private static float percentageOfScreenForCardWidth = 0.1f;
     private readonly List<Transform> cardTransforms = new();
+    [SerializeField] private RectTransform handBox;
+    private List<int> currentlyHeldCards = new();
     void Start()
     {
         
@@ -49,6 +54,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         }
 
         List<int> cardIds = boardDescription[0];
+        this.currentlyHeldCards = cardIds;
         int cardCount = cardIds.Count;
         int handSize = cardIds.Count % 2 == 0 && cardIds.Count < defaultHandSize ? defaultHandSize + 1 : defaultHandSize;
         int bezierPointCount = Math.Max(cardCount, handSize);
@@ -62,8 +68,14 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         for (int i = 0; i < cardCount; ++i, ++positionIndex)
         {
  
-            CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
+            Transform newCard = CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
+            cardTransforms.Add(newCard);
         }
+    }
+
+    public bool CardInHand(int cardId)
+    {
+        return this.currentlyHeldCards.Contains(cardId);
     }
 
     private void ClearExistingCards()
@@ -77,10 +89,10 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         return boardDescription.Count == 0 || boardDescription[0].Count == 0;
     }
 
-    private Vector2 CalculateCardDimensions()
+    public static Vector2 CalculateCardDimensions()
     {
         float cardWidth = Screen.width * percentageOfScreenForCardWidth;
-        return new Vector2(cardWidth, 7f / 5f * cardWidth);
+        return new Vector2(cardWidth, cardHeightToWidthRatio * cardWidth);
     }
 
     private Vector3[] GenerateCardPositions(int bezierPointCount)
@@ -101,7 +113,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         return middlePosition - cardCount / 2;
     }
 
-    private void CreateAndPositionCard(int cardId, Vector3 position, float rotation, Vector2 cardDimensions)
+    private Transform CreateAndPositionCard(int cardId, Vector3 position, float rotation, Vector2 cardDimensions)
     {
         Transform card = CardFactory.Instance.GetCardImage(cardId);
         card.GetComponent<RectTransform>().sizeDelta = cardDimensions;
@@ -110,6 +122,31 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         card.GetChild(0).GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
         card.rotation = Quaternion.Euler(0, 0, 90 - rotation);
         card.GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
-        cardTransforms.Add(card);
+        return card;
+    }
+
+    
+
+    public void AddCard(int cardId)
+    {
+        GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
+    }
+
+    public bool MouseInHand()
+    {
+        return RectTransformUtility.RectangleContainsScreenPoint(handBox, Input.mousePosition);
+    }
+
+    public void RerenderContainer()
+    {
+        UpdateHolder(new List<List<int>>(){currentlyHeldCards});
+    }
+
+    public void RemoveCard(int cardId)
+    {
+        if(currentlyHeldCards.Remove(cardId))
+        {
+            RerenderContainer();
+        }
     }
 }

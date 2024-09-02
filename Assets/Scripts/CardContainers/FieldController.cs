@@ -13,6 +13,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     private float percentageOfCardAsSpacer = 0.25f;
     public int defaultCardCount = 0;
     private List<GameObject> cardsOnField = new();
+    private List<List<int>> currentlyHeldCards = new();
     
     void Start()
     {
@@ -40,6 +41,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
+        currentlyHeldCards = boardDescription;
         cardsOnField.ForEach(card => Destroy(card));
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
         float cardWidth = transform.lossyScale.x / (currentCardCount + (currentCardCount - 1) * percentageOfCardAsSpacer);
@@ -69,4 +71,28 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         }
     }
 
+    public void AddCard(int cardId)
+    {
+        GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
+    }
+
+    public void RerenderContainer()
+    {
+        UpdateHolder(this.currentlyHeldCards);
+    }
+
+    public void RemoveCard(int cardId)
+    {
+        for (int i = 0; i < currentlyHeldCards.Count; i++)
+        {
+            var innerList = currentlyHeldCards[i];
+            int index = innerList.IndexOf(cardId);
+            if (index != -1)
+            {
+                innerList.RemoveAt(index);
+                RerenderContainer();
+                return;
+            }
+        }
+    }
 }

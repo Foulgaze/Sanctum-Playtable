@@ -1,6 +1,5 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,82 +8,87 @@ using UnityEngine.UI;
 
 public class DragController : MonoBehaviour
 {
-    private Transform? currentDraggedObject;
-    private GraphicRaycaster raycaster;
+    private IDraggable? currentDragScript;
     private PointerEventData pointerEventData;
     [SerializeField] private EventSystem eventSystem;
+    [SerializeField] private Transform dragParent;
+    public static Vector2 screenDimensions;
     private Vector2 offset;
-    private int draggableMask;
 
     void Start()
     {
-        raycaster = GetComponent<GraphicRaycaster>();
+        screenDimensions = new Vector2(Screen.width, Screen.height);
         pointerEventData = new(eventSystem);
-        draggableMask = LayerMask.NameToLayer("Draggable");
     }
     public bool IsDragging()
     {
-        return currentDraggedObject != null;
+        return currentDragScript != null;
     }
 
-    private Transform? RaycastForUI()
+    private (GameObject?, IDraggable?) RaycastForUI()
     {
         List<RaycastResult> results = new List<RaycastResult>();
         pointerEventData = new PointerEventData(eventSystem);
         pointerEventData.position = Input.mousePosition;
-        raycaster.Raycast(pointerEventData, results);
+        eventSystem.RaycastAll(pointerEventData, results);
         if(results.Count == 0)
         {
-            return null;
+            UnityLogger.LogError("Could not find any raycast targets");
+            return (null,null);
         }
         
         results = results.OrderBy(result => result.distance).ThenByDescending(result => result.sortingOrder).ToList();
         RaycastResult hit = results[0];
-        Debug.Log($"{hit.gameObject.name}");
-        if(hit.gameObject.layer != draggableMask)
+        IDraggable dragScript = hit.gameObject.GetComponent<IDraggable>();
+        if(dragScript == null)
         {
-            return null;
-        }
-        
-        return hit.gameObject.transform;
+            UnityLogger.LogError($"Could not find drag script on {hit.gameObject.name}");
+        }        
+        return (hit.gameObject, dragScript);
     }
 
     private void CheckForStartDrag()
     {
         if(Input.GetMouseButtonDown((int)MouseButton.Left))
         {
-            Transform? hit = RaycastForUI();
-            if(hit == null)
+            (GameObject? dragObj , IDraggable? dragScript) = RaycastForUI();
+            if(dragScript == null)
             {
                 return;
             }
-            currentDraggedObject = hit;
-            offset = hit.position - Input.mousePosition;
+            currentDragScript = dragScript;
+            dragScript.StartDrag(dragParent);
         }
     }
     private void CheckForReleaseDrag()
     {
-        if(!IsDragging() || Input.GetMouseButton((int) MouseButton.Left))
+        if(Input.GetMouseButton((int) MouseButton.Left))
         {
             return;
         }
-        currentDraggedObject = null;
+        currentDragScript.Release();
+        currentDragScript = null;
     }
 
     void Update()
     {
         CheckForStartDrag();
-        CheckForReleaseDrag();
-        UpdateDragPosition();
+        if(IsDragging())
+        {
+            UpdateDragPosition();
+            CheckForReleaseDrag();
+        }
+        
     }
 
     private void UpdateDragPosition()
     {
-        if(!IsDragging())
-        {
-            return;
-        }
-        currentDraggedObject.position = (Vector2)Input.mousePosition + offset;
+        currentDragScript.UpdateDrag();
     }
-
+    public static Vector2 ClampNewPosition(Vector2 newPosition)
+    {
+        newPosition.x = Math.Clamp(newPosition.x, screenDimensions.x/-2, screenDimensions.x/2);
+        newPosition.y = Math.Clamp(newPosition.y, screenDimensions.y/-2, screenDimensions.y/2);
+        return newPosition;
+    }
 }

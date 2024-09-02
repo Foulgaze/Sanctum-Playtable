@@ -31,6 +31,7 @@ public class CardFactory : MonoBehaviour
 			return idToCardTransform[cardId];
 		}
 		Transform newCard = GameObject.Instantiate(cardOnFieldPrefab);
+		newCard.GetChild(0).GetChild(0).GetComponent<CardDrag>().cardId = cardId; // SIGH i hate doing getchild
 		Card card = GetCard(cardId);
 		SetupCardOnField(card, newCard);
 		return newCard;
@@ -57,6 +58,9 @@ public class CardFactory : MonoBehaviour
 		Card card = GetCard(cardId);
 
 		Transform newCardImage = Instantiate(cardImagePrefab);
+		newCardImage.GetComponent<CardDrag>().cardId = cardId;
+
+		newCardImage.name = cardId.ToString();
 		newCardImage.transform.position = new Vector3(1000,1000,1000);
 		SetupCardForHandOrPile(card, newCardImage);
 		// Pull new texture at some point
