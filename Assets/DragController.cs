@@ -12,12 +12,13 @@ public class DragController : MonoBehaviour
     private PointerEventData pointerEventData;
     [SerializeField] private EventSystem eventSystem;
     [SerializeField] private Transform dragParent;
-    public static Vector2 screenDimensions;
+    [SerializeField] private CanvasScaler scaler;
+    public static float scaleFactor;
     private Vector2 offset;
 
     void Start()
     {
-        screenDimensions = new Vector2(Screen.width, Screen.height);
+        scaleFactor = scaler.scaleFactor;
         pointerEventData = new(eventSystem);
     }
     public bool IsDragging()
@@ -33,7 +34,6 @@ public class DragController : MonoBehaviour
         eventSystem.RaycastAll(pointerEventData, results);
         if(results.Count == 0)
         {
-            UnityLogger.LogError("Could not find any raycast targets");
             return (null,null);
         }
         
@@ -42,7 +42,7 @@ public class DragController : MonoBehaviour
         IDraggable dragScript = hit.gameObject.GetComponent<IDraggable>();
         if(dragScript == null)
         {
-            UnityLogger.LogError($"Could not find drag script on {hit.gameObject.name}");
+            //UnityLogger.LogError($"Could not find drag script on {hit.gameObject.name}");
         }        
         return (hit.gameObject, dragScript);
     }
@@ -87,8 +87,8 @@ public class DragController : MonoBehaviour
     }
     public static Vector2 ClampNewPosition(Vector2 newPosition)
     {
-        newPosition.x = Math.Clamp(newPosition.x, screenDimensions.x/-2, screenDimensions.x/2);
-        newPosition.y = Math.Clamp(newPosition.y, screenDimensions.y/-2, screenDimensions.y/2);
+        // newPosition.x = Math.Clamp(newPosition.x, screenDimensions.x/-2, screenDimensions.x/2);
+        // newPosition.y = Math.Clamp(newPosition.y, screenDimensions.y/-2, screenDimensions.y/2);
         return newPosition;
     }
 }

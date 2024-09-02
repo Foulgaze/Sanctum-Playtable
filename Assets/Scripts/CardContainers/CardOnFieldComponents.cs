@@ -14,23 +14,25 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     public Image cardImage;
     public Transform tappedSymbol;
 
-    void Start()
+    public void Setup(Card card)
     {
-        card.isTapped.nonNetworkChange += Setup;
-        card.isFlipped.nonNetworkChange += Setup;
-        card.power.nonNetworkChange += Setup;
-        card.toughness.nonNetworkChange += Setup;
-        card.isUsingBackSide.nonNetworkChange += Setup;
+        this.card = card;
+        card.isTapped.nonNetworkChange += SetupAttributes;
+        card.isFlipped.nonNetworkChange += SetupAttributes;
+        card.power.nonNetworkChange += SetupAttributes;
+        card.toughness.nonNetworkChange += SetupAttributes;
+        card.isUsingBackSide.nonNetworkChange += SetupAttributes;
         enablePT = EnablePowerToughess();
-
+        SetupAttributes(null);
     }
 
     private bool EnablePowerToughess()
 	{
 		return card.CurrentInfo.power != string.Empty || card.CurrentInfo.toughness != string.Empty;
 	}
+    
 
-    public void Setup(NetworkAttribute _)
+    private void SetupAttributes(NetworkAttribute _)
     {
 		name.text = card.name.Value;
 		if(enablePT)
@@ -49,9 +51,11 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 
     public void TextureSelf(CardInfo info, Sprite sprite)
     {
-        if(info == card.CurrentInfo)
+        if(info.name == card.CurrentInfo.name)
         {
             cardImage.sprite = sprite;
+		    
+
         }
     }
 

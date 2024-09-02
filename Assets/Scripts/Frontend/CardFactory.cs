@@ -7,7 +7,6 @@ using UnityEngine;
 public class CardFactory : MonoBehaviour
 {
 	public static CardFactory Instance { get; private set; }
-	private Dictionary<int, Transform> idToCardTransform = new();
 	public Transform cardOnFieldPrefab;
 	public Transform cardPilePrefab;
 	public Transform cardImagePrefab;
@@ -26,16 +25,11 @@ public class CardFactory : MonoBehaviour
     }
 	public Transform GetCardOnField(int cardId)
 	{
-		if(idToCardTransform.ContainsKey(cardId))
-		{
-			return idToCardTransform[cardId];
-		}
 		Transform newCard = GameObject.Instantiate(cardOnFieldPrefab);
 		newCard.GetChild(0).GetChild(0).GetComponent<CardDrag>().cardId = cardId; // SIGH i hate doing getchild
 		Card card = GetCard(cardId);
 		CardOnFieldComponents components = newCard.GetComponent<CardOnFieldComponents>();
-		components.card = card;
-		components.Setup(null);
+		components.Setup(card);
 		return newCard;
 	}
 
@@ -53,10 +47,6 @@ public class CardFactory : MonoBehaviour
 
 	public Transform GetCardImage(int cardId)
 	{
-		if(idToCardTransform.ContainsKey(cardId))
-		{
-			return Instantiate(idToCardTransform[cardId]);
-		}
 		Card card = GetCard(cardId);
 		Debug.Log($"CARD - {card.name.Value}");
 		Transform newCardImage = Instantiate(cardImagePrefab);
@@ -67,7 +57,6 @@ public class CardFactory : MonoBehaviour
 		GenericCardComponents components = newCardImage.GetComponent<GenericCardComponents>();
 		components.Setup(card);
 		Debug.Log($"CARD - {components.card.name.Value}");
-		// Pull new texture at some point
-		return Instantiate(newCardImage);
+		return newCardImage;
 	}
 }

@@ -35,15 +35,17 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
         type.text = card.CurrentInfo.type;
         description.text = card.CurrentInfo.text;
         // cardImage.enabled = false;
-		// TextureController.Instance.TextureImage(this);
+        UnityLogger.Log("About to texture");
+		TextureController.Instance.TextureImage(this);
     }
 
     public void TextureSelf(CardInfo info, Sprite sprite)
     {
-        if(info == card.CurrentInfo)
+        if(info.name == card.CurrentInfo.name)
         {
+
             cardImage.sprite = sprite;
-            enabled = true;
+            cardImage.enabled = true;
         }
     }
 

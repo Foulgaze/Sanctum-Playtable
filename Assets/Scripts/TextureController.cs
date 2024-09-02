@@ -11,7 +11,7 @@ using Sanctum_Core;
 
 public class TextureController : MonoBehaviour
 {
-    public static TextureController Instance;
+    public static TextureController Instance { get; private set; }
     private float timer = 0;
     private float cooldownPeriod = 0.1f; // 10 miliseconds
     private Dictionary<string, Sprite> uuidToSprite = new();
@@ -53,7 +53,9 @@ public class TextureController : MonoBehaviour
         }
         else
         {
-            CardTexture newTexture = new(info, !card.isUsingBackSide.Value);
+            UnityLogger.Log($"Enqueing {info.name}");
+
+            CardTexture newTexture = new(info, card.isUsingBackSide.Value);
             newTexture.Enqueue(toBeTextured);
             uuidToTextureable[info.uuid] = newTexture;
             textureQueue.Enqueue(info.uuid);
@@ -72,6 +74,7 @@ public class TextureController : MonoBehaviour
     // TODO make multiple sources that images can be gathered from. 
     public IEnumerator GetSprite(CardInfo info, Queue<ITextureable> toBeTextured, bool usingBackSide)
     {
+        UnityLogger.Log("Getting sprite");
         string filepath = $"Assets/Resources/Textures/{info.uuid}.jpg";
         if (File.Exists(filepath))
         {
