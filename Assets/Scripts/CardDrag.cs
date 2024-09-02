@@ -72,6 +72,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, raycastLayermask))
 		{
 			UnityLogger.Log($"Found nothing to raycast too!");
+			// Test
 			return;
 		}
 		IPhysicalCardContainer? container = hit.transform.GetComponent<IPhysicalCardContainer>();
