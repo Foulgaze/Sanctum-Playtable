@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Sanctum_Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FieldController : MonoBehaviour, IPhysicalCardContainer
 {
@@ -14,11 +16,13 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     private float percentageOfCardAsSpacer = 0.25f;
     public int defaultCardCount = 0;
     private List<GameObject> cardsOnField = new();
-    private List<List<int>> currentlyHeldCards = new();
+    private List<List<int>> currentlyHeldCardContainers = new();
+    private int cardLayermask;
     
     void Start()
     {
         this.extents = GetComponent<MeshRenderer>().bounds.extents;
+        cardLayermask = 1 << LayerMask.NameToLayer("cardSection");
         
     }
     public CardZone GetZone()
@@ -43,7 +47,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
-        currentlyHeldCards = boardDescription;
+        currentlyHeldCardContainers = boardDescription;
         cardsOnField.ForEach(card => Destroy(card));
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
         float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount - 1) * percentageOfCardAsSpacer);
@@ -74,19 +78,62 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     public void AddCard(int cardId)
     {
-        GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
+        RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(cardLayermask);
+        InsertCardData insertCardData;
+        if(hit != null)
+        {
+            insertCardData = AddCardToExistingContainer(((RaycastHit)hit).transform);
+        }
+        else
+        {
+            insertCardData = AddCardToNewColumn(cardId);
+        }
+        GameOrchestrator.Instance.MoveCard(this.zone, insertCardData);
+    }
+
+    private InsertCardData AddCardToExistingContainer(Transform hitCard)
+    {
+        int cardId = hitCard.parent.GetComponent<CardOnFieldComponents>().card.Id;
+        for(int currentContainerIndex = 0; currentContainerIndex < currentlyHeldCardContainers.Count; ++currentContainerIndex)
+        {
+            List<int> currentCardColumn = currentlyHeldCardContainers[currentContainerIndex];
+            int cardIndex = currentCardColumn.IndexOf(cardId);
+            if(cardIndex != -1)
+            {
+                return new InsertCardData(insertPosition : currentContainerIndex, cardID: cardId, containerInsertPosition: null, createNewContainer: false);
+            }
+        }
+        UnityLogger.LogError($"Could not find card {cardId} in held cards");
+        return new InsertCardData(null, cardId, null, false);
+    }
+
+    private InsertCardData AddCardToNewColumn(int cardId)
+    {
+        RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(BoardController.cardContainerLayermask);
+		if(!hit.HasValue)
+		{
+            UnityLogger.LogError($"Can't find card container for card Id {cardId} ");
+			return new InsertCardData(null, cardId, null, false);
+		}
+        float hitXPosition = hit.Value.point.x;
+        int insertPosition = 0;
+        currentlyHeldCardContainers = currentlyHeldCardContainers.Where(container => container.Any()).ToList(); // Remove empty containers
+		for(; insertPosition < currentlyHeldCardContainers.Count; ++insertPosition)
+        {
+            float xPositionOfContainer = currentlyHeldCardContainers[insertPosition][0].
+        }
     }
 
     public void RerenderContainer()
     {
-        UpdateHolder(this.currentlyHeldCards);
+        UpdateHolder(this.currentlyHeldCardContainers);
     }
 
     public void RemoveCard(int cardId)
     {
-        for (int i = 0; i < currentlyHeldCards.Count; i++)
+        for (int i = 0; i < currentlyHeldCardContainers.Count; i++)
         {
-            var innerList = currentlyHeldCards[i];
+            var innerList = currentlyHeldCardContainers[i];
             int index = innerList.IndexOf(cardId);
             if (index != -1)
             {

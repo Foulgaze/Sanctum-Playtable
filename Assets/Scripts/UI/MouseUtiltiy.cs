@@ -40,4 +40,17 @@ public class MouseUtility : MonoBehaviour
 
         return localPoint;
     }
+
+    public RaycastHit? RaycastFromMouse(int layermask)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+
+		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, layermask))
+		{
+			return null;
+		}
+		return hit;
+    }
+    
 }
