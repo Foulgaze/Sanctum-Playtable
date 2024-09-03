@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Sanctum_Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardFactory : MonoBehaviour
 {
@@ -23,10 +24,15 @@ public class CardFactory : MonoBehaviour
             Instance = this; 
         } 
     }
-	public Transform GetCardOnField(int cardId)
+	public Transform GetCardOnField(int cardId, bool isOpponentCard)
 	{
 		Transform newCard = GameObject.Instantiate(cardOnFieldPrefab);
-		newCard.GetChild(0).GetChild(0).GetComponent<CardDrag>().cardId = cardId; // SIGH i hate doing getchild
+		Transform cardImage = newCard.GetChild(0).GetChild(0); // SIGH i hate doing getchild
+		cardImage.GetComponent<CardDrag>().cardId = cardId;
+		if(isOpponentCard)
+		{
+			cardImage.GetComponent<Image>().raycastTarget = false;
+		}
 		Card card = GetCard(cardId);
 		CardOnFieldComponents components = newCard.GetComponent<CardOnFieldComponents>();
 		components.Setup(card);
@@ -45,18 +51,20 @@ public class CardFactory : MonoBehaviour
 		return card;
 	}
 
-	public Transform GetCardImage(int cardId)
+	public Transform GetCardImage(int cardId, bool isOpponentCard)
 	{
 		Card card = GetCard(cardId);
-		Debug.Log($"CARD - {card.name.Value}");
 		Transform newCardImage = Instantiate(cardImagePrefab);
 		newCardImage.GetComponent<CardDrag>().cardId = cardId;
+		if(isOpponentCard)
+		{
+			newCardImage.GetComponent<Image>().raycastTarget = false;
+		}
 
 		newCardImage.name = cardId.ToString();
 		newCardImage.transform.position = new Vector3(1000,1000,1000);
 		GenericCardComponents components = newCardImage.GetComponent<GenericCardComponents>();
 		components.Setup(card);
-		Debug.Log($"CARD - {components.card.name.Value}");
 		return newCardImage;
 	}
 }

@@ -11,6 +11,7 @@ using UnityEngine;
 public class PileController : MonoBehaviour, IPhysicalCardContainer
 {
     private CardZone zone;
+    public bool isOpponent;
     private Vector3 extents;
     private Vector3 cardTopperExtents;
     private Vector3 nextCardPosition;
@@ -58,7 +59,6 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
         cardTopper.localScale = new Vector3(extents.x * 2, cardTopperExtents.y, extents.z * 2);
         cardTopper.position = GetNextCardPosition();
         cardTopper.SetParent(transform);
-        cardTopper.rotation = transform.parent.rotation;
         cardTransforms.Add(cardTopper);
     }
 
@@ -69,15 +69,11 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     }
     private void PrepareTopCard(Transform createdCard, int cardId)
     {
-        UnityLogger.Log("Preparing top card");
-        Transform cardImage = CardFactory.Instance.GetCardImage(cardId);
+        Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponent);
         Transform canvas = createdCard.GetChild(0);
-        UnityLogger.Log($"Canvas name - {canvas.name}");
 
         canvas.gameObject.SetActive(true); // Enable canvas
         cardImage.SetParent(canvas);
-        UnityLogger.Log($"Parent is - {cardImage.parent.name}");
-
         cardImage.position = Vector3.zero;
         PrepareTopCardImage(cardImage);
     }
@@ -99,9 +95,10 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
         return this.zone;
     }
 
-    public void SetZone(CardZone zone)
+    public void Setup(CardZone zone, bool isOpponent)
     {
         this.zone = zone;
+        this.isOpponent = isOpponent;
     }
 
     public void AddCard(int cardId)

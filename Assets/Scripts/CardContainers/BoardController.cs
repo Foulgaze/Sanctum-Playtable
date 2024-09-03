@@ -44,15 +44,15 @@ public class BoardController : MonoBehaviour
             {CardZone.LeftField , opponentLeftField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.RightField , opponentRightField.GetComponent<IPhysicalCardContainer>()},
         };
-        SetupZones(clientZoneToCardContainer);
-        SetupZones(opponentZoneToCardContainer);
+        SetupZones(clientZoneToCardContainer, isOpponent : false);
+        SetupZones(opponentZoneToCardContainer, isOpponent : true);
     }
 
-    private void SetupZones(  Dictionary<CardZone, IPhysicalCardContainer> zoneToContainer)
+    private void SetupZones(  Dictionary<CardZone, IPhysicalCardContainer> zoneToContainer, bool isOpponent)
     {
         foreach (var (zone, container) in zoneToContainer)
         {
-            container.SetZone(zone);
+            container.Setup(zone,isOpponent);
         }
     }
 
