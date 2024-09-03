@@ -20,7 +20,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	public void StartDrag(Transform dragParent)
     {
         GameOrchestrator.Instance.handController.currentHeldCardId = cardId;
-		Transform cardImage = CardFactory.Instance.GetCardImage(cardId);
+		Transform cardImage = CardFactory.Instance.GetCardImage(cardId, false);
 		draggableRect = cardImage.GetComponent<RectTransform>();
 		draggableRect.transform.SetParent(dragParent);
 		SetupDraggedCard(draggableRect);

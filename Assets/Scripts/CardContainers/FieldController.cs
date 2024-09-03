@@ -7,6 +7,7 @@ using UnityEngine;
 public class FieldController : MonoBehaviour, IPhysicalCardContainer
 {
     private CardZone zone;
+    private bool isOpponent;
     private Vector3 extents;
     private static float widthToHeightRatio = 4/3f;
     private static int maxColumnCount = 3;
@@ -34,9 +35,10 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         UpdateHolder(((NetworkAttribute<List<List<int>>>)attribute).Value);
     }
 
-    public void SetZone(CardZone zone)
+    public void Setup(CardZone zone, bool isOpponent)
     {
         this.zone = zone;
+        this.isOpponent = isOpponent;
     }
 
     public void UpdateHolder(List<List<int>> boardDescription)
@@ -61,13 +63,11 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         float offsetZ = 0.1f * (cardWidth * 1/widthToHeightRatio);
         foreach(int cardId in cardColumn)
         {
-            Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId);
+            Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId, isOpponent);
             cardsOnField.Add(onFieldCard.gameObject);
             onFieldCard.localScale = new Vector3(cardWidth, onFieldCard.localScale.y, cardWidth * 1/widthToHeightRatio);
             onFieldCard.position = centerPosition;
             onFieldCard.SetParent(transform);
-            onFieldCard.rotation = transform.parent.rotation;
-
             centerPosition += new Vector3(offsetX, onFieldCard.localScale.y,-offsetZ);
         }
     }

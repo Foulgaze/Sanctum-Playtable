@@ -103,7 +103,6 @@ public class GameOrchestrator : MonoBehaviour
 
     public void MoveCard(CardZone zone, InsertCardData data)
     {
-        Debug.Log($"Moving card to {zone}");
         string uuid = lobbyManager.lobbyInfo.clientUUID;
         CardContainerCollection collection = playtable.GetPlayer(uuid).GetCardContainer(zone);
         collection.insertCardData.SetValue(data);

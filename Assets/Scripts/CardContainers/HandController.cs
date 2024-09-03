@@ -29,7 +29,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         return this.zone;
     }
 
-    public void SetZone(CardZone zone)
+    public void Setup(CardZone zone, bool _)
     {
         this.zone = zone;
     }
@@ -115,7 +115,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
 
     private Transform CreateAndPositionCard(int cardId, Vector3 position, float rotation, Vector2 cardDimensions)
     {
-        Transform card = CardFactory.Instance.GetCardImage(cardId);
+        Transform card = CardFactory.Instance.GetCardImage(cardId,false);
         card.GetComponent<RectTransform>().sizeDelta = cardDimensions;
         card.SetParent(transform);
         card.position = position;
