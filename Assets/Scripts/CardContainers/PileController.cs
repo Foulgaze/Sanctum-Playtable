@@ -69,11 +69,15 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     }
     private void PrepareTopCard(Transform createdCard, int cardId)
     {
+        UnityLogger.Log("Preparing top card");
         Transform cardImage = CardFactory.Instance.GetCardImage(cardId);
         Transform canvas = createdCard.GetChild(0);
+        UnityLogger.Log($"Canvas name - {canvas.name}");
 
         canvas.gameObject.SetActive(true); // Enable canvas
         cardImage.SetParent(canvas);
+        UnityLogger.Log($"Parent is - {cardImage.parent.name}");
+
         cardImage.position = Vector3.zero;
         PrepareTopCardImage(cardImage);
     }

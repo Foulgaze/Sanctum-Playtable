@@ -44,9 +44,10 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         currentlyHeldCards = boardDescription;
         cardsOnField.ForEach(card => Destroy(card));
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
-        float cardWidth = transform.lossyScale.x / (currentCardCount + (currentCardCount - 1) * percentageOfCardAsSpacer);
+        float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount - 1) * percentageOfCardAsSpacer);
         float totalWidth = (cardWidth * boardDescription.Count) + (cardWidth * percentageOfCardAsSpacer * (boardDescription.Count - 1));
         Vector3 iterPosition = transform.position + new Vector3(-totalWidth / 2 + cardWidth / 2, this.extents.y, 0);
+        UnityLogger.Log($"Card Width - {cardWidth}");
         foreach(List<int> cardColumn in boardDescription)
         {
             this.RenderCardColumn(cardColumn, cardWidth, iterPosition);

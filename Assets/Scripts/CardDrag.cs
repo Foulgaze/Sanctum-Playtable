@@ -31,14 +31,14 @@ public class CardDrag : MonoBehaviour, IDraggable
 	{
 		if(GameOrchestrator.Instance.handController.CardInHand(cardId)) // In hand
 		{
-			UnityLogger.Log("Picking up from hand");
-			return rect.anchoredPosition - ((Vector2)Input.mousePosition - new Vector2(Screen.width, Screen.height)/2);
+			return rect.anchoredPosition -  MouseUtility.Instance.GetMousePositionOnCanvas();
 		}
+		draggableRect.anchoredPosition =  MouseUtility.Instance.GetMousePositionOnCanvas();
 		return Vector2.zero;
 	}
 	public void UpdateDrag()
 	{
-		draggableRect.anchoredPosition = DragController.ClampNewPosition((Vector2)Input.mousePosition + offset - DragController.screenDimensions/2);
+		draggableRect.anchoredPosition = MouseUtility.Instance.GetMousePositionOnCanvas() + offset;
 	}
 
 	private void SetupDraggedCard(RectTransform rectToSetup)
@@ -72,6 +72,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, raycastLayermask))
 		{
 			UnityLogger.Log($"Found nothing to raycast too!");
+			// Test
 			return;
 		}
 		IPhysicalCardContainer? container = hit.transform.GetComponent<IPhysicalCardContainer>();
