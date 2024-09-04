@@ -23,8 +23,13 @@ public class BoardController : MonoBehaviour
 
     Dictionary<CardZone, IPhysicalCardContainer> clientZoneToCardContainer;
     Dictionary<CardZone, IPhysicalCardContainer> opponentZoneToCardContainer;
+
+	public static int cardContainerLayermask;
+
     void Start()
     {
+		cardContainerLayermask = 1 << LayerMask.NameToLayer("CardContainer");
+
         clientZoneToCardContainer = new()
         {
             {CardZone.Library , clientLibrary.GetComponent<IPhysicalCardContainer>()},

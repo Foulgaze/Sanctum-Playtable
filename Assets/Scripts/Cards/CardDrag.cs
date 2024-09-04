@@ -8,13 +8,11 @@ public class CardDrag : MonoBehaviour, IDraggable
 	public int cardId;
 	private RectTransform rect;
 	private RectTransform draggableRect;
-	private int raycastLayermask;
 	private Vector2 offset;
 
 	void Start()
 	{
 		rect = GetComponent<RectTransform>();
-		raycastLayermask = 1 << LayerMask.NameToLayer("CardContainer");
 	}
 
 	public void StartDrag(Transform dragParent)
@@ -66,20 +64,16 @@ public class CardDrag : MonoBehaviour, IDraggable
 			return;
 		}
 
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		RaycastHit hit;
-
-		if (!Physics.Raycast(ray, out hit, Mathf.Infinity, raycastLayermask))
+		RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(BoardController.cardContainerLayermask);
+		if(!hit.HasValue)
 		{
-			UnityLogger.Log($"Found nothing to raycast too!");
-			// Test
 			return;
 		}
-		IPhysicalCardContainer? container = hit.transform.GetComponent<IPhysicalCardContainer>();
+		IPhysicalCardContainer? container = hit.Value.transform.GetComponent<IPhysicalCardContainer>();
 		if(container == null)
 		{
 			
-			UnityLogger.LogError($"Unable to find container script on object - {hit.transform.name} - {hit.transform.gameObject.layer} - {raycastLayermask}");
+			UnityLogger.LogError($"Unable to find container script on object - {hit.Value.transform.name}");
 			GameOrchestrator.Instance.handController.AddCard(cardId); // Add to hand if breaks :)
 			return;
 		}
