@@ -12,10 +12,9 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     private bool isOpponent;
     private Vector3 extents;
     private static float widthToHeightRatio = 4/3f;
-    private static int maxColumnCount = 3;
     private float percentageOfCardAsSpacer = 0.25f;
     public int defaultCardCount = 0;
-    private List<GameObject> cardsOnField = new();
+    private Dictionary<int, GameObject> idToCardOnField = new();
     private List<List<int>> currentlyHeldCardContainers = new();
     private int cardLayermask;
     
@@ -48,16 +47,21 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     public void UpdateHolder(List<List<int>> boardDescription)
     {
         currentlyHeldCardContainers = boardDescription;
-        cardsOnField.ForEach(card => Destroy(card));
+        idToCardOnField.Values.ToList().ForEach(card => Destroy(card));
+        idToCardOnField.Clear();
+
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
-        float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount - 1) * percentageOfCardAsSpacer);
-        float totalWidth = (cardWidth * boardDescription.Count) + (cardWidth * percentageOfCardAsSpacer * (boardDescription.Count - 1));
-        Vector3 iterPosition = transform.position + new Vector3(-totalWidth / 2 + cardWidth / 2, this.extents.y, 0);
+        float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount + 1) * percentageOfCardAsSpacer);
+        float spacerWidth = cardWidth * percentageOfCardAsSpacer;
+        float totalWidth = (cardWidth * boardDescription.Count) + (spacerWidth * (boardDescription.Count + 1));
+
+        Vector3 iterPosition = transform.position + new Vector3(-totalWidth / 2 + spacerWidth + cardWidth / 2, this.extents.y, 0);
         UnityLogger.Log($"Card Width - {cardWidth}");
+
         foreach(List<int> cardColumn in boardDescription)
         {
             this.RenderCardColumn(cardColumn, cardWidth, iterPosition);
-            iterPosition += new Vector3(cardWidth + cardWidth * percentageOfCardAsSpacer, 0, 0);
+            iterPosition += new Vector3(cardWidth + spacerWidth, 0, 0);
         }
     }
 
@@ -68,7 +72,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         foreach(int cardId in cardColumn)
         {
             Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId, isOpponent);
-            cardsOnField.Add(onFieldCard.gameObject);
+            idToCardOnField[cardId] = onFieldCard.gameObject;
             onFieldCard.localScale = new Vector3(cardWidth, onFieldCard.localScale.y, cardWidth * 1/widthToHeightRatio);
             onFieldCard.position = centerPosition;
             onFieldCard.SetParent(transform);
@@ -79,35 +83,43 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     public void AddCard(int cardId)
     {
         RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(cardLayermask);
-        InsertCardData insertCardData;
+        InsertCardData? insertCardData;
         if(hit != null)
         {
-            insertCardData = AddCardToExistingContainer(((RaycastHit)hit).transform);
+            insertCardData = AddCardToExistingContainer(((RaycastHit)hit).transform, cardId);
         }
         else
         {
             insertCardData = AddCardToNewColumn(cardId);
         }
+        if(insertCardData == null)
+        {
+            return;
+        }
         GameOrchestrator.Instance.MoveCard(this.zone, insertCardData);
     }
 
-    private InsertCardData AddCardToExistingContainer(Transform hitCard)
+    private InsertCardData? AddCardToExistingContainer(Transform hitCard, int cardId)
     {
-        int cardId = hitCard.parent.GetComponent<CardOnFieldComponents>().card.Id;
+        int hitCardId = hitCard.parent.GetComponent<CardOnFieldComponents>().card.Id;
+        if(hitCardId == cardId)
+        {
+            return null;
+        }
         for(int currentContainerIndex = 0; currentContainerIndex < currentlyHeldCardContainers.Count; ++currentContainerIndex)
         {
             List<int> currentCardColumn = currentlyHeldCardContainers[currentContainerIndex];
-            int cardIndex = currentCardColumn.IndexOf(cardId);
+            int cardIndex = currentCardColumn.IndexOf(hitCardId);
             if(cardIndex != -1)
             {
                 return new InsertCardData(insertPosition : currentContainerIndex, cardID: cardId, containerInsertPosition: null, createNewContainer: false);
             }
         }
-        UnityLogger.LogError($"Could not find card {cardId} in held cards");
-        return new InsertCardData(null, cardId, null, false);
+        UnityLogger.LogError($"Could not find card {hitCardId} in held cards");
+        return new InsertCardData(null, hitCardId, null, false);
     }
 
-    private InsertCardData AddCardToNewColumn(int cardId)
+    private InsertCardData? AddCardToNewColumn(int cardId)
     {
         RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(BoardController.cardContainerLayermask);
 		if(!hit.HasValue)
@@ -120,8 +132,14 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         currentlyHeldCardContainers = currentlyHeldCardContainers.Where(container => container.Any()).ToList(); // Remove empty containers
 		for(; insertPosition < currentlyHeldCardContainers.Count; ++insertPosition)
         {
-            float xPositionOfContainer = currentlyHeldCardContainers[insertPosition][0].
+            float xPositionOfContainer = idToCardOnField[currentlyHeldCardContainers[insertPosition][0]].transform.position.x; 
+            if(xPositionOfContainer > hitXPosition)
+            {
+                break;
+            }
         }
+        return new InsertCardData(insertPosition, cardId, null, true);
+
     }
 
     public void RerenderContainer()
