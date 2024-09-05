@@ -62,6 +62,7 @@ public class GameOrchestrator : MonoBehaviour
         this.connectToLobbyMenu.createLobby += this.lobbyManager.CreateLobby;
         this.serverListener.onNetworkCommandReceived[NetworkInstruction.JoinLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
         this.serverListener.onNetworkCommandReceived[NetworkInstruction.CreateLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
+        this.rightClickMenuController.networkCommand += (instruction, payload) => this.serverListener.SendMessage(instruction,payload);
     }
 
     public void OnLobbyFilled(LobbyInfo info,  Dictionary<string, string> players)

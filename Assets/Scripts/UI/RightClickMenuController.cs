@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sanctum_Core;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,9 +11,12 @@ public class RightClickMenuController : MonoBehaviour
 {
     
     [SerializeField] private RectTransform rightClickMenuButtonHolder;
-    [SerializeField] private SingleIntInputField singleIntInputField;
+    [SerializeField] private SingleIntInputField singleIntInputFieldPrefab;
+    [SerializeField] private Transform mainGameplayScreen;
     [SerializeField] private Button buttonPrefab;
     public event Action<NetworkInstruction, string> networkCommand = delegate{};
+    public float widthAsAPercentageOfSceen = 0.1f;
+    public float heightAsAPercentageOfSceen = 0.1f;
 
     private int cardHolderMask;
     
@@ -65,40 +69,59 @@ public class RightClickMenuController : MonoBehaviour
 
     private void SetupSingleIntInput(string name, Action submitBtnAction, string submitBtnName)
     {
-
+        SingleIntInputField singleIntInputField = Instantiate(singleIntInputFieldPrefab,mainGameplayScreen);
+        singleIntInputField.Setup(name, submitBtnName);
+        singleIntInputField.submitBtn.onClick.AddListener(() => submitBtnAction());
+        singleIntInputField.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+    }
+    private Button CreateBtn(string buttonText)
+    {
+        Button button = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = buttonText;
+        return button;
     }
 
     private void CreateLibraryMenu()
     {
         CleanupRightClickMenu();
-        Button drawCardBtn = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button drawCardBtn = CreateBtn("Draw Card");
         drawCardBtn.onClick.AddListener(() => {networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|1"); CleanupRightClickMenu();});
-        Button multipleDrawBtn = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button multipleDrawBtn = CreateBtn("Draw Cards");
         Action drawCards = () => 
         {
-            if(string.IsNullOrEmpty(singleIntInputField.input.text))
+            if(string.IsNullOrEmpty(singleIntInputFieldPrefab.input.text))
             {
                 return;
             }
-            networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|{int.Parse(singleIntInputField.input.text)}");
+            networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|{int.Parse(singleIntInputFieldPrefab.input.text)}");
         };
         multipleDrawBtn.onClick.AddListener(() => SetupSingleIntInput("Draw Cards",drawCards ,"Draw"));
-        Button shuffle = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
-        shuffle.onClick.AddListener(() => {networkCommand(NetworkInstruction.NetworkAttribute, ((int)SpecialAction.Shuffle).ToString());});
-        Button viewLibrary = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button shuffle = CreateBtn("Shuffle");
+        shuffle.onClick.AddListener(() => {networkCommand(NetworkInstruction.NetworkAttribute, $"{(int)SpecialAction.Shuffle}|");});
+        Button viewLibrary = CreateBtn("View Library");
         // To Do
-        Button viewTopCards = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button viewTopCards = CreateBtn("View Top Cards");
         // To Do
-        Button revealLibraryTo = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button revealLibraryTo = CreateBtn("Reveal Library");
         // To Do
-        Button revealTopCardsTo = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button revealTopCardsTo = CreateBtn("Reveal Top Cards");
         // To Do
-        Button alwaysRevealTopCard = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button alwaysRevealTopCard = CreateBtn("Flip Top Card");
         // To Do
-        Button mill = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button mill = CreateBtn("Mill");
         // To Do
-        Button exile = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
+        Button exile = CreateBtn("Exile");
         // To Do
+
+        SetupRightClickMenu(10);
+    }
+
+    private void SetupRightClickMenu(int buttonCount)
+    {
+        Vector2 boxDimensions = new Vector2(Screen.width*widthAsAPercentageOfSceen,Screen.height*heightAsAPercentageOfSceen*buttonCount );
+        rightClickMenuButtonHolder.sizeDelta = boxDimensions;
+        rightClickMenuButtonHolder.anchoredPosition = MouseUtility.Instance.GetMousePositionOnCanvas() + boxDimensions/2;
+        rightClickMenuButtonHolder.gameObject.SetActive(true);
 
     }
     private void CreateExileMenu()
