@@ -15,7 +15,18 @@ public class DragController : MonoBehaviour
     [SerializeField] private CanvasScaler scaler;
     public static float scaleFactor;
     private Vector2 offset;
-
+    public static DragController Instance;
+    private void Awake() 
+    {         
+        if (Instance != null && Instance != this) 
+        { 
+            Destroy(this); 
+        } 
+        else 
+        { 
+            Instance = this; 
+        } 
+    }
     void Start()
     {
         scaleFactor = scaler.scaleFactor;

@@ -14,6 +14,7 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private ScreenChanger lobbyScreenChanger;
     [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
     [SerializeField] private BoardController boardController;
+    [SerializeField] private RightClickMenuController rightClickMenuController; 
 
     public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
