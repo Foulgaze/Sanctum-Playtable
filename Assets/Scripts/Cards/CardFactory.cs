@@ -12,6 +12,7 @@ public class CardFactory : MonoBehaviour
 	public Transform cardPilePrefab;
 	public Transform cardImagePrefab;
 	public Playtable playtable;
+	public readonly Dictionary<string, Sprite> fileNameToSprite = new();
 	
 	private void Awake() 
     {         
@@ -24,6 +25,15 @@ public class CardFactory : MonoBehaviour
             Instance = this; 
         } 
     }
+
+	void Start()
+	{
+		Sprite[] sprites = Resources.LoadAll<Sprite>("Colors");
+		foreach(Sprite sprite in sprites)
+		{
+			fileNameToSprite[sprite.name] = sprite;
+		}
+	}
 	public Transform GetCardOnField(int cardId, bool isOpponentCard)
 	{
 		Transform newCard = GameObject.Instantiate(cardOnFieldPrefab);
