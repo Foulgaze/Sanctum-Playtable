@@ -56,7 +56,6 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         float totalWidth = (cardWidth * boardDescription.Count) + (spacerWidth * (boardDescription.Count + 1));
 
         Vector3 iterPosition = transform.position + new Vector3(-totalWidth / 2 + spacerWidth + cardWidth / 2, this.extents.y, 0);
-        UnityLogger.Log($"Card Width - {cardWidth}");
 
         foreach(List<int> cardColumn in boardDescription)
         {
