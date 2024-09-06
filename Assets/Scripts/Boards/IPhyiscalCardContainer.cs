@@ -11,4 +11,8 @@ public interface IPhysicalCardContainer
     public void AddCard(int cardId);
     public void RerenderContainer();
     public void RemoveCard(int cardId);
+    public void FlipTopCard(NetworkAttribute value);
+    public bool RevealTopCard();
+
+
 }

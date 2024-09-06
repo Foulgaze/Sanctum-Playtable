@@ -61,7 +61,7 @@ public class CardFactory : MonoBehaviour
 		return card;
 	}
 
-	public Transform GetCardImage(int cardId, bool isOpponentCard)
+	public Transform GetCardImage(int cardId, bool isOpponentCard, bool renderCardBack = false)
 	{
 		Card card = GetCard(cardId);
 		Transform newCardImage = Instantiate(cardImagePrefab);
@@ -74,7 +74,7 @@ public class CardFactory : MonoBehaviour
 		newCardImage.name = cardId.ToString();
 		newCardImage.transform.position = new Vector3(1000,1000,1000);
 		GenericCardComponents components = newCardImage.GetComponent<GenericCardComponents>();
-		components.Setup(card);
+		components.Setup(card, renderCardBack);
 		return newCardImage;
 	}
 }

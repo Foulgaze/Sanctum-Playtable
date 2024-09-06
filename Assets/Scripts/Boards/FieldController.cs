@@ -160,4 +160,15 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
             }
         }
     }
+
+    public void FlipTopCard(NetworkAttribute value)
+    {
+        UnityLogger.LogError("Trying to flip top card of field");
+        return;
+    }
+
+    public bool RevealTopCard()
+    {
+        return true;
+    }
 }

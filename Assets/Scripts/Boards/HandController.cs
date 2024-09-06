@@ -149,4 +149,14 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
             RerenderContainer();
         }
     }
+
+    public void FlipTopCard(NetworkAttribute value)
+    {
+        UnityLogger.LogError("Trying to flip top card of hand");
+        return;
+    }
+    public bool RevealTopCard()
+    {
+        return true;
+    }
 }

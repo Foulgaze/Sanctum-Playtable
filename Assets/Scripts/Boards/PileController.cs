@@ -18,6 +18,8 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     private List<int> removedCardIds = new();
     List<Transform> cardTransforms = new();
     private List<int> currentlyHeadCards = new();
+
+    public bool revealTopCard = true;
     void Start()
     {
         extents = this.transform.GetComponent<MeshRenderer>().bounds.extents;
@@ -69,7 +71,7 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     }
     private void PrepareTopCard(Transform createdCard, int cardId)
     {
-        Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponent);
+        Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponent, renderCardBack : !revealTopCard);
         Transform canvas = createdCard.GetChild(0);
 
         canvas.gameObject.SetActive(true); // Enable canvas
@@ -88,6 +90,8 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
         imageRect.offsetMax = Vector2.zero;
         imageRect.localEulerAngles = Vector3.zero;
         imageRect.anchoredPosition3D = Vector3.zero;
+
+        cardImage.GetComponent<CardDrag>().renderCardBack = !revealTopCard;
     }
 
     public CardZone GetZone()
@@ -117,5 +121,16 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
        {
             RerenderContainer();
        }
+    }
+
+    public void FlipTopCard(NetworkAttribute attribute)
+    {
+        revealTopCard = ((NetworkAttribute<bool>)attribute).Value;
+        RerenderContainer();
+    }
+
+    public bool RevealTopCard()
+    {
+        return revealTopCard;
     }
 }

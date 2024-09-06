@@ -45,12 +45,12 @@ public class DragController : MonoBehaviour
         pointerEventData = new PointerEventData(eventSystem);
         pointerEventData.position = Input.mousePosition;
         eventSystem.RaycastAll(pointerEventData, results);
+        results = results.Where(result => result.gameObject.layer != ignoreLayer).OrderBy(result => result.distance).ThenByDescending(result => result.sortingOrder).ToList();
         if(results.Count == 0)
         {
             return (null,null);
         }
         
-        results = results.Where(result => result.gameObject.layer != ignoreLayer).OrderBy(result => result.distance).ThenByDescending(result => result.sortingOrder).ToList();
         RaycastResult hit = results[0];
         IDraggable dragScript = hit.gameObject.GetComponent<IDraggable>();
         if(dragScript == null)

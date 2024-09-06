@@ -1513,6 +1513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee2f26ec2a98e4448b6ce1f3a1078c1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardBack: {fileID: 21300000, guid: b749fdcb146c05e40be905c39b2d2131, type: 3}
 --- !u!114 &288914917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3937,6 +3938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpponent: 0
+  revealTopCard: 0
 --- !u!1 &654017119
 GameObject:
   m_ObjectHideFlags: 0
@@ -4421,6 +4423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpponent: 0
+  revealTopCard: 1
 --- !u!1 &721822113
 GameObject:
   m_ObjectHideFlags: 0
@@ -8171,6 +8174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpponent: 0
+  revealTopCard: 1
 --- !u!1 &1225395323
 GameObject:
   m_ObjectHideFlags: 0
@@ -8332,6 +8336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpponent: 0
+  revealTopCard: 1
 --- !u!1 &1237686446
 GameObject:
   m_ObjectHideFlags: 0
@@ -8873,6 +8878,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpponent: 0
+  revealTopCard: 0
 --- !u!4 &1336677156 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6239969156481072347, guid: b71b0f8d2f881c743a85228f3030d1cb, type: 3}
@@ -14417,6 +14423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpponent: 0
+  revealTopCard: 1
 --- !u!1 &2131803833
 GameObject:
   m_ObjectHideFlags: 0

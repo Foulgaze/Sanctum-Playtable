@@ -115,6 +115,12 @@ public class GameOrchestrator : MonoBehaviour
         rightClickMenuController.DisableRightClickMenu();
     }
 
+    public void FlipLibraryTop()
+    {
+        CardContainerCollection collection = playtable.GetPlayer(lobbyManager.lobbyInfo.clientUUID).GetCardContainer(CardZone.Library);
+        collection.revealTopCard.SetValue(!collection.revealTopCard.Value);
+    }
+
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.G))

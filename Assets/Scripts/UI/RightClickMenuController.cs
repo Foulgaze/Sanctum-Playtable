@@ -116,7 +116,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("View Top Cards", () => {} ),
             CreateBtn("Reveal To", () => {} ),
             CreateBtn("Reveal Top Cards To", () => {} ),
-            CreateBtn("Flip Top Card", () => {} ),
+            CreateBtn("Flip Top Card", () => {GameOrchestrator.Instance.FlipLibraryTop();} ),
             CreateBtn("Mill Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Mill, input), "Mill" )),
             CreateBtn("Exile Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Exile, input), "Mill" )),
         };

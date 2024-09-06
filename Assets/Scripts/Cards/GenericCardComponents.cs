@@ -14,6 +14,7 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
     public TextMeshProUGUI type;
     public TextMeshProUGUI description;
     public Image cardImage;
+    public bool renderCardBack = false;
 
     void Start()
     {
@@ -21,9 +22,10 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
         // card.isUsingBackSide.nonNetworkChange += Setup;
     }
 
-    public void Setup(Card card)
+    public void Setup(Card card, bool renderCardBack)
     {
         this.card = card;
+        this.renderCardBack = renderCardBack;
         card.isUsingBackSide.nonNetworkChange += SetAttributes;
         SetAttributes(null);
     }
@@ -35,7 +37,14 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
         type.text = card.CurrentInfo.type;
         description.text = card.CurrentInfo.text;
         // cardImage.enabled = false;
-		TextureController.Instance.TextureImage(this);
+        if(renderCardBack)
+        {
+            TextureController.Instance.TextureBackOfCard(this);
+        }
+        else
+        {
+		    TextureController.Instance.TextureImage(this);
+        }
     }
 
     public void TextureSelf(CardInfo info, Sprite sprite)

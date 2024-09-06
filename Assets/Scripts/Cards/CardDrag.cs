@@ -9,6 +9,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	private RectTransform rect;
 	private RectTransform draggableRect;
 	private Vector2 offset;
+	public bool renderCardBack = false;
 
 	void Start()
 	{
@@ -18,7 +19,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	public void StartDrag(Transform dragParent)
     {
         GameOrchestrator.Instance.handController.currentHeldCardId = cardId;
-		Transform cardImage = CardFactory.Instance.GetCardImage(cardId, false);
+		Transform cardImage = CardFactory.Instance.GetCardImage(cardId, false,  renderCardBack : renderCardBack);
 		draggableRect = cardImage.GetComponent<RectTransform>();
 		draggableRect.transform.SetParent(dragParent);
 		SetupDraggedCard(draggableRect);
