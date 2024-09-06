@@ -14,6 +14,7 @@ public class DragController : MonoBehaviour
     [SerializeField] private Transform dragParent;
     [SerializeField] private CanvasScaler scaler;
     public static float scaleFactor;
+    private int ignoreLayer = 0;
     private Vector2 offset;
     public static DragController Instance;
     private void Awake() 
@@ -30,6 +31,7 @@ public class DragController : MonoBehaviour
     void Start()
     {
         scaleFactor = scaler.scaleFactor;
+        ignoreLayer = LayerMask.NameToLayer("IgnoreRaycast");
         pointerEventData = new(eventSystem);
     }
     public bool IsDragging()
@@ -48,7 +50,7 @@ public class DragController : MonoBehaviour
             return (null,null);
         }
         
-        results = results.OrderBy(result => result.distance).ThenByDescending(result => result.sortingOrder).ToList();
+        results = results.Where(result => result.gameObject.layer != ignoreLayer).OrderBy(result => result.distance).ThenByDescending(result => result.sortingOrder).ToList();
         RaycastResult hit = results[0];
         IDraggable dragScript = hit.gameObject.GetComponent<IDraggable>();
         if(dragScript == null)
@@ -69,6 +71,7 @@ public class DragController : MonoBehaviour
             }
             currentDragScript = dragScript;
             dragScript.StartDrag(dragParent);
+            GameOrchestrator.Instance.DisableRightClickMenu();
         }
     }
     private void CheckForReleaseDrag()

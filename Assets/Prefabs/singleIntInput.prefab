@@ -780,7 +780,7 @@ MonoBehaviour:
   input: {fileID: 4331835406056239718}
   submitBtn: {fileID: 6494767992108199314}
   submitBtnText: {fileID: 7322558101389649422}
-  closeBtn: {fileID: 0}
+  closeBtn: {fileID: 1972825281208613145}
 --- !u!1 &4874301452475472868
 GameObject:
   m_ObjectHideFlags: 0

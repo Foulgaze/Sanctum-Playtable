@@ -16,7 +16,8 @@ public class SingleIntInputField : MonoBehaviour
 	}
 	void Start()
 	{
-		closeBtn.onClick.AddListener(() => Destroy(this));
-		submitBtn.onClick.AddListener(() => Destroy(this));
+		closeBtn.onClick.AddListener(() => Destroy(transform.gameObject));
+		submitBtn.onClick.AddListener(() => Destroy(transform.gameObject));
+
 	}
 }

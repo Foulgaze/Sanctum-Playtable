@@ -11,6 +11,7 @@ public class RightClickMenuController : MonoBehaviour
 {
     
     [SerializeField] private RectTransform rightClickMenuButtonHolder;
+    [SerializeField] private Transform menuDisableBtn;
     [SerializeField] private SingleIntInputField singleIntInputFieldPrefab;
     [SerializeField] private Transform mainGameplayScreen;
     [SerializeField] private Button buttonPrefab;
@@ -58,6 +59,12 @@ public class RightClickMenuController : MonoBehaviour
                 break;
         }
     }
+
+    public void DisableRightClickMenu()
+    {
+        rightClickMenuButtonHolder.gameObject.SetActive(false);
+        menuDisableBtn.gameObject.SetActive(false);
+    }
     private void CleanupRightClickMenu()
     {
         foreach(Transform child in rightClickMenuButtonHolder)
@@ -67,11 +74,11 @@ public class RightClickMenuController : MonoBehaviour
         rightClickMenuButtonHolder.gameObject.SetActive(false);
     }
 
-    private void SetupSingleIntInput(string name, Action submitBtnAction, string submitBtnName)
+    private void SetupSingleIntInput(string name, Action<string> submitBtnAction, string submitBtnName)
     {
         SingleIntInputField singleIntInputField = Instantiate(singleIntInputFieldPrefab,mainGameplayScreen);
         singleIntInputField.Setup(name, submitBtnName);
-        singleIntInputField.submitBtn.onClick.AddListener(() => submitBtnAction());
+        singleIntInputField.submitBtn.onClick.AddListener(() => submitBtnAction(singleIntInputField.input.text));
         singleIntInputField.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
     private Button CreateBtn(string buttonText)
@@ -87,17 +94,18 @@ public class RightClickMenuController : MonoBehaviour
         Button drawCardBtn = CreateBtn("Draw Card");
         drawCardBtn.onClick.AddListener(() => {networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|1"); CleanupRightClickMenu();});
         Button multipleDrawBtn = CreateBtn("Draw Cards");
-        Action drawCards = () => 
+        Action<string> drawCards = (inputValue) => 
         {
-            if(string.IsNullOrEmpty(singleIntInputFieldPrefab.input.text))
+
+            if(string.IsNullOrEmpty(inputValue))
             {
                 return;
             }
-            networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|{int.Parse(singleIntInputFieldPrefab.input.text)}");
+            networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|{inputValue}");
         };
-        multipleDrawBtn.onClick.AddListener(() => SetupSingleIntInput("Draw Cards",drawCards ,"Draw"));
+        multipleDrawBtn.onClick.AddListener(() => {SetupSingleIntInput("Draw Cards",drawCards ,"Draw");CleanupRightClickMenu(); });
         Button shuffle = CreateBtn("Shuffle");
-        shuffle.onClick.AddListener(() => {networkCommand(NetworkInstruction.NetworkAttribute, $"{(int)SpecialAction.Shuffle}|");});
+        shuffle.onClick.AddListener(() => {networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Shuffle}|");});
         Button viewLibrary = CreateBtn("View Library");
         // To Do
         Button viewTopCards = CreateBtn("View Top Cards");
@@ -118,6 +126,7 @@ public class RightClickMenuController : MonoBehaviour
 
     private void SetupRightClickMenu(int buttonCount)
     {
+        menuDisableBtn.gameObject.SetActive(true);
         Vector2 boxDimensions = new Vector2(Screen.width*widthAsAPercentageOfSceen,Screen.height*heightAsAPercentageOfSceen*buttonCount );
         rightClickMenuButtonHolder.sizeDelta = boxDimensions;
         rightClickMenuButtonHolder.anchoredPosition = MouseUtility.Instance.GetMousePositionOnCanvas() + boxDimensions/2;

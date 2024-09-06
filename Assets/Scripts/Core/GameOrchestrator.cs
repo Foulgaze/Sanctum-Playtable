@@ -110,9 +110,9 @@ public class GameOrchestrator : MonoBehaviour
         collection.insertCardData.SetValue(data);
     }
 
-    public void MouseInHandBox()
+    public void DisableRightClickMenu()
     {
-
+        rightClickMenuController.DisableRightClickMenu();
     }
 
     void Update()
