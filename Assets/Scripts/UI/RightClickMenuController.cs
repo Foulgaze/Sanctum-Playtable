@@ -78,50 +78,50 @@ public class RightClickMenuController : MonoBehaviour
     {
         SingleIntInputField singleIntInputField = Instantiate(singleIntInputFieldPrefab,mainGameplayScreen);
         singleIntInputField.Setup(name, submitBtnName);
-        singleIntInputField.submitBtn.onClick.AddListener(() => submitBtnAction(singleIntInputField.input.text));
+        singleIntInputField.submitBtn.onClick.AddListener(() => 
+        {
+            if(string.IsNullOrEmpty(singleIntInputField.input.text))
+            {
+                return;
+            }
+            submitBtnAction(singleIntInputField.input.text);
+        });
         singleIntInputField.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
-    private Button CreateBtn(string buttonText)
+    private Button CreateBtn(string buttonText, Action onClick)
     {
         Button button = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
         button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = buttonText;
+        button.onClick.AddListener(() => onClick());
+        button.onClick.AddListener(() => rightClickMenuButtonHolder.gameObject.SetActive(false));
+        button.onClick.AddListener(() => menuDisableBtn.gameObject.SetActive(false));
         return button;
+    }
+
+    private void ExecuteSpecialAction(SpecialAction action, string parameter = "")
+    {
+        networkCommand(NetworkInstruction.SpecialAction, $"{(int)action}|{parameter}");
     }
 
     private void CreateLibraryMenu()
     {
         CleanupRightClickMenu();
-        Button drawCardBtn = CreateBtn("Draw Card");
-        drawCardBtn.onClick.AddListener(() => {networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|1"); CleanupRightClickMenu();});
-        Button multipleDrawBtn = CreateBtn("Draw Cards");
-        Action<string> drawCards = (inputValue) => 
+
+        List<Button> setupButtons = new()
         {
-
-            if(string.IsNullOrEmpty(inputValue))
-            {
-                return;
-            }
-            networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|{inputValue}");
+            CreateBtn("Draw Card", () => ExecuteSpecialAction(SpecialAction.Draw, "1")),
+            CreateBtn("Draw Cards", () => SetupSingleIntInput("Draw Cards",(input) => ExecuteSpecialAction(SpecialAction.Draw, input), "Draw" )),
+            CreateBtn("Shuffle", () => ExecuteSpecialAction(SpecialAction.Shuffle)),
+            CreateBtn("View All Cards", () => {} ),
+            CreateBtn("View Top Cards", () => {} ),
+            CreateBtn("Reveal To", () => {} ),
+            CreateBtn("Reveal Top Cards To", () => {} ),
+            CreateBtn("Flip Top Card", () => {} ),
+            CreateBtn("Mill Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Mill, input), "Mill" )),
+            CreateBtn("Exile Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Exile, input), "Mill" )),
         };
-        multipleDrawBtn.onClick.AddListener(() => {SetupSingleIntInput("Draw Cards",drawCards ,"Draw");CleanupRightClickMenu(); });
-        Button shuffle = CreateBtn("Shuffle");
-        shuffle.onClick.AddListener(() => {networkCommand(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Shuffle}|");});
-        Button viewLibrary = CreateBtn("View Library");
-        // To Do
-        Button viewTopCards = CreateBtn("View Top Cards");
-        // To Do
-        Button revealLibraryTo = CreateBtn("Reveal Library");
-        // To Do
-        Button revealTopCardsTo = CreateBtn("Reveal Top Cards");
-        // To Do
-        Button alwaysRevealTopCard = CreateBtn("Flip Top Card");
-        // To Do
-        Button mill = CreateBtn("Mill");
-        // To Do
-        Button exile = CreateBtn("Exile");
-        // To Do
 
-        SetupRightClickMenu(10);
+        SetupRightClickMenu(setupButtons.Count);
     }
 
     private void SetupRightClickMenu(int buttonCount)
