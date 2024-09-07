@@ -262,6 +262,7 @@ MonoBehaviour:
   cardImage: {fileID: 1021090678427531156}
   tappedSymbol: {fileID: 2088409194510630164}
   backgroundImage: {fileID: 3670973594876160261}
+  raycastableImage: {fileID: 3670973594876160261}
 --- !u!1 &3283586372565979194
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,6 +613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardId: 0
+  renderCardBack: 0
 --- !u!1 &5383174099905741199
 GameObject:
   m_ObjectHideFlags: 0

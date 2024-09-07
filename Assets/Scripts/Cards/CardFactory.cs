@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sanctum_Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,10 @@ public class CardFactory : MonoBehaviour
 	public Transform cardImagePrefab;
 	public Playtable playtable;
 	public readonly Dictionary<string, Sprite> fileNameToSprite = new();
+	public readonly Dictionary<int, Queue<Transform>> uuidToCardOnField = new();
+	public readonly Dictionary<int, Queue<Transform>> uuidToCardImage = new();
+	[SerializeField] Transform disposedCardParent;
+
 	
 	private void Awake() 
     {         
@@ -34,22 +39,37 @@ public class CardFactory : MonoBehaviour
 			fileNameToSprite[sprite.name] = sprite;
 		}
 	}
-	public Transform GetCardOnField(int cardId, bool isOpponentCard)
+
+	public void DisposeOfCard(int cardId, Transform cardTransform, bool onField)
 	{
-		Transform newCard = GameObject.Instantiate(cardOnFieldPrefab);
-		Transform cardImage = newCard.GetChild(0).GetChild(0); // SIGH i hate doing getchild
-		cardImage.GetComponent<CardDrag>().cardId = cardId;
-		if(isOpponentCard)
+		var disposeDict = onField ? uuidToCardOnField : uuidToCardImage;
+		cardTransform.SetParent(disposedCardParent);
+		if(!disposeDict.ContainsKey(cardId))
 		{
-			cardImage.GetComponent<Image>().raycastTarget = false;
+			disposeDict[cardId] = new Queue<Transform>();
 		}
-		Card card = GetCard(cardId);
-		CardOnFieldComponents components = newCard.GetComponent<CardOnFieldComponents>();
-		components.Setup(card);
-		return newCard;
+		disposeDict[cardId].Enqueue(cardTransform);
 	}
 
-	public Card GetCard(int id)
+	public Transform GetCardOnField(int cardId, bool isOpponentCard)
+	{
+		bool queueHasCard = uuidToCardOnField.ContainsKey(cardId) && uuidToCardOnField[cardId].Count == 0;
+		Transform cardOnField = queueHasCard ? uuidToCardOnField[cardId].Dequeue() : Instantiate(cardOnFieldPrefab);
+		
+		CardOnFieldComponents components = cardOnField.GetComponent<CardOnFieldComponents>();
+		components.backgroundImage.raycastTarget = !isOpponentCard;
+		
+		if(!queueHasCard)
+		{
+			components.backgroundImage.GetComponent<CardDrag>().cardId = cardId;
+			Card card = GetCard(cardId);
+			components.Setup(card);
+		}
+
+		return cardOnField;
+	}
+
+	private Card GetCard(int id)
 	{
 		Card? card = playtable.cardFactory.GetCard(id);
 
@@ -64,17 +84,23 @@ public class CardFactory : MonoBehaviour
 	public Transform GetCardImage(int cardId, bool isOpponentCard, bool renderCardBack = false)
 	{
 		Card card = GetCard(cardId);
-		Transform newCardImage = Instantiate(cardImagePrefab);
-		newCardImage.GetComponent<CardDrag>().cardId = cardId;
-		if(isOpponentCard)
+		
+		bool queueHasCard = uuidToCardImage.ContainsKey(cardId) && uuidToCardImage[cardId].Count != 0;
+		Transform cardImage = queueHasCard ? uuidToCardImage[cardId].Dequeue() : Instantiate(cardImagePrefab);
+		GenericCardComponents components = cardImage.GetComponent<GenericCardComponents>();
+		if(queueHasCard)
 		{
-			newCardImage.GetComponent<Image>().raycastTarget = false;
+			components.RenderCardImage(renderCardBack);
+			UnityLogger.Log($"Dequeing card - {cardId}");
 		}
-
-		newCardImage.name = cardId.ToString();
-		newCardImage.transform.position = new Vector3(1000,1000,1000);
-		GenericCardComponents components = newCardImage.GetComponent<GenericCardComponents>();
-		components.Setup(card, renderCardBack);
-		return newCardImage;
+		else
+		{
+			cardImage.GetComponent<CardDrag>().cardId = cardId;
+			cardImage.name = cardId.ToString();
+			components.Setup(card, renderCardBack);
+		}
+		
+		cardImage.GetComponent<Image>().raycastTarget = !isOpponentCard;
+		return cardImage;
 	}
 }

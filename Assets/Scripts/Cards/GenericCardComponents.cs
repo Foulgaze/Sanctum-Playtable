@@ -20,30 +20,44 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
     {
         // UnityLogger.Log($"Card Name : [{card.Id}]");
         // card.isUsingBackSide.nonNetworkChange += Setup;
+        card.isUsingBackSide.nonNetworkChange += SetAttributes;
     }
 
     public void Setup(Card card, bool renderCardBack)
     {
         this.card = card;
         this.renderCardBack = renderCardBack;
-        card.isUsingBackSide.nonNetworkChange += SetAttributes;
         SetAttributes(null);
     }
 
     private void SetAttributes(NetworkAttribute? _)
     {
+        if(!RenderCardImage())
+        {
+            return;
+        }
 		name.text = card.name.Value;
         manaCost.text = card.CurrentInfo.manaCost;
         type.text = card.CurrentInfo.type;
         description.text = card.CurrentInfo.text;
         // cardImage.enabled = false;
+        
+    }
+
+    public bool RenderCardImage(bool? renderBack = null)
+    {
+        if(renderBack != null && renderBack == renderCardBack)
+        {
+            return true;
+        }
+
         if(renderCardBack)
         {
-            TextureController.Instance.TextureBackOfCard(this);
+            return TextureController.Instance.TextureBackOfCard(this);
         }
         else
         {
-		    TextureController.Instance.TextureImage(this);
+		    return TextureController.Instance.TextureImage(this);
         }
     }
 
@@ -54,6 +68,10 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
 
             cardImage.sprite = sprite;
             cardImage.enabled = true;
+            Destroy(name.gameObject);
+            Destroy(manaCost.gameObject);
+            Destroy(type.gameObject);
+            Destroy(description.gameObject);
         }
     }
 

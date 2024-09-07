@@ -56,7 +56,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 
 	private void RaycastForRelease()
 	{
-		Destroy(draggableRect.gameObject);
+		CardFactory.Instance.DisposeOfCard(cardId, draggableRect.transform, onField: false);
 		if(GameOrchestrator.Instance.handController.MouseInHand())
 		{
 			UnityLogger.Log($"Releasing in hand");

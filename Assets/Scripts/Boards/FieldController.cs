@@ -14,7 +14,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     private static float widthToHeightRatio = 4/3f;
     private float percentageOfCardAsSpacer = 0.25f;
     public int defaultCardCount = 0;
-    private Dictionary<int, GameObject> idToCardOnField = new();
+    private Dictionary<int, Transform> idToCardOnField = new();
     private List<List<int>> currentlyHeldCardContainers = new();
     private int cardLayermask;
     
@@ -47,7 +47,10 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     public void UpdateHolder(List<List<int>> boardDescription)
     {
         currentlyHeldCardContainers = boardDescription;
-        idToCardOnField.Values.ToList().ForEach(card => Destroy(card));
+        foreach(var kvp in idToCardOnField)
+        {
+            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, true);
+        }
         idToCardOnField.Clear();
 
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
@@ -71,7 +74,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         foreach(int cardId in cardColumn)
         {
             Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId, isOpponent);
-            idToCardOnField[cardId] = onFieldCard.gameObject;
+            idToCardOnField[cardId] = onFieldCard;
             onFieldCard.localScale = new Vector3(cardWidth, onFieldCard.localScale.y, cardWidth * 1/widthToHeightRatio);
             onFieldCard.position = centerPosition;
             onFieldCard.SetParent(transform);

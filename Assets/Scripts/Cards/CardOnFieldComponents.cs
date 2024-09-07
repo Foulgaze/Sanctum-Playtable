@@ -78,7 +78,6 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         if(info.name == card.CurrentInfo.name)
         {
             cardImage.sprite = sprite;
-		    
 
         }
     }

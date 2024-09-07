@@ -114,7 +114,7 @@ public class GameOrchestrator : MonoBehaviour
 
     public void DisableRightClickMenu()
     {
-        rightClickMenuController.DisableRightClickMenu();
+        rightClickMenuController.CleanupRightClickMenu();
     }
 
     public void FlipLibraryTop()

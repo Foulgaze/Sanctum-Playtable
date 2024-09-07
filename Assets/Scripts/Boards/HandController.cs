@@ -16,7 +16,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     private CardZone zone;
     public int defaultHandSize = 7;
     private static float percentageOfScreenForCardWidth = 0.1f;
-    private readonly List<Transform> cardTransforms = new();
+    private readonly Dictionary<int,Transform> idToCardTransform = new();
     [SerializeField] private RectTransform handBox;
     private List<int> currentlyHeldCards = new();
     void Start()
@@ -48,7 +48,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     {
         ClearExistingCards();
 
-        if (IsBoardEmpty(boardDescription))
+        if (boardDescription.Count == 0 || boardDescription[0].Count == 0)
         {
             return;
         }
@@ -69,7 +69,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         {
  
             Transform newCard = CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
-            cardTransforms.Add(newCard);
+            idToCardTransform[cardIds[i]] = newCard;
         }
     }
 
@@ -80,13 +80,11 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
 
     private void ClearExistingCards()
     {
-        cardTransforms.ForEach(card => Destroy(card.gameObject));
-        cardTransforms.Clear();
-    }
-
-    private bool IsBoardEmpty(List<List<int>> boardDescription)
-    {
-        return boardDescription.Count == 0 || boardDescription[0].Count == 0;
+        foreach(var kvp in idToCardTransform)
+        {
+            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField: false);
+        }
+        idToCardTransform.Clear();
     }
 
     public static Vector2 CalculateCardDimensions()

@@ -61,18 +61,15 @@ public class RightClickMenuController : MonoBehaviour
         }
     }
 
-    public void DisableRightClickMenu()
-    {
-        rightClickMenuButtonHolder.gameObject.SetActive(false);
-        menuDisableBtn.gameObject.SetActive(false);
-    }
-    private void CleanupRightClickMenu()
+    public void CleanupRightClickMenu()
     {
         foreach(Transform child in rightClickMenuButtonHolder)
         {
             Destroy(child.gameObject);
         }
         rightClickMenuButtonHolder.gameObject.SetActive(false);
+        menuDisableBtn.gameObject.SetActive(false);
+
     }
 
     private void SetupSingleIntInput(string name, Action<string> submitBtnAction, string submitBtnName)
@@ -94,8 +91,7 @@ public class RightClickMenuController : MonoBehaviour
         Button button = Instantiate(buttonPrefab, rightClickMenuButtonHolder);
         button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = buttonText;
         button.onClick.AddListener(() => onClick());
-        button.onClick.AddListener(() => rightClickMenuButtonHolder.gameObject.SetActive(false));
-        button.onClick.AddListener(() => menuDisableBtn.gameObject.SetActive(false));
+        button.onClick.AddListener(() => CleanupRightClickMenu());
         return button;
     }
 
@@ -133,10 +129,10 @@ public class RightClickMenuController : MonoBehaviour
     private void SetupRightClickMenu(int buttonCount)
     {
         menuDisableBtn.gameObject.SetActive(true);
+        rightClickMenuButtonHolder.gameObject.SetActive(true);
         Vector2 boxDimensions = new Vector2(Screen.width*widthAsAPercentageOfSceen,Screen.height*heightAsAPercentageOfSceen*buttonCount );
         rightClickMenuButtonHolder.sizeDelta = boxDimensions;
         rightClickMenuButtonHolder.anchoredPosition = MouseUtility.Instance.GetMousePositionOnCanvas() + boxDimensions/2;
-        rightClickMenuButtonHolder.gameObject.SetActive(true);
 
     }
     private void CreateExileMenu()
