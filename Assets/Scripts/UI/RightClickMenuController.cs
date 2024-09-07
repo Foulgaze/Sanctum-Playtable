@@ -15,10 +15,11 @@ public class RightClickMenuController : MonoBehaviour
     [SerializeField] private SingleIntInputField singleIntInputFieldPrefab;
     [SerializeField] private Transform mainGameplayScreen;
     [SerializeField] private Button buttonPrefab;
+    [SerializeField] private ContainerViewer containerViewerPrefab;
     public event Action<NetworkInstruction, string> networkCommand = delegate{};
     public float widthAsAPercentageOfSceen = 0.1f;
     public float heightAsAPercentageOfSceen = 0.1f;
-
+    public Player clientPlayer;
     private int cardHolderMask;
     
     // Start is called before the first frame update
@@ -103,6 +104,11 @@ public class RightClickMenuController : MonoBehaviour
         networkCommand(NetworkInstruction.SpecialAction, $"{(int)action}|{parameter}");
     }
 
+    private void CreateContianerView(CardContainerCollection collection)
+    {
+        ContainerViewer containerViewer = Instantiate(containerViewerPrefab, rightClickMenuButtonHolder.parent);
+        containerViewer.Setup(collection, $"{collection.Zone}", false);
+    }
     private void CreateLibraryMenu()
     {
         CleanupRightClickMenu();
@@ -112,7 +118,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Draw Card", () => ExecuteSpecialAction(SpecialAction.Draw, "1")),
             CreateBtn("Draw Cards", () => SetupSingleIntInput("Draw Cards",(input) => ExecuteSpecialAction(SpecialAction.Draw, input), "Draw" )),
             CreateBtn("Shuffle", () => ExecuteSpecialAction(SpecialAction.Shuffle)),
-            CreateBtn("View All Cards", () => {} ),
+            CreateBtn("View All Cards", () => {CreateContianerView(clientPlayer.GetCardContainer(CardZone.Library));}),
             CreateBtn("View Top Cards", () => {} ),
             CreateBtn("Reveal To", () => {} ),
             CreateBtn("Reveal Top Cards To", () => {} ),
