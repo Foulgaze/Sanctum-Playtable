@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HandController : MonoBehaviour, IPhysicalCardContainer
+public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
 {
     [SerializeField] private Transform leftHandLocation;
     [SerializeField] private Transform middleHandLocation;
@@ -17,7 +17,6 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     public int defaultHandSize = 7;
     private static float percentageOfScreenForCardWidth = 0.1f;
     private readonly Dictionary<int,Transform> idToCardTransform = new();
-    [SerializeField] private RectTransform handBox;
     private List<int> currentlyHeldCards = new();
     void Start()
     {
@@ -130,11 +129,6 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
     }
 
-    public bool MouseInHand()
-    {
-        return RectTransformUtility.RectangleContainsScreenPoint(handBox, Input.mousePosition);
-    }
-
     public void RerenderContainer()
     {
         UpdateHolder(new List<List<int>>(){currentlyHeldCards});
@@ -156,5 +150,10 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     public bool RevealTopCard()
     {
         return true;
+    }
+
+    public void DropCard(int cardId)
+    {
+        AddCard(cardId);
     }
 }

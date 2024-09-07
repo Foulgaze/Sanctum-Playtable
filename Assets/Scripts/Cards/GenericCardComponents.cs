@@ -32,25 +32,31 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
 
     private void SetAttributes(NetworkAttribute? _)
     {
-        if(!RenderCardImage())
+        if(RenderCardImage())
         {
+            SetComponentState(false);
             return;
         }
+        SetComponentState(true);
 		name.text = card.name.Value;
         manaCost.text = card.CurrentInfo.manaCost;
         type.text = card.CurrentInfo.type;
         description.text = card.CurrentInfo.text;
-        // cardImage.enabled = false;
+        cardImage.enabled = false;
         
     }
 
     public bool RenderCardImage(bool? renderBack = null)
     {
-        if(renderBack != null && renderBack == renderCardBack)
+        if(renderBack != null)
         {
-            return true;
+            if(renderCardBack == renderBack)
+            {
+                return true;
+            }
+            renderCardBack = (bool)renderBack;
         }
-
+    
         if(renderCardBack)
         {
             return TextureController.Instance.TextureBackOfCard(this);
@@ -61,17 +67,20 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
         }
     }
 
+    private void SetComponentState(bool state)
+    {
+        name.gameObject.SetActive(state);
+        manaCost.gameObject.SetActive(state);
+        type.gameObject.SetActive(state);
+        description.gameObject.SetActive(state);
+    }
+
     public void TextureSelf(CardInfo info, Sprite sprite)
     {
         if(info.name == card.CurrentInfo.name)
         {
-
             cardImage.sprite = sprite;
             cardImage.enabled = true;
-            Destroy(name.gameObject);
-            Destroy(manaCost.gameObject);
-            Destroy(type.gameObject);
-            Destroy(description.gameObject);
         }
     }
 
