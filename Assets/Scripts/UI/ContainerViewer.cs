@@ -191,7 +191,7 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         
     }
 
-    private InsertCardData InsertCardIntoContainer(int cardId)
+    private InsertCardData? InsertCardIntoContainer(int cardId)
     {
         if(idToTransform.Count == 0)
         {
@@ -200,6 +200,10 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         int totalRows = Mathf.CeilToInt(idToTransform.Count / (float)cardsPerRow);
         Vector2 mousePos = GetMousePositionInGrid();
         int findClosestChild = GetClosestGridChildIndex(gridLayout, mousePos, cardsPerRow ,totalRows);
+        if(idToTransform[findClosestChild].Item1 == cardId)
+        {
+            return null;
+        }
         int insertIndex = AlignInsertIndex(mousePos, findClosestChild);
         UnityLogger.Log($"Closest child {findClosestChild} - insert Index {insertIndex}");
 
@@ -220,7 +224,7 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         {
             return;
         }
-        InsertCardData insertData;
+        InsertCardData? insertData;
         if(RevealAllCards())
         {
 
@@ -235,7 +239,10 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         {
             insertData = InsertCardIntoContainer(cardId);
         }
-        
+        if(insertData == null)
+        {
+            return;
+        }
         GameOrchestrator.Instance.MoveCard(collection.Zone, insertData);
     }
 
