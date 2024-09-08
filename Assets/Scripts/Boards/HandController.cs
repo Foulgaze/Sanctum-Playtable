@@ -81,6 +81,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     {
         foreach(var kvp in idToCardTransform)
         {
+            kvp.Value.rotation = Quaternion.Euler(0,0,0);
             CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField: false);
         }
         idToCardTransform.Clear();

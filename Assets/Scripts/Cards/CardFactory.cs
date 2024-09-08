@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,7 +54,8 @@ public class CardFactory : MonoBehaviour
 
 	public Transform GetCardOnField(int cardId, bool isOpponentCard)
 	{
-		bool queueHasCard = uuidToCardOnField.ContainsKey(cardId) && uuidToCardOnField[cardId].Count == 0;
+
+		bool queueHasCard = uuidToCardOnField.ContainsKey(cardId) && uuidToCardOnField[cardId].Count != 0;
 		Transform cardOnField = queueHasCard ? uuidToCardOnField[cardId].Dequeue() : Instantiate(cardOnFieldPrefab);
 		
 		CardOnFieldComponents components = cardOnField.GetComponent<CardOnFieldComponents>();
@@ -61,6 +63,7 @@ public class CardFactory : MonoBehaviour
 		
 		if(!queueHasCard)
 		{
+			
 			components.backgroundImage.GetComponent<CardDrag>().cardId = cardId;
 			Card card = GetCard(cardId);
 			components.Setup(card);
@@ -86,12 +89,12 @@ public class CardFactory : MonoBehaviour
 		Card card = GetCard(cardId);
 		
 		bool queueHasCard = uuidToCardImage.ContainsKey(cardId) && uuidToCardImage[cardId].Count != 0;
+
 		Transform cardImage = queueHasCard ? uuidToCardImage[cardId].Dequeue() : Instantiate(cardImagePrefab);
 		GenericCardComponents components = cardImage.GetComponent<GenericCardComponents>();
 		if(queueHasCard)
 		{
 			components.RenderCardImage(renderCardBack);
-			UnityLogger.Log($"Dequeing card - {cardId}");
 		}
 		else
 		{

@@ -47,11 +47,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     public void UpdateHolder(List<List<int>> boardDescription)
     {
         currentlyHeldCardContainers = boardDescription;
-        foreach(var kvp in idToCardOnField)
-        {
-            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, true);
-        }
-        idToCardOnField.Clear();
+        ClearExistingCards();
 
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
         float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount + 1) * percentageOfCardAsSpacer);
@@ -65,6 +61,15 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
             this.RenderCardColumn(cardColumn, cardWidth, iterPosition);
             iterPosition += new Vector3(cardWidth + spacerWidth, 0, 0);
         }
+    }
+
+    private void ClearExistingCards()
+    {
+        foreach(var kvp in idToCardOnField)
+        {
+            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField: true);
+        }
+        idToCardOnField.Clear();
     }
 
     private void RenderCardColumn(List<int> cardColumn, float cardWidth, Vector3 centerPosition)
