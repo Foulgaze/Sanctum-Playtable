@@ -105,6 +105,16 @@ public class RightClickMenuController : MonoBehaviour
         ContainerViewer containerViewer = Instantiate(containerViewerPrefab, rightClickMenuButtonHolder.parent);
         containerViewer.Setup(collection, $"{collection.Zone}", false);
     }
+    private void CreateContainerRevealCards(CardContainerCollection collection)
+    {
+        Action<string> revealCards = (rawCardCount) => 
+        {
+            ContainerViewer containerViewer = Instantiate(containerViewerPrefab, rightClickMenuButtonHolder.parent);
+            containerViewer.Setup(collection, $"{collection.Zone}", false, int.Parse(rawCardCount));
+        };
+        SetupSingleIntInput(name : "Reveal Count", revealCards, "Reveal");
+        
+    }
     private void CreateLibraryMenu()
     {
         CleanupRightClickMenu();
@@ -115,7 +125,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Draw Cards", () => SetupSingleIntInput("Draw Cards",(input) => ExecuteSpecialAction(SpecialAction.Draw, input), "Draw" )),
             CreateBtn("Shuffle", () => ExecuteSpecialAction(SpecialAction.Shuffle)),
             CreateBtn("View All Cards", () => {CreateContianerView(clientPlayer.GetCardContainer(CardZone.Library));}),
-            CreateBtn("View Top Cards", () => {} ),
+            CreateBtn("View Top Cards", () => {CreateContainerRevealCards(clientPlayer.GetCardContainer(CardZone.Library));}),
             CreateBtn("Reveal To", () => {} ),
             CreateBtn("Reveal Top Cards To", () => {} ),
             CreateBtn("Flip Top Card", () => {GameOrchestrator.Instance.FlipLibraryTop();} ),

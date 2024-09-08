@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Newtonsoft.Json;
 using Sanctum_Core;
 using TMPro;
 using Unity.VisualScripting;
@@ -11,9 +12,10 @@ using UnityEngine.UI;
 
 public class ContainerViewer : MonoBehaviour, IDroppable
 {
-    [SerializeField] TextMeshProUGUI name;
-    [SerializeField] Button closeBtn;
-    [SerializeField] GridLayoutGroup gridLayout;
+    [SerializeField] private TextMeshProUGUI name;
+    [SerializeField] private Button closeBtn;
+    [SerializeField] private GridLayoutGroup gridLayout;
+    [SerializeField] private Transform hiddenCardPrefab;
     public int cardsPerRow = 5;
     CardContainerCollection collection;
     private bool isOpponents;
@@ -21,6 +23,8 @@ public class ContainerViewer : MonoBehaviour, IDroppable
     List<(int, Transform)> idToTransform = new();
     private Vector2 defaultSize;
     private int? revealCardCount;
+    private HashSet<int> revealedCardIds = new();
+    private bool firstTimeLoading = true;
     public void Setup(CardContainerCollection collection, string windowName, bool isOpponents, int? revealCardCount = null)
     {
         closeBtn.onClick.AddListener(() => Destroy(this.gameObject));
@@ -29,14 +33,22 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         this.collection = collection;
         collection.boardState.nonNetworkChange += UpdateCardContainer;
         this.isOpponents = isOpponents;
+        this.revealCardCount = revealCardCount;
+        SetupRevealedCards(collection.boardState);
         UpdateCardContainer(collection.boardState);
     }
 
+    private bool RevealAllCards()
+    {
+        return revealCardCount == null;
+    }
+
+
     public void UpdateCardContainer(NetworkAttribute attribute)
     {
-
         ClearExistingCards();
         List<int> cardIds = GetCardsToRender(attribute);
+        UnityLogger.Log($"ALL CARD IDs - {JsonConvert.SerializeObject(cardIds)}");
         SetupGridLayout(cardIds.Count);
         cardIds.ForEach(cardId => SetupGridCard(cardId));
     }
@@ -45,7 +57,14 @@ public class ContainerViewer : MonoBehaviour, IDroppable
     {
         foreach(var kvp in idToTransform)
         {
-            CardFactory.Instance.DisposeOfCard(kvp.Item1, kvp.Item2, onField:false);
+            if(!RevealAllCards() && !revealedCardIds.Contains(kvp.Item1))
+            {
+                Destroy(kvp.Item2.gameObject);
+            }
+            else
+            {
+                CardFactory.Instance.DisposeOfCard(kvp.Item1, kvp.Item2, onField:false);
+            }
         }
         idToTransform.Clear();
     }
@@ -57,7 +76,20 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         {
             return new List<int>();
         }
-        return cardIdsRaw[0];
+        List<int> returnCards = new List<int>(cardIdsRaw[0]);
+        returnCards.Reverse();
+        return returnCards;
+    }
+
+    private void SetupRevealedCards(NetworkAttribute attribute)
+    {
+        if(RevealAllCards())
+        {
+            return;
+        }
+        List<int> cardIds = GetCardsToRender(attribute);
+        int trueRevealCount = Math.Clamp((int)revealCardCount,0, cardIds.Count - 1);
+        revealedCardIds = new HashSet<int>(cardIds.GetRange(0, trueRevealCount));
     }
     private void SetupGridLayout(int cardCount, float horizontalSpacingPercentage = 0.05f, float verticalSpacingPercentage = 0.1f)
     {
@@ -77,9 +109,19 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         SetGridLayoutProperties(cellWidth, cellHeight, horizontalSpacingPercentage, verticalSpacingPercentage);
         AdjustRectTransform(windowHeight);
     }
+    
+    private Transform GetCardImage(int cardId)
+    {
+        if(RevealAllCards() || revealedCardIds.Contains(cardId))
+        {
+            return CardFactory.Instance.GetCardImage(cardId, isOpponents);
+        }
+        return Instantiate(hiddenCardPrefab);
+
+    }
     private void SetupGridCard(int cardId)
     {
-        Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponents);
+        Transform cardImage = GetCardImage(cardId);
         cardImage.transform.SetParent(gridLayout.transform);
         idToTransform.Add((cardId,cardImage));  
     }
@@ -109,26 +151,44 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         rect.anchoredPosition -= new Vector2(0, verticalOffset / 2);
     }
 
-    private int FindClosestCardIndex(List<(int, RectTransform)> rects, Vector2 mousePos)
+    private int GetClosestGridChildIndex(GridLayoutGroup gridLayoutGroup, Vector2 position, int totalColumns, int totalRows)
     {
-        int minIndex = 0;
-        float minDistance = float.MaxValue;
-        for(int i = 0; i < rects.Count; ++i)
-        {
-            RectTransform rect = rects[i].Item2;
-            float distance = Vector2.Distance(rect.anchoredPosition, mousePos);
-            if(distance < minDistance)
-            {
-                minIndex = i;
-                minDistance = distance;
-            }
-        }
-        if(mousePos.x > rects[minIndex].Item2.anchoredPosition.x)
-        {
-            ++minIndex;
-        }
-        return minIndex;
+        Vector2 cellSize = gridLayoutGroup.cellSize;
+        Vector2 spacing = gridLayoutGroup.spacing;
 
+        int column = Mathf.FloorToInt(position.x / (cellSize.x + spacing.x));
+        int row = Mathf.FloorToInt(position.y / (cellSize.y + spacing.y)) * -1 - 1;
+        int totalChildren = gridLayoutGroup.transform.childCount;
+
+        column = Mathf.Clamp(column, 0, totalColumns - 1);
+        row = Mathf.Clamp(row, 0, totalRows - 1);
+
+        int childIndex = row * totalColumns + column;
+
+        childIndex = Mathf.Clamp(childIndex, 0, totalChildren - 1);
+        return childIndex;
+    }
+
+    private Vector2 GetMousePositionInGrid()
+    {
+        RectTransform rect = gridLayout.GetComponent<RectTransform>();
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rect,
+            Input.mousePosition,
+            null,
+            out Vector2 localPoint);
+        return localPoint - new Vector2(rect.rect.size.x * -1,rect.rect.size.y)/2;
+    }
+
+    private int AlignInsertIndex(Vector2 mousePos, int closestChild)
+    {
+        RectTransform rect = idToTransform[closestChild].Item2.GetComponent<RectTransform>();
+        if(mousePos.x > rect.anchoredPosition.x)
+        {
+            return closestChild + 1;
+        }
+        return closestChild;
+        
     }
 
     private InsertCardData InsertCardIntoContainer(int cardId)
@@ -136,15 +196,20 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         if(idToTransform.Count == 0)
         {
             return new InsertCardData(null, cardId, null, false); 
+        }   
+        int totalRows = Mathf.CeilToInt(idToTransform.Count / (float)cardsPerRow);
+        Vector2 mousePos = GetMousePositionInGrid();
+        int findClosestChild = GetClosestGridChildIndex(gridLayout, mousePos, cardsPerRow ,totalRows);
+        int insertIndex = AlignInsertIndex(mousePos, findClosestChild);
+        return new InsertCardData(null, cardId,Math.Max(0, idToTransform.Count - insertIndex) , false);
+    }
+
+    void Update()
+    {
+        if(Input.GetMouseButtonDown((int)MouseButton.Left))
+        {
+            
         }
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            gridLayout.GetComponent<RectTransform>(),
-            Input.mousePosition,
-            null,
-            out Vector2 localPoint);
-        List<(int, RectTransform)> rects = idToTransform.Select(pair => (pair.Item1, pair.Item2.GetComponent<RectTransform>())).ToList();
-        int closestCardIndex = FindClosestCardIndex(rects, localPoint);
-        return new InsertCardData(null, cardId, closestCardIndex, false);
     }
 
     public void DropCard(int cardId)
@@ -154,7 +219,7 @@ public class ContainerViewer : MonoBehaviour, IDroppable
             return;
         }
         InsertCardData insertData;
-        if(revealCardCount == null)
+        if(RevealAllCards())
         {
 
             bool idAlreadyPresent = idToTransform.Any(pair => pair.Item1 == cardId);
@@ -170,6 +235,10 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         }
         
         GameOrchestrator.Instance.MoveCard(collection.Zone, insertData);
+    }
 
+    private void OnDestroy()
+    {
+        ClearExistingCards();
     }
 }
