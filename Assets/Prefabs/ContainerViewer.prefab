@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 6292936708674340438}
   - component: {fileID: 2299967781374544126}
   - component: {fileID: 2457015578840029054}
-  m_Layer: 5
+  - component: {fileID: 739200498394921946}
+  m_Layer: 10
   m_Name: cardHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,6 +102,19 @@ MonoBehaviour:
   m_Spacing: {x: 10, y: 10}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!114 &739200498394921946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 421979269304006992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cd75a39e0b21f8458439c2567349fa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  containerViewer: {fileID: 5856819999723173368}
 --- !u!1 &1522859386084877838
 GameObject:
   m_ObjectHideFlags: 0

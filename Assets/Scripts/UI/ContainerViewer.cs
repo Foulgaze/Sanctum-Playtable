@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using Sanctum_Core;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ContainerViewer : MonoBehaviour
+public class ContainerViewer : MonoBehaviour, IDroppable
 {
     [SerializeField] TextMeshProUGUI name;
     [SerializeField] Button closeBtn;
@@ -16,9 +18,10 @@ public class ContainerViewer : MonoBehaviour
     CardContainerCollection collection;
     private bool isOpponents;
 
-    Dictionary<int, Transform> idToTransform = new();
+    List<(int, Transform)> idToTransform = new();
     private Vector2 defaultSize;
-    public void Setup(CardContainerCollection collection, string windowName, bool isOpponents)
+    private int? revealCardCount;
+    public void Setup(CardContainerCollection collection, string windowName, bool isOpponents, int? revealCardCount = null)
     {
         closeBtn.onClick.AddListener(() => Destroy(this.gameObject));
         defaultSize = GetComponent<RectTransform>().rect.size;
@@ -32,31 +35,30 @@ public class ContainerViewer : MonoBehaviour
     public void UpdateCardContainer(NetworkAttribute attribute)
     {
 
+        ClearExistingCards();
+        List<int> cardIds = GetCardsToRender(attribute);
+        SetupGridLayout(cardIds.Count);
+        cardIds.ForEach(cardId => SetupGridCard(cardId));
+    }
+
+    private void ClearExistingCards()
+    {
         foreach(var kvp in idToTransform)
         {
-            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField:false);
+            CardFactory.Instance.DisposeOfCard(kvp.Item1, kvp.Item2, onField:false);
         }
-
         idToTransform.Clear();
-
+    }
+    private List<int> GetCardsToRender(NetworkAttribute attribute)
+    {
         List<List<int>> cardIdsRaw = ((NetworkAttribute<List<List<int>>>)attribute).Value;
 
         if(cardIdsRaw.Count == 0 || cardIdsRaw[0].Count == 0)
         {
-            return;
+            return new List<int>();
         }
-
-        List<int> cardIds = cardIdsRaw[0];
-        SetupGridLayout(cardIds.Count);
-
-        foreach(var cardId in cardIds)
-        {
-            Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponents);
-            cardImage.transform.SetParent(gridLayout.transform);
-            idToTransform[cardId] = cardImage;
-        }
+        return cardIdsRaw[0];
     }
-
     private void SetupGridLayout(int cardCount, float horizontalSpacingPercentage = 0.05f, float verticalSpacingPercentage = 0.1f)
     {
         RectTransform holderRect = gridLayout.GetComponent<RectTransform>();
@@ -74,6 +76,12 @@ public class ContainerViewer : MonoBehaviour
         
         SetGridLayoutProperties(cellWidth, cellHeight, horizontalSpacingPercentage, verticalSpacingPercentage);
         AdjustRectTransform(windowHeight);
+    }
+    private void SetupGridCard(int cardId)
+    {
+        Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponents);
+        cardImage.transform.SetParent(gridLayout.transform);
+        idToTransform.Add((cardId,cardImage));  
     }
 
     private float CalculateCellWidth(float availableWidth, float horizontalSpacingPercentage)
@@ -99,5 +107,69 @@ public class ContainerViewer : MonoBehaviour
         float verticalOffset = windowHeight - rect.rect.size.y;
         rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, windowHeight);
         rect.anchoredPosition -= new Vector2(0, verticalOffset / 2);
+    }
+
+    private int FindClosestCardIndex(List<(int, RectTransform)> rects, Vector2 mousePos)
+    {
+        int minIndex = 0;
+        float minDistance = float.MaxValue;
+        for(int i = 0; i < rects.Count; ++i)
+        {
+            RectTransform rect = rects[i].Item2;
+            float distance = Vector2.Distance(rect.anchoredPosition, mousePos);
+            if(distance < minDistance)
+            {
+                minIndex = i;
+                minDistance = distance;
+            }
+        }
+        if(mousePos.x > rects[minIndex].Item2.anchoredPosition.x)
+        {
+            ++minIndex;
+        }
+        return minIndex;
+
+    }
+
+    private InsertCardData InsertCardIntoContainer(int cardId)
+    {
+        if(idToTransform.Count == 0)
+        {
+            return new InsertCardData(null, cardId, null, false); 
+        }
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            gridLayout.GetComponent<RectTransform>(),
+            Input.mousePosition,
+            null,
+            out Vector2 localPoint);
+        List<(int, RectTransform)> rects = idToTransform.Select(pair => (pair.Item1, pair.Item2.GetComponent<RectTransform>())).ToList();
+        int closestCardIndex = FindClosestCardIndex(rects, localPoint);
+        return new InsertCardData(null, cardId, closestCardIndex, false);
+    }
+
+    public void DropCard(int cardId)
+    {
+        if(isOpponents)
+        {
+            return;
+        }
+        InsertCardData insertData;
+        if(revealCardCount == null)
+        {
+
+            bool idAlreadyPresent = idToTransform.Any(pair => pair.Item1 == cardId);
+            if(idAlreadyPresent)
+            {
+                return;
+            }
+            insertData = new InsertCardData(null, cardId, null, false);
+        }
+        else
+        {
+            insertData = InsertCardIntoContainer(cardId);
+        }
+        
+        GameOrchestrator.Instance.MoveCard(collection.Zone, insertData);
+
     }
 }

@@ -35,9 +35,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	{
 		if(GameOrchestrator.Instance.handController.CardInHand(cardId)) // In hand
 		{
-			return rect.transform.position -  Input.mousePosition;
-
-			// return rect.transform.position -  MouseUtility.Instance.GetMousePositionOnCanvas();
+			return MouseUtility.Instance.GetRectPositionInCanvasSpace(rect.position) -  MouseUtility.Instance.GetMousePositionOnCanvas();
 		}
 		draggableRect.anchoredPosition =  MouseUtility.Instance.GetMousePositionOnCanvas();
 		return Vector2.zero;
@@ -71,24 +69,22 @@ public class CardDrag : MonoBehaviour, IDraggable
 		{
 			return null;
 		}
-		
+		UnityLogger.LogError($"Results - {results.Count}");
 		int droppableIndex = SkipDraggableResults(results, draggableLayer);
+		UnityLogger.LogError($"Index - {droppableIndex}");
 		if (droppableIndex >= results.Count)
 		{
 			return null;
-		}
-		UnityLogger.LogError($"GO - {results[droppableIndex].gameObject} - {results[droppableIndex].gameObject.layer}");
-		
+		}		
 		return results[droppableIndex].gameObject.GetComponent<IDroppable>();
 	}
 
 	private int SkipDraggableResults(List<RaycastResult> results, int draggableLayer)
 	{
 		int index = 0;
-		UnityLogger.LogError($"Layer - {results[index].gameObject.layer} - Mask - {draggableLayer}");
 		while (index < results.Count && results[index].gameObject.layer == draggableLayer)
 		{
-			index++;
+			++index;
 		}
 		return index;
 	}

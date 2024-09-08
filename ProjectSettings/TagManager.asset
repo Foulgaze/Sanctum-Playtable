@@ -15,7 +15,7 @@ TagManager:
   - CardContainer
   - cardSection
   - IgnoreRaycast
-  - 
+  - UIDroppable
   - 
   - 
   - 
