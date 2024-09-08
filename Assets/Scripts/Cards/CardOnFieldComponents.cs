@@ -86,4 +86,13 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     {
         return card;
     }
+
+    private void OnDestroy()
+    {
+        card.isTapped.nonNetworkChange -= SetupAttributes;
+        card.isFlipped.nonNetworkChange -= SetupAttributes;
+        card.power.nonNetworkChange -= SetupAttributes;
+        card.toughness.nonNetworkChange -= SetupAttributes;
+        card.isUsingBackSide.nonNetworkChange -= SetupAttributes;
+    }
 }

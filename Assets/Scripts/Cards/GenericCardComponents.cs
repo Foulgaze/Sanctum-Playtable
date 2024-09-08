@@ -88,4 +88,9 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
     {
         return card;
     }
+
+    private void OnDestroy()
+    {
+        card.isUsingBackSide.nonNetworkChange -= SetAttributes;
+    }
 }

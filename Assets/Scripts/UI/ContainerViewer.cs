@@ -201,7 +201,9 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         Vector2 mousePos = GetMousePositionInGrid();
         int findClosestChild = GetClosestGridChildIndex(gridLayout, mousePos, cardsPerRow ,totalRows);
         int insertIndex = AlignInsertIndex(mousePos, findClosestChild);
-        return new InsertCardData(null, cardId,Math.Max(0, idToTransform.Count - insertIndex) , false);
+        UnityLogger.Log($"Closest child {findClosestChild} - insert Index {insertIndex}");
+
+        return new InsertCardData(null, cardId,Math.Max(0, idToTransform.Count - 1 - insertIndex) , false);
     }
 
     void Update()
@@ -240,5 +242,6 @@ public class ContainerViewer : MonoBehaviour, IDroppable
     private void OnDestroy()
     {
         ClearExistingCards();
+        collection.boardState.nonNetworkChange -= UpdateCardContainer;
     }
 }
