@@ -118,6 +118,19 @@ public class RightClickMenuController : MonoBehaviour
         Action<List<string>> revealAction = (uuids) => {GameOrchestrator.Instance.RevealZoneToOpponents(CardZone.Library, uuids, null);};
         CreateOpponentSelectMenu("Reveal Library", revealAction, "Reveal"); 
     }
+
+    public void RevealOpponentZone(NetworkAttribute attribute, Player player)
+    {
+        (CardZone zone, int? revealCount) = ((NetworkAttribute<(CardZone,int?)>)attribute).Value;
+        if(!Enum.IsDefined(typeof(CardZone), zone))
+        {
+            UnityLogger.LogError($"Invalid cardzone value : {zone}");
+            return;
+        }
+        CardContainerCollection collection = player.GetCardContainer(zone);
+        ContainerViewer containerViewer = Instantiate(containerViewerPrefab, rightClickMenuButtonHolder.parent);
+        containerViewer.Setup(collection, $"{collection.Zone}", false, revealCount);
+    }
     
     
     private void CreateLibraryMenu()

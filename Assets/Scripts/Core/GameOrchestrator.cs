@@ -75,6 +75,8 @@ public class GameOrchestrator : MonoBehaviour
 		this.playtable.networkAttributeFactory.attributeValueChanged += (attribute) => this.serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");
 		this.serverListener.onNetworkCommandReceived[NetworkInstruction.NetworkAttribute] += this.playtable.networkAttributeFactory.HandleNetworkedAttribute;
         List<string> opponentUUIDs = players.Keys.Where(uuid => this.lobbyManager.lobbyInfo.clientUUID != uuid).ToList();
+        List<Player> opponents = opponentUUIDs.Select(uuid => playtable.GetPlayer(uuid)).ToList();
+        opponents.ForEach(opponent => opponent.RevealCardZone.nonNetworkChange += (attribute) => rightClickMenuController.RevealOpponentZone(attribute, opponent));
         this.lobbyScreenChanger.OnPlaytableCreated(this.playtable);
         this.opponentRotator = new(opponentUUIDs, this.playtable);
         this.playerDescriptionController.InitializeDescriptions(this.playtable,clientPlayer, opponentRotator);
@@ -127,6 +129,8 @@ public class GameOrchestrator : MonoBehaviour
     {
         uuids.ForEach(uuid => playtable.GetPlayer(uuid).RevealCardZone.SetValue((zone, revealCardCount)));
     }
+
+
 
     public string GetPlayerName(string uuid)
     {
