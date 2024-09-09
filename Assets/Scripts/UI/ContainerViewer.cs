@@ -48,7 +48,6 @@ public class ContainerViewer : MonoBehaviour, IDroppable
     {
         ClearExistingCards();
         List<int> cardIds = GetCardsToRender(attribute);
-        UnityLogger.Log($"ALL CARD IDs - {JsonConvert.SerializeObject(cardIds)}");
         SetupGridLayout(cardIds.Count);
         cardIds.ForEach(cardId => SetupGridCard(cardId));
     }
@@ -180,15 +179,41 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         return localPoint - new Vector2(rect.rect.size.x * -1,rect.rect.size.y)/2;
     }
 
-    private int AlignInsertIndex(Vector2 mousePos, int closestChild)
+    private int AlignInsertIndex(Vector2 mousePos, int insertPosition)
     {
-        RectTransform rect = idToTransform[closestChild].Item2.GetComponent<RectTransform>();
-        if(mousePos.x > rect.anchoredPosition.x)
+        RectTransform rect = idToTransform[insertPosition].Item2.GetComponent<RectTransform>();
+        if(mousePos.x < rect.anchoredPosition.x)
         {
-            return closestChild + 1;
+            insertPosition += 1;
         }
-        return closestChild;
-        
+        return insertPosition;   
+    }
+
+    private int? GetInsertPosition(int insertCardId)
+    {
+        int totalRows = Mathf.CeilToInt(idToTransform.Count / (float)cardsPerRow);
+        Vector2 mousePos = GetMousePositionInGrid();
+        int closestChild = GetClosestGridChildIndex(gridLayout, mousePos, cardsPerRow ,totalRows);
+        int initialInsertId = idToTransform[closestChild].Item1;
+        idToTransform.Reverse();
+        int nonAdjustedInsertPosition = idToTransform.FindIndex(kvp => kvp.Item1 == initialInsertId);
+        int adjustedInsertPosition = AlignInsertIndex(mousePos, nonAdjustedInsertPosition);
+        for(int i = 0; i < adjustedInsertPosition; ++i)
+        {
+            if(idToTransform[i].Item1 == insertCardId)
+            {
+                adjustedInsertPosition -= 1;
+                break;
+            }
+        }
+
+        // // int adjustInsertId = idToTransform[AlignInsertIndex(mousePos, closestChild)].Item1;
+        // if(adjustInsertId == insertCardId)
+        // {
+        //     return null;
+        // }
+        // // List<(int,Transform)> listWithoutInsertCard = new(idToTransform.Where(kvp => kvp.Item1 != insertCardId).ToList());
+        return adjustedInsertPosition;
     }
 
     private InsertCardData? InsertCardIntoContainer(int cardId)
@@ -197,17 +222,12 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         {
             return new InsertCardData(null, cardId, null, false); 
         }   
-        int totalRows = Mathf.CeilToInt(idToTransform.Count / (float)cardsPerRow);
-        Vector2 mousePos = GetMousePositionInGrid();
-        int findClosestChild = GetClosestGridChildIndex(gridLayout, mousePos, cardsPerRow ,totalRows);
-        if(idToTransform[findClosestChild].Item1 == cardId)
+        int? insertPosition = GetInsertPosition(cardId);
+        if(!insertPosition.HasValue)
         {
             return null;
         }
-        int insertIndex = AlignInsertIndex(mousePos, findClosestChild);
-        UnityLogger.Log($"Closest child {findClosestChild} - insert Index {insertIndex}");
-
-        return new InsertCardData(null, cardId,Math.Max(0, idToTransform.Count - 1 - insertIndex) , false);
+        return new InsertCardData(null, cardId, insertPosition , false);
     }
 
     void Update()
