@@ -129,7 +129,7 @@ public class RightClickMenuController : MonoBehaviour
         }
         CardContainerCollection collection = player.GetCardContainer(zone);
         ContainerViewer containerViewer = Instantiate(containerViewerPrefab, rightClickMenuButtonHolder.parent);
-        containerViewer.Setup(collection, $"{collection.Zone}", false, revealCount);
+        containerViewer.Setup(collection, $"{collection.Zone}", true, revealCount);
     }
     
     
