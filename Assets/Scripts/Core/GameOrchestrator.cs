@@ -123,6 +123,16 @@ public class GameOrchestrator : MonoBehaviour
         collection.revealTopCard.SetValue(!collection.revealTopCard.Value);
     }
 
+    public void RevealZoneToOpponents(CardZone zone, List<string> uuids, int? revealCardCount)
+    {
+        uuids.ForEach(uuid => playtable.GetPlayer(uuid).RevealCardZone.SetValue((zone, revealCardCount)));
+    }
+
+    public string GetPlayerName(string uuid)
+    {
+        return playtable.GetPlayer(uuid).Name;
+    }
+
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.G))

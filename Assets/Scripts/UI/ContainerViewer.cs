@@ -206,13 +206,6 @@ public class ContainerViewer : MonoBehaviour, IDroppable
                 break;
             }
         }
-
-        // // int adjustInsertId = idToTransform[AlignInsertIndex(mousePos, closestChild)].Item1;
-        // if(adjustInsertId == insertCardId)
-        // {
-        //     return null;
-        // }
-        // // List<(int,Transform)> listWithoutInsertCard = new(idToTransform.Where(kvp => kvp.Item1 != insertCardId).ToList());
         return adjustedInsertPosition;
     }
 

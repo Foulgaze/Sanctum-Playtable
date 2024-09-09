@@ -13,6 +13,7 @@ public class RightClickMenuController : MonoBehaviour
     [SerializeField] private RectTransform rightClickMenuButtonHolder;
     [SerializeField] private Transform menuDisableBtn;
     [SerializeField] private SingleIntInputField singleIntInputFieldPrefab;
+    [SerializeField] private PlayerSelector playerSelectorPrefab;
     [SerializeField] private Transform mainGameplayScreen;
     [SerializeField] private Button buttonPrefab;
     [SerializeField] private ContainerViewer containerViewerPrefab;
@@ -75,15 +76,7 @@ public class RightClickMenuController : MonoBehaviour
     private void SetupSingleIntInput(string name, Action<string> submitBtnAction, string submitBtnName)
     {
         SingleIntInputField singleIntInputField = Instantiate(singleIntInputFieldPrefab,mainGameplayScreen);
-        singleIntInputField.Setup(name, submitBtnName);
-        singleIntInputField.submitBtn.onClick.AddListener(() => 
-        {
-            if(string.IsNullOrEmpty(singleIntInputField.input.text))
-            {
-                return;
-            }
-            submitBtnAction(singleIntInputField.input.text);
-        });
+        singleIntInputField.Setup(name, submitBtnAction,submitBtnName);
         singleIntInputField.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
     private Button CreateBtn(string buttonText, Action onClick)
@@ -113,8 +106,20 @@ public class RightClickMenuController : MonoBehaviour
             containerViewer.Setup(collection, $"{collection.Zone}", false, int.Parse(rawCardCount));
         };
         SetupSingleIntInput(name : "Reveal Count", revealCards, "Reveal");
-        
     }
+    private void CreateOpponentSelectMenu(string windowName, Action<List<string>> submitAction,string submitBtnText)
+    {
+        PlayerSelector playerSelector = Instantiate(playerSelectorPrefab, mainGameplayScreen);
+        playerSelector.Setup(windowName, submitAction,submitBtnText);
+    }
+
+    private void RevealLibraryOpponent()
+    {
+        Action<List<string>> revealAction = (uuids) => {GameOrchestrator.Instance.RevealZoneToOpponents(CardZone.Library, uuids, null);};
+        CreateOpponentSelectMenu("Reveal Library", revealAction, "Reveal"); 
+    }
+    
+    
     private void CreateLibraryMenu()
     {
         CleanupRightClickMenu();
@@ -126,7 +131,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Shuffle", () => ExecuteSpecialAction(SpecialAction.Shuffle)),
             CreateBtn("View All Cards", () => {CreateContianerView(clientPlayer.GetCardContainer(CardZone.Library));}),
             CreateBtn("View Top Cards", () => {CreateContainerRevealCards(clientPlayer.GetCardContainer(CardZone.Library));}),
-            CreateBtn("Reveal To", () => {} ),
+            CreateBtn("Reveal To", () => {RevealLibraryOpponent();} ),
             CreateBtn("Reveal Top Cards To", () => {} ),
             CreateBtn("Flip Top Card", () => {GameOrchestrator.Instance.FlipLibraryTop();} ),
             CreateBtn("Mill Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Mill, input), "Mill" )),
