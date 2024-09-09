@@ -113,22 +113,34 @@ public class RightClickMenuController : MonoBehaviour
         playerSelector.Setup(windowName, submitAction,submitBtnText);
     }
 
-    private void RevealLibraryOpponent()
+    private void RevealLibraryOpponent(int? setValue = null)
     {
-        Action<List<string>> revealAction = (uuids) => {GameOrchestrator.Instance.RevealZoneToOpponents(CardZone.Library, uuids, null);};
+        Action<List<string>> revealAction = (uuids) => {GameOrchestrator.Instance.RevealZoneToOpponents(CardZone.Library, uuids, setValue);};
         CreateOpponentSelectMenu("Reveal Library", revealAction, "Reveal"); 
     }
 
-    public void RevealOpponentZone(NetworkAttribute attribute, Player player)
+    private void RevealLibraryToOpponentCount(string rawCountValue)
     {
-        (CardZone zone, int? revealCount) = ((NetworkAttribute<(CardZone,int?)>)attribute).Value;
+        int? value = !string.IsNullOrWhiteSpace(rawCountValue) ? int.Parse(rawCountValue) : null;
+        RevealLibraryOpponent(value);
+    }
+
+    public void RevealOpponentZone(NetworkAttribute attribute, Playtable table)
+    {
+        (CardZone zone,string opponentUUID, int? revealCount) = ((NetworkAttribute<(CardZone,string,int?)>)attribute).Value;
         if(!Enum.IsDefined(typeof(CardZone), zone))
         {
             UnityLogger.LogError($"Invalid cardzone value : {zone}");
             return;
         }
-        CardContainerCollection collection = player.GetCardContainer(zone);
+        Player? opponentPlayer = table.GetPlayer(opponentUUID);
+        if(opponentPlayer == null)
+        {
+            UnityLogger.LogError($"Unable to find opponent of id - {opponentUUID}");
+            return;
+        }
         ContainerViewer containerViewer = Instantiate(containerViewerPrefab, rightClickMenuButtonHolder.parent);
+        CardContainerCollection collection = opponentPlayer.GetCardContainer(zone);
         containerViewer.Setup(collection, $"{collection.Zone}", true, revealCount);
     }
     
@@ -145,7 +157,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("View All Cards", () => {CreateContianerView(clientPlayer.GetCardContainer(CardZone.Library));}),
             CreateBtn("View Top Cards", () => {CreateContainerRevealCards(clientPlayer.GetCardContainer(CardZone.Library));}),
             CreateBtn("Reveal To", () => {RevealLibraryOpponent();} ),
-            CreateBtn("Reveal Top Cards To", () => {} ),
+            CreateBtn("Reveal Top Cards To", () => {SetupSingleIntInput("Reveal To Opponent Card Count", RevealLibraryToOpponentCount, "Select Opponents");} ),
             CreateBtn("Flip Top Card", () => {GameOrchestrator.Instance.FlipLibraryTop();} ),
             CreateBtn("Mill Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Mill, input), "Mill" )),
             CreateBtn("Exile Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Exile, input), "Mill" )),

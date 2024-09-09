@@ -20,6 +20,7 @@ public class PlayerSelector : MonoBehaviour
         this.submitBtnText.text = submitBtnText;
         submitBtn.onClick.AddListener(() => {submitAction(GetSelectedUUIDs());});
         closeBtn.onClick.AddListener(() => Destroy(this.gameObject));
+        submitBtn.onClick.AddListener(() => Destroy(this.gameObject));
         SetupToggles();
     }
 

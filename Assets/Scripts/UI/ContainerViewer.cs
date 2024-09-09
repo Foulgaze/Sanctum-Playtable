@@ -36,6 +36,10 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         this.revealCardCount = revealCardCount;
         SetupRevealedCards(collection.boardState);
         UpdateCardContainer(collection.boardState);
+        if(isOpponents)
+        {
+            gridLayout.gameObject.layer = LayerMask.NameToLayer("UI");
+        }
     }
 
     private bool RevealAllCards()
