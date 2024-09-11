@@ -73,7 +73,7 @@ public class CardFactory : MonoBehaviour
 		return cardOnField;
 	}
 
-	private Card GetCard(int id)
+	public Card GetCard(int id)
 	{
 		Card? card = playtable.cardFactory.GetCard(id);
 
@@ -123,9 +123,4 @@ public class CardFactory : MonoBehaviour
 		cardIdToContainer[cardId] = zone;
 	}
 
-	public void SetCardFlip(int cardId, bool isUpsideDown)
-	{
-		Card card = GetCard(cardId);
-		card.isFlipped.SetValue(isUpsideDown);
-	}
 }

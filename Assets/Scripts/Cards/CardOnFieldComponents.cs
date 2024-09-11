@@ -24,8 +24,16 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         card.toughness.nonNetworkChange += SetupAttributes;
         card.isUsingBackSide.nonNetworkChange += SetupAttributes;
         enablePT = EnablePowerToughess();
-        SetupAttributes(null);
-        SetupBackground();
+        if(!card.isFlipped.Value)
+        {
+		    SetupAttributes(null);
+        }
+        else
+        {
+            RenderCard();
+        }
+        
+        
     }
 
     private void SetupBackground()
@@ -68,6 +76,15 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 		{
 			powerToughess.transform.parent.gameObject.SetActive(false);
 		}
+        RenderCard();
+        SetupBackground();
+
+		tappedSymbol.gameObject.SetActive(card.isTapped.Value);
+        // ROtate some amount
+    }
+
+    public void RenderCard()
+    {
         if(!card.isFlipped.Value)
         {
 		    TextureController.Instance.TextureImage(this);
@@ -76,8 +93,6 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         {
             TextureController.Instance.TextureBackOfCard(this);
         }
-		tappedSymbol.gameObject.SetActive(card.isTapped.Value);
-        // ROtate some amount
     }
 
     public void TextureSelf(CardInfo info, Sprite sprite)

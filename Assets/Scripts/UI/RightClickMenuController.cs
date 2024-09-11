@@ -64,7 +64,7 @@ public class RightClickMenuController : MonoBehaviour
         var fieldZones = new CardZone[]{CardZone.MainField, CardZone.LeftField, CardZone.RightField};
         if(fieldZones.Contains(hitCardCurrentZone))
         {
-            CreateCardOnFieldMenu();
+            CreateCardOnFieldMenu(hitCardScript.cardId);
         }
         else
         {
@@ -92,7 +92,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Play", () => GameOrchestrator.Instance.MoveCard(CardZone.MainField, new InsertCardData(null, cardId, null, true))),
             CreateBtn("Play Face Down", () => 
             {
-                CardFactory.Instance.SetCardFlip(cardId, true);
+                CardFactory.Instance.GetCard(cardId).isFlipped.SetValue(true);
                 GameOrchestrator.Instance.MoveCard(CardZone.MainField, new InsertCardData(null, cardId, null, true));
             }),
             CreateBtn("Move To", () => {CreateMoveToMenu(cardId);}),
@@ -100,9 +100,16 @@ public class RightClickMenuController : MonoBehaviour
         SetupMenu(setupButtons.Count);
         
     }
-    private void CreateCardOnFieldMenu()
+    private void CreateCardOnFieldMenu(int cardId)
     {
-
+        CleanupMenu();
+        Card card = CardFactory.Instance.GetCard(cardId); 
+        List<Button> setupButtons = new()
+        {
+            CreateBtn("Tap/Untap", () => {card.isTapped.SetValue(!card.isTapped.Value);}),
+            CreateBtn("Turn Over", () => {card.isFlipped.SetValue(!card.isFlipped.Value);}),
+        };
+        SetupMenu(setupButtons.Count);
     }
 
     private void HandleGameObjectRightClick()
