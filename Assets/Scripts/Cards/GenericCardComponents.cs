@@ -50,7 +50,7 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
     {
         if(renderBack != null)
         {
-            renderCardBack = (bool)renderBack || ;
+            renderCardBack = (bool)renderBack || card.isFlipped.Value;
         }
     
         if(renderCardBack)
