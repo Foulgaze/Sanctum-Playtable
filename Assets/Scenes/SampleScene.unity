@@ -1644,13 +1644,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c330d07e90119864e8582c7a54894d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightClickMenuButtonHolder: {fileID: 2094041140}
+  buttonHolder: {fileID: 2094041140}
   menuDisableBtn: {fileID: 1644289666}
   singleIntInputFieldPrefab: {fileID: 4827227516083999252, guid: de85353cd80f69d4c8bdd3593d254eb1, type: 3}
   playerSelectorPrefab: {fileID: 2003704337751514308, guid: 2f881da982e43444384e2f9796f1526e, type: 3}
   mainGameplayScreen: {fileID: 1998041330}
   buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
   containerViewerPrefab: {fileID: 5856819999723173368, guid: 9092b527445cbd64ca0f11d88399ab17, type: 3}
+  moveCardMenuPrefab: {fileID: 265312105039473404, guid: f9ff9f48275bcbc4883977ed539b922a, type: 3}
   widthAsAPercentageOfSceen: 0.1
   heightAsAPercentageOfSceen: 0.05
 --- !u!1 &296402555
