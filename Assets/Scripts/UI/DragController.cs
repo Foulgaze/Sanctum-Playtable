@@ -62,7 +62,7 @@ public class DragController : MonoBehaviour
         return hit.gameObject.GetComponent<T>();
     }
 
-    public  IDraggable? RaycastForDraggable()
+    public IDraggable? RaycastForDraggable()
     {
         var results = PerformUIRaycast(Input.mousePosition);
         var filteredResults = FilterAndSortRaycastResults(results);

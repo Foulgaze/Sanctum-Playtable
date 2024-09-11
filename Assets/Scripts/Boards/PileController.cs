@@ -58,6 +58,7 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     private void InstantiateCardTopper(int cardId)
     {
         Transform cardTopper = Instantiate(CardFactory.Instance.cardPilePrefab);
+        CardFactory.Instance.SetCardZone(cardId, this.zone);
         cardTopper.localScale = new Vector3(extents.x * 2, cardTopperExtents.y, extents.z * 2);
         cardTopper.position = GetNextCardPosition();
         cardTopper.SetParent(transform);

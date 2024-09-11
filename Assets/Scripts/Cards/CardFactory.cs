@@ -17,6 +17,7 @@ public class CardFactory : MonoBehaviour
 	public readonly Dictionary<string, Sprite> fileNameToSprite = new();
 	public readonly Dictionary<int, Queue<Transform>> uuidToCardOnField = new();
 	public readonly Dictionary<int, Queue<Transform>> uuidToCardImage = new();
+	public readonly Dictionary<int, CardZone> cardIdToContainer = new();
 	[SerializeField] Transform disposedCardParent;
 
 	
@@ -105,5 +106,20 @@ public class CardFactory : MonoBehaviour
 		
 		cardImage.GetComponent<Image>().raycastTarget = !isOpponentCard;
 		return cardImage;
+	}
+
+	public CardZone GetCardZone(int cardId)
+	{
+		Card? card = playtable.cardFactory.GetCard(cardId);
+		if(card == null)
+		{
+			throw new Exception($"Could not find card of id - {cardId}");
+		}
+		return cardIdToContainer[cardId];
+	}
+
+	public void SetCardZone(int cardId, CardZone zone)
+	{
+		cardIdToContainer[cardId] = zone;
 	}
 }

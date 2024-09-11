@@ -116,7 +116,7 @@ public class GameOrchestrator : MonoBehaviour
 
     public void DisableRightClickMenu()
     {
-        rightClickMenuController.CleanupRightClickMenu();
+        rightClickMenuController.CleanupMenu();
     }
 
     public void FlipLibraryTop()
@@ -128,6 +128,11 @@ public class GameOrchestrator : MonoBehaviour
     public void RevealZoneToOpponents(CardZone zone, List<string> uuids, int? revealCardCount)
     {
         uuids.ForEach(uuid => playtable.GetPlayer(uuid).RevealCardZone.SetValue((zone,lobbyManager.lobbyInfo.clientUUID, revealCardCount)));
+    }
+
+    public void SendSpecialAction(SpecialAction action, string payload)
+    {
+        serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)action}|{payload}");
     }
 
 

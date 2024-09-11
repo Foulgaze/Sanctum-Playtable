@@ -114,6 +114,8 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     private Transform CreateAndPositionCard(int cardId, Vector3 position, float rotation, Vector2 cardDimensions)
     {
         Transform card = CardFactory.Instance.GetCardImage(cardId,false);
+        CardFactory.Instance.SetCardZone(cardId, this.zone);
+
         card.GetComponent<RectTransform>().sizeDelta = cardDimensions;
         card.SetParent(transform);
         card.position = position;

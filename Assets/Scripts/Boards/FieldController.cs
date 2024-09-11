@@ -79,6 +79,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         foreach(int cardId in cardColumn)
         {
             Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId, isOpponent);
+            CardFactory.Instance.SetCardZone(cardId, this.zone);
             idToCardOnField[cardId] = onFieldCard;
             onFieldCard.localScale = new Vector3(cardWidth, onFieldCard.localScale.y, cardWidth * 1/widthToHeightRatio);
             onFieldCard.position = centerPosition;
