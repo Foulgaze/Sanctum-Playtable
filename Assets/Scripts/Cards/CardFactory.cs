@@ -122,4 +122,10 @@ public class CardFactory : MonoBehaviour
 	{
 		cardIdToContainer[cardId] = zone;
 	}
+
+	public void SetCardFlip(int cardId, bool isUpsideDown)
+	{
+		Card card = GetCard(cardId);
+		card.isFlipped.SetValue(isUpsideDown);
+	}
 }

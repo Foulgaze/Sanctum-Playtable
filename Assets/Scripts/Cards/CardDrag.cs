@@ -90,6 +90,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 
 	private void HandleCardRelease()
 	{
+		renderCardBack = false;
 		CardFactory.Instance.DisposeOfCard(cardId, draggableRect.transform, onField: false);
 
 		if (TryDropOnUIElement())

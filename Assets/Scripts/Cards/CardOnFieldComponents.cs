@@ -68,7 +68,14 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 		{
 			powerToughess.transform.parent.gameObject.SetActive(false);
 		}
-		TextureController.Instance.TextureImage(this);
+        if(!card.isFlipped.Value)
+        {
+		    TextureController.Instance.TextureImage(this);
+        }
+        else
+        {
+            TextureController.Instance.TextureBackOfCard(this);
+        }
 		tappedSymbol.gameObject.SetActive(card.isTapped.Value);
         // ROtate some amount
     }

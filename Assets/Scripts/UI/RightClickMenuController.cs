@@ -90,7 +90,11 @@ public class RightClickMenuController : MonoBehaviour
         List<Button> setupButtons = new()
         {
             CreateBtn("Play", () => GameOrchestrator.Instance.MoveCard(CardZone.MainField, new InsertCardData(null, cardId, null, true))),
-            CreateBtn("Play Face Down", () => GameOrchestrator.Instance.MoveCard(CardZone.MainField, new InsertCardData(null, cardId, null, true))),
+            CreateBtn("Play Face Down", () => 
+            {
+                CardFactory.Instance.SetCardFlip(cardId, true);
+                GameOrchestrator.Instance.MoveCard(CardZone.MainField, new InsertCardData(null, cardId, null, true));
+            }),
             CreateBtn("Move To", () => {CreateMoveToMenu(cardId);}),
         };
         SetupMenu(setupButtons.Count);

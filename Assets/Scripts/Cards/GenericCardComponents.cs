@@ -50,11 +50,7 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
     {
         if(renderBack != null)
         {
-            if(renderCardBack == renderBack)
-            {
-                return true;
-            }
-            renderCardBack = (bool)renderBack;
+            renderCardBack = (bool)renderBack || ;
         }
     
         if(renderCardBack)
