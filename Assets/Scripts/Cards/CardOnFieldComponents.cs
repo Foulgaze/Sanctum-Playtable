@@ -32,20 +32,16 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         {
             RenderCard();
         }
-        
-        
     }
 
     private void SetupBackground()
     {
         string pattern = @"\{([GRBWU])\}";
 
-        // Find all matches in the input string
         MatchCollection matches = Regex.Matches(card.CurrentInfo.manaCost, pattern);
 
         List<string> matchingChars = new();
 
-        // Iterate over each match and extract the value
         foreach (Match match in matches)
         {
             matchingChars.Add(match.Groups[1].Value);
@@ -66,7 +62,7 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 
     private void SetupAttributes(NetworkAttribute _)
     {
-		name.text = card.name.Value;
+        name.text = card.name.Value;
 		if(enablePT)
 		{
 			powerToughess.text = $"{card.power.Value}/{card.toughness.Value}";
