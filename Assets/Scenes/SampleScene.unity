@@ -1652,6 +1652,7 @@ MonoBehaviour:
   buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
   containerViewerPrefab: {fileID: 5856819999723173368, guid: 9092b527445cbd64ca0f11d88399ab17, type: 3}
   moveCardMenuPrefab: {fileID: 265312105039473404, guid: f9ff9f48275bcbc4883977ed539b922a, type: 3}
+  powerToughnessMenuPrefab: {fileID: 9182647339866525440, guid: c71d1fcc610fbda40a809c080e670089, type: 3}
   widthAsAPercentageOfSceen: 0.1
   heightAsAPercentageOfSceen: 0.05
 --- !u!1 &296402555

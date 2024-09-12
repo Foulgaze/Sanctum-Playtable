@@ -18,24 +18,22 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     public void Setup(Card card)
     {
         this.card = card;
-        card.isTapped.nonNetworkChange += SetupAttributes;
+        SetupAttributes(null);
+        SetupListeners();
+    }
+    
+    private void SetupListeners()
+    {
+        card.isTapped.nonNetworkChange += TapUntapCard;
         card.isFlipped.nonNetworkChange += SetupAttributes;
-        card.power.nonNetworkChange += SetupAttributes;
-        card.toughness.nonNetworkChange += SetupAttributes;
         card.isUsingBackSide.nonNetworkChange += SetupAttributes;
-        enablePT = EnablePowerToughess();
-        if(!card.isFlipped.Value)
-        {
-		    SetupAttributes(null);
-        }
-        else
-        {
-            RenderCard();
-        }
+        card.power.nonNetworkChange += SetupPT;
+        card.toughness.nonNetworkChange += SetupPT;
     }
 
     private void SetupBackground()
     {
+        
         string pattern = @"\{([GRBWU])\}";
 
         MatchCollection matches = Regex.Matches(card.CurrentInfo.manaCost, pattern);
@@ -48,38 +46,45 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         }
 
         matchingChars.Sort();
-
         string potentialFileName = string.Join("", matchingChars);
+
+        if(card.isFlipped.Value)
+        {
+            potentialFileName = "default";
+        }
+        print($"Matching name {potentialFileName} - {card.CurrentInfo.manaCost}");
+
         Sprite backgroundColor = CardFactory.Instance.fileNameToSprite.ContainsKey(potentialFileName) ? CardFactory.Instance.fileNameToSprite[potentialFileName]  : CardFactory.Instance.fileNameToSprite["default"];
         backgroundImage.sprite = backgroundColor;
     }
 
+    private void TapUntapCard(NetworkAttribute _)
+    {
+        tappedSymbol.gameObject.SetActive(card.isTapped.Value);
+    }
+    private void SetupPT(NetworkAttribute _)
+    {
+		powerToughess.text = $"{card.power.Value}/{card.toughness.Value}";
+        powerToughess.transform.parent.gameObject.SetActive(true);
+    }
     private bool EnablePowerToughess()
 	{
-		return card.CurrentInfo.power != string.Empty || card.CurrentInfo.toughness != string.Empty;
+        bool hasDefaultPT = card.CurrentInfo.power != string.Empty || card.CurrentInfo.toughness != string.Empty; 
+		return hasDefaultPT && !card.isFlipped.Value;
 	}
     
 
     private void SetupAttributes(NetworkAttribute _)
     {
-        name.text = card.name.Value;
-		if(enablePT)
-		{
-			powerToughess.text = $"{card.power.Value}/{card.toughness.Value}";
-			powerToughess.transform.parent.gameObject.SetActive(true);
-		}
-		else
-		{
-			powerToughess.transform.parent.gameObject.SetActive(false);
-		}
-        RenderCard();
+        SetupPT(null);
+        powerToughess.transform.parent.gameObject.SetActive(EnablePowerToughess());
+        name.text = card.isFlipped.Value ? string.Empty : card.name.Value;
+        RenderCardImage();
         SetupBackground();
-
-		tappedSymbol.gameObject.SetActive(card.isTapped.Value);
-        // ROtate some amount
+        TapUntapCard(null);
     }
 
-    public void RenderCard()
+    public void RenderCardImage()
     {
         if(!card.isFlipped.Value)
         {
@@ -107,10 +112,10 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 
     private void OnDestroy()
     {
-        card.isTapped.nonNetworkChange -= SetupAttributes;
+        card.isTapped.nonNetworkChange -= TapUntapCard;
         card.isFlipped.nonNetworkChange -= SetupAttributes;
-        card.power.nonNetworkChange -= SetupAttributes;
-        card.toughness.nonNetworkChange -= SetupAttributes;
         card.isUsingBackSide.nonNetworkChange -= SetupAttributes;
+        card.power.nonNetworkChange -= SetupPT;
+        card.toughness.nonNetworkChange -= SetupPT;
     }
 }

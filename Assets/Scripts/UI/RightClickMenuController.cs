@@ -19,6 +19,7 @@ public class RightClickMenuController : MonoBehaviour
     [SerializeField] private Button buttonPrefab;
     [SerializeField] private ContainerViewer containerViewerPrefab;
     [SerializeField] private Transform moveCardMenuPrefab;
+    [SerializeField] private Transform powerToughnessMenuPrefab;
     public event Action<NetworkInstruction, string> networkCommand = delegate{};
     public float widthAsAPercentageOfSceen = 0.1f;
     public float heightAsAPercentageOfSceen = 0.1f;
@@ -98,7 +99,6 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Move To", () => {CreateMoveToMenu(cardId);}),
         };
         SetupMenu(setupButtons.Count);
-        
     }
     private void CreateCardOnFieldMenu(int cardId)
     {
@@ -108,6 +108,7 @@ public class RightClickMenuController : MonoBehaviour
         {
             CreateBtn("Tap/Untap", () => {card.isTapped.SetValue(!card.isTapped.Value);}),
             CreateBtn("Turn Over", () => {card.isFlipped.SetValue(!card.isFlipped.Value);}),
+            CreateBtn("Change Power/Toughness", () => {Instantiate(powerToughnessMenuPrefab, mainGameplayScreen).GetComponent<powerToughenssController>().Setup(card);}),
         };
         SetupMenu(setupButtons.Count);
     }
