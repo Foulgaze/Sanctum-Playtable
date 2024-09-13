@@ -132,7 +132,8 @@ public class GameOrchestrator : MonoBehaviour
 
     public void SendSpecialAction(SpecialAction action, string payload)
     {
-        serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)action}|{payload}");
+        playtable.specialAction.SetValue((payload,lobbyManager.lobbyInfo.clientUUID,action));
+        // serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)action}|{payload}");
     }
 
 
@@ -146,7 +147,7 @@ public class GameOrchestrator : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.G))
         {
-            serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Mill}|10");
+            this.SendSpecialAction(SpecialAction.Mill, "10");
         }
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.L))
         {
@@ -158,7 +159,7 @@ public class GameOrchestrator : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.N))
         {
-            serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|1");
+            this.SendSpecialAction(SpecialAction.Draw, "1");
         }
         serverListener.ReadServerData();
     }	

@@ -109,6 +109,7 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Tap/Untap", () => {card.isTapped.SetValue(!card.isTapped.Value);}),
             CreateBtn("Turn Over", () => {card.isFlipped.SetValue(!card.isFlipped.Value);}),
             CreateBtn("Change Power/Toughness", () => {Instantiate(powerToughnessMenuPrefab, mainGameplayScreen).GetComponent<powerToughenssController>().Setup(card);}),
+            CreateBtn("Copy Card", () => {GameOrchestrator.Instance.SendSpecialAction(SpecialAction.CopyCard,cardId.ToString());}),
         };
         SetupMenu(setupButtons.Count);
     }
@@ -168,9 +169,9 @@ public class RightClickMenuController : MonoBehaviour
         return button;
     }
 
-    private void ExecuteSpecialAction(SpecialAction action, string parameter = "")
+    private void ExecuteSpecialAction(SpecialAction action, string payload = "")
     {
-        networkCommand(NetworkInstruction.SpecialAction, $"{(int)action}|{parameter}");
+        GameOrchestrator.Instance.SendSpecialAction(action, payload);
     }
 
     private void CreateContianerView(CardContainerCollection collection)
