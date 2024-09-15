@@ -140,6 +140,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         float hitXPosition = hit.Value.point.x;
         int insertPosition = 0;
         currentlyHeldCardContainers = currentlyHeldCardContainers.Where(container => container.Any()).ToList(); // Remove empty containers
+        bool foundSelf = false;
 		for(; insertPosition < currentlyHeldCardContainers.Count; ++insertPosition)
         {
             float xPositionOfContainer = idToCardOnField[currentlyHeldCardContainers[insertPosition][0]].transform.position.x; 
@@ -147,6 +148,14 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
             {
                 break;
             }
+            if(currentlyHeldCardContainers[insertPosition].Contains(cardId))
+            {
+                foundSelf = true;
+            }
+        }
+        if(foundSelf)
+        {
+            insertPosition -= 1;
         }
         return new InsertCardData(insertPosition, cardId, null, true);
 
