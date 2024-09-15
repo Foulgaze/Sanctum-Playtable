@@ -181,7 +181,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -214,7 +214,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28.1
+  m_fontSize: 31.55
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -798,7 +798,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.25, y: 0.76000005}
   m_AnchorMax: {x: 0.75, y: 0.92946887}
-  m_AnchoredPosition: {x: 0.000017926, y: -0.00000006333}
+  m_AnchoredPosition: {x: 0.000015258789, y: 0}
   m_SizeDelta: {x: 0.000030518, y: 0.000091553}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5412228211169981942
@@ -823,7 +823,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.84313726, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -851,6 +851,7 @@ GameObject:
   - component: {fileID: 5146465590489525690}
   - component: {fileID: 1091915970441689839}
   - component: {fileID: 5321696238342200475}
+  - component: {fileID: 141727127583684699}
   m_Layer: 5
   m_Name: ptMenu
   m_TagString: Untagged
@@ -877,10 +878,10 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.37, y: 0.35500002}
-  m_AnchorMax: {x: 0.63, y: 0.683}
-  m_AnchoredPosition: {x: -0.000017166, y: 0.000030875}
-  m_SizeDelta: {x: 0.0001, y: 0}
+  m_AnchorMin: {x: 0.4337396, y: 0.4233148}
+  m_AnchorMax: {x: 0.5797813, y: 0.6038334}
+  m_AnchoredPosition: {x: 0, y: -0.000015259}
+  m_SizeDelta: {x: 0.00012207, y: -0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5146465590489525690
 CanvasRenderer:
@@ -939,6 +940,18 @@ MonoBehaviour:
   toughnessMinusBtn: {fileID: 8990143011088556289}
   toughnessInputField: {fileID: 8462502008584001348}
   closeBtn: {fileID: 6979244550564904050}
+--- !u!114 &141727127583684699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3678866338497665337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea9af3f32de163346b5c34426ff55b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5252013501966526704
 GameObject:
   m_ObjectHideFlags: 0

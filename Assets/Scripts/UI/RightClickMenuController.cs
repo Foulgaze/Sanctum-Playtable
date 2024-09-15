@@ -338,6 +338,7 @@ public class RightClickMenuController : MonoBehaviour
         Vector2 boxDimensions = new Vector2(Screen.width*widthAsAPercentageOfSceen,Screen.height*heightAsAPercentageOfSceen*buttonCount );
         buttonHolder.sizeDelta = boxDimensions;
         buttonHolder.anchoredPosition = MouseUtility.Instance.GetMousePositionOnCanvas() + boxDimensions/2;
+        buttonHolder.SetAsLastSibling();
 
     }
 
