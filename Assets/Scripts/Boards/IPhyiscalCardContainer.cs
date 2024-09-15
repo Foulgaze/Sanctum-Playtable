@@ -13,6 +13,7 @@ public interface IPhysicalCardContainer
     public void RerenderContainer();
     public void FlipTopCard(NetworkAttribute value);
     public bool RevealTopCard();
+    
 
 
 }
