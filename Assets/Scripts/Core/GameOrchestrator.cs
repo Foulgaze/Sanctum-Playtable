@@ -6,6 +6,7 @@ using System.Net;
 using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
+using UnityEngine.UI;
 using static LobbyManager;
 public class GameOrchestrator : MonoBehaviour
 {
@@ -14,7 +15,9 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private ScreenChanger lobbyScreenChanger;
     [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
     [SerializeField] private BoardController boardController;
-
+    [SerializeField] private RightClickMenuController rightClickMenuController; 
+    [SerializeField] private Canvas canvas;
+    public float scaleFactor;
     public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
     private LobbyManager lobbyManager = new();
@@ -46,6 +49,13 @@ public class GameOrchestrator : MonoBehaviour
         this.InitListeners();
     }
 
+    void Start()
+    {
+        CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
+        scaleFactor = Mathf.Lerp(Screen.width / scaler.referenceResolution.x, Screen.height / scaler.referenceResolution.y, scaler.matchWidthOrHeight);
+        UnityLogger.LogError($"SCALE FACTOR - {scaleFactor}");
+    }
+
     private void InitListeners()
     {
         this.lobbyManager.sendNetworkCommand += this.serverListener.SendMessage;
@@ -61,6 +71,7 @@ public class GameOrchestrator : MonoBehaviour
         this.connectToLobbyMenu.createLobby += this.lobbyManager.CreateLobby;
         this.serverListener.onNetworkCommandReceived[NetworkInstruction.JoinLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
         this.serverListener.onNetworkCommandReceived[NetworkInstruction.CreateLobby] += (_) => this.lobbyScreenChanger.OnChangeToLobbyMenu();
+        this.rightClickMenuController.networkCommand += (instruction, payload) => this.serverListener.SendMessage(instruction,payload);
     }
 
     public void OnLobbyFilled(LobbyInfo info,  Dictionary<string, string> players)
@@ -68,9 +79,13 @@ public class GameOrchestrator : MonoBehaviour
 		this.playtable = new Playtable(players.Count, $"{this.pathToCSVs}/cards.csv", $"{this.pathToCSVs}/tokens.csv", isSlave: true);
 		players.Keys.ToList().ForEach(key => this.playtable.AddPlayer(key, players[key]));
         Player clientPlayer = this.playtable.GetPlayer(this.lobbyManager.lobbyInfo.clientUUID);
+        rightClickMenuController.clientPlayer = clientPlayer;
+        rightClickMenuController.tokenSelectMenu.Setup(CardData.GetTokenUUINamePairs());
 		this.playtable.networkAttributeFactory.attributeValueChanged += (attribute) => this.serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");
 		this.serverListener.onNetworkCommandReceived[NetworkInstruction.NetworkAttribute] += this.playtable.networkAttributeFactory.HandleNetworkedAttribute;
         List<string> opponentUUIDs = players.Keys.Where(uuid => this.lobbyManager.lobbyInfo.clientUUID != uuid).ToList();
+        List<Player> opponents = opponentUUIDs.Select(uuid => playtable.GetPlayer(uuid)).ToList();
+        clientPlayer.RevealCardZone.nonNetworkChange += (attribute) => rightClickMenuController.RevealOpponentZone(attribute, playtable);
         this.lobbyScreenChanger.OnPlaytableCreated(this.playtable);
         this.opponentRotator = new(opponentUUIDs, this.playtable);
         this.playerDescriptionController.InitializeDescriptions(this.playtable,clientPlayer, opponentRotator);
@@ -108,16 +123,40 @@ public class GameOrchestrator : MonoBehaviour
         collection.insertCardData.SetValue(data);
     }
 
-    public void MouseInHandBox()
+    public void DisableRightClickMenu()
     {
+        rightClickMenuController.CleanupMenu();
+    }
 
+    public void FlipLibraryTop()
+    {
+        CardContainerCollection collection = playtable.GetPlayer(lobbyManager.lobbyInfo.clientUUID).GetCardContainer(CardZone.Library);
+        collection.revealTopCard.SetValue(!collection.revealTopCard.Value);
+    }
+
+    public void RevealZoneToOpponents(CardZone zone, List<string> uuids, int? revealCardCount)
+    {
+        uuids.ForEach(uuid => playtable.GetPlayer(uuid).RevealCardZone.SetValue((zone,lobbyManager.lobbyInfo.clientUUID, revealCardCount)));
+    }
+
+    public void SendSpecialAction(SpecialAction action, string payload)
+    {
+        playtable.specialAction.SetValue((payload,lobbyManager.lobbyInfo.clientUUID,action));
+        // serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)action}|{payload}");
+    }
+
+
+
+    public string GetPlayerName(string uuid)
+    {
+        return playtable.GetPlayer(uuid).Name;
     }
 
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.G))
         {
-            serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Mill}|10");
+            this.SendSpecialAction(SpecialAction.Mill, "10");
         }
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.L))
         {
@@ -129,7 +168,7 @@ public class GameOrchestrator : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.LeftControl) && Input.GetKey(KeyCode.N))
         {
-            serverListener.SendMessage(NetworkInstruction.SpecialAction, $"{(int)SpecialAction.Draw}|1");
+            this.SendSpecialAction(SpecialAction.Draw, "1");
         }
         serverListener.ReadServerData();
     }	

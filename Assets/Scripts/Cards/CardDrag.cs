@@ -1,7 +1,10 @@
 
 
+using System.Collections.Generic;
 using Sanctum_Core;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class CardDrag : MonoBehaviour, IDraggable
 {
@@ -9,6 +12,8 @@ public class CardDrag : MonoBehaviour, IDraggable
 	private RectTransform rect;
 	private RectTransform draggableRect;
 	private Vector2 offset;
+	public bool renderCardBack = false;
+	
 
 	void Start()
 	{
@@ -18,7 +23,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	public void StartDrag(Transform dragParent)
     {
         GameOrchestrator.Instance.handController.currentHeldCardId = cardId;
-		Transform cardImage = CardFactory.Instance.GetCardImage(cardId, false);
+		Transform cardImage = CardFactory.Instance.GetCardImage(cardId, false,  renderCardBack : renderCardBack);
 		draggableRect = cardImage.GetComponent<RectTransform>();
 		draggableRect.transform.SetParent(dragParent);
 		SetupDraggedCard(draggableRect);
@@ -29,7 +34,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	{
 		if(GameOrchestrator.Instance.handController.CardInHand(cardId)) // In hand
 		{
-			return rect.anchoredPosition -  MouseUtility.Instance.GetMousePositionOnCanvas();
+			return MouseUtility.Instance.GetRectPositionInCanvasSpace(rect.position) -  MouseUtility.Instance.GetMousePositionOnCanvas();
 		}
 		draggableRect.anchoredPosition =  MouseUtility.Instance.GetMousePositionOnCanvas();
 		return Vector2.zero;
@@ -50,33 +55,84 @@ public class CardDrag : MonoBehaviour, IDraggable
     public void Release()
     {
 		GameOrchestrator.Instance.handController.currentHeldCardId = null;
-		RaycastForRelease();
+		HandleCardRelease();
     }
 
-	private void RaycastForRelease()
+	private IDroppable FindFirstDroppableUIElement()
 	{
-		Destroy(draggableRect.gameObject);
-		if(GameOrchestrator.Instance.handController.MouseInHand())
-		{
-			UnityLogger.Log($"Releasing in hand");
+		int draggableLayer = LayerMask.NameToLayer("Draggable");
 
-			GameOrchestrator.Instance.handController.AddCard(cardId);
+		List<RaycastResult> results = DragController.Instance.PerformUIRaycast(Input.mousePosition);
+		results = DragController.Instance.FilterAndSortRaycastResults(results);
+		if (results.Count == 0)
+		{
+			return null;
+		}
+		UnityLogger.LogError($"Results - {results.Count}");
+		int droppableIndex = SkipDraggableResults(results, draggableLayer);
+		UnityLogger.LogError($"Index - {droppableIndex}");
+		if (droppableIndex >= results.Count)
+		{
+			return null;
+		}		
+		return results[droppableIndex].gameObject.GetComponent<IDroppable>();
+	}
+
+	private int SkipDraggableResults(List<RaycastResult> results, int draggableLayer)
+	{
+		int index = 0;
+		while (index < results.Count && results[index].gameObject.layer == draggableLayer)
+		{
+			++index;
+		}
+		return index;
+	}
+
+	private void HandleCardRelease()
+	{
+		renderCardBack = false;
+		CardFactory.Instance.DisposeOfCard(cardId, draggableRect.transform, onField: false);
+
+		if (TryDropOnUIElement())
+		{
 			return;
 		}
 
+		if (TryDropOnPhysicalContainer())
+		{
+			return;
+		}
+	}
+
+	private bool TryDropOnUIElement()
+	{
+		IDroppable? droppableElement = FindFirstDroppableUIElement();
+		if (droppableElement == null)
+		{
+			UnityLogger.LogError("Could not find drop script");
+			return false;
+		}
+
+		droppableElement.DropCard(cardId);
+		return true;
+	}
+
+	private bool TryDropOnPhysicalContainer()
+	{
 		RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(BoardController.cardContainerLayermask);
-		if(!hit.HasValue)
+		if (!hit.HasValue)
 		{
-			return;
+			return false;
 		}
+
 		IPhysicalCardContainer? container = hit.Value.transform.GetComponent<IPhysicalCardContainer>();
-		if(container == null)
+		if (container == null)
 		{
-			
 			UnityLogger.LogError($"Unable to find container script on object - {hit.Value.transform.name}");
-			GameOrchestrator.Instance.handController.AddCard(cardId); // Add to hand if breaks :)
-			return;
+			return false;
 		}
+
 		container.AddCard(cardId);
+		return true;
 	}
 }

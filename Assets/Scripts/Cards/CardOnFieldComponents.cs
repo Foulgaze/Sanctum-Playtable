@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Sanctum_Core;
@@ -17,60 +18,86 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 
     public void Setup(Card card)
     {
+        print($"SETTING UP CARD - {card.name.Value}");
         this.card = card;
-        card.isTapped.nonNetworkChange += SetupAttributes;
-        card.isFlipped.nonNetworkChange += SetupAttributes;
-        card.power.nonNetworkChange += SetupAttributes;
-        card.toughness.nonNetworkChange += SetupAttributes;
-        card.isUsingBackSide.nonNetworkChange += SetupAttributes;
-        enablePT = EnablePowerToughess();
         SetupAttributes(null);
-        SetupBackground();
+        SetupListeners();
+        
+        
+    }
+    
+    private void SetupListeners()
+    {
+        card.isTapped.nonNetworkChange += TapUntapCard;
+        card.isFlipped.nonNetworkChange += SetupAttributes;
+        card.isUsingBackSide.nonNetworkChange += SetupAttributes;
+        card.power.nonNetworkChange += SetupPT;
+        card.toughness.nonNetworkChange += SetupPT;
     }
 
     private void SetupBackground()
     {
+        
         string pattern = @"\{([GRBWU])\}";
 
-        // Find all matches in the input string
         MatchCollection matches = Regex.Matches(card.CurrentInfo.manaCost, pattern);
 
         List<string> matchingChars = new();
 
-        // Iterate over each match and extract the value
         foreach (Match match in matches)
         {
             matchingChars.Add(match.Groups[1].Value);
         }
 
         matchingChars.Sort();
+        string potentialFileName = string.Join("", new HashSet<string>(matchingChars));
 
-        string potentialFileName = string.Join("", matchingChars);
+        if(card.isFlipped.Value)
+        {
+            potentialFileName = "default";
+        }
+
         Sprite backgroundColor = CardFactory.Instance.fileNameToSprite.ContainsKey(potentialFileName) ? CardFactory.Instance.fileNameToSprite[potentialFileName]  : CardFactory.Instance.fileNameToSprite["default"];
         backgroundImage.sprite = backgroundColor;
     }
 
+    private void TapUntapCard(NetworkAttribute _)
+    {
+        tappedSymbol.gameObject.SetActive(card.isTapped.Value);
+    }
+    private void SetupPT(NetworkAttribute _)
+    {
+		powerToughess.text = $"{card.power.Value}/{card.toughness.Value}";
+        powerToughess.transform.parent.gameObject.SetActive(true);
+    }
     private bool EnablePowerToughess()
 	{
-		return card.CurrentInfo.power != string.Empty || card.CurrentInfo.toughness != string.Empty;
+        bool hasDefaultPT = card.CurrentInfo.power != string.Empty || card.CurrentInfo.toughness != string.Empty; 
+        return hasDefaultPT && !card.isFlipped.Value;
 	}
     
 
     private void SetupAttributes(NetworkAttribute _)
     {
-		name.text = card.name.Value;
-		if(enablePT)
-		{
-			powerToughess.text = $"{card.power.Value}/{card.toughness.Value}";
-			powerToughess.transform.parent.gameObject.SetActive(true);
-		}
-		else
-		{
-			powerToughess.transform.parent.gameObject.SetActive(false);
-		}
-		TextureController.Instance.TextureImage(this);
-		tappedSymbol.gameObject.SetActive(card.isTapped.Value);
-        // ROtate some amount
+        SetupPT(null);
+        powerToughess.transform.parent.gameObject.SetActive(EnablePowerToughess());
+        UnityLogger.LogError($"Setting Power TOughness - {EnablePowerToughess()}");
+        name.text = card.isFlipped.Value ? string.Empty : card.CurrentInfo.name;
+        RenderCardImage();
+        SetupBackground();
+        TapUntapCard(null);
+    }
+
+    public void RenderCardImage()
+    {
+        if(!card.isFlipped.Value)
+        {
+		    TextureController.Instance.TextureImage(this);
+        }
+        else
+        {
+            TextureController.Instance.TextureBackOfCard(this);
+        }
     }
 
     public void TextureSelf(CardInfo info, Sprite sprite)
@@ -78,7 +105,6 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         if(info.name == card.CurrentInfo.name)
         {
             cardImage.sprite = sprite;
-		    
 
         }
     }
@@ -86,5 +112,14 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     public Card GetCard()
     {
         return card;
+    }
+
+    private void OnDestroy()
+    {
+        card.isTapped.nonNetworkChange -= TapUntapCard;
+        card.isFlipped.nonNetworkChange -= SetupAttributes;
+        card.isUsingBackSide.nonNetworkChange -= SetupAttributes;
+        card.power.nonNetworkChange -= SetupPT;
+        card.toughness.nonNetworkChange -= SetupPT;
     }
 }

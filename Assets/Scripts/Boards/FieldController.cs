@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +15,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     private static float widthToHeightRatio = 4/3f;
     private float percentageOfCardAsSpacer = 0.25f;
     public int defaultCardCount = 0;
-    private Dictionary<int, GameObject> idToCardOnField = new();
+    private Dictionary<int, Transform> idToCardOnField = new();
     private List<List<int>> currentlyHeldCardContainers = new();
     private int cardLayermask;
     
@@ -46,9 +47,9 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
+        UnityLogger.Log($"RENDERING - {JsonConvert.SerializeObject(boardDescription)}");
         currentlyHeldCardContainers = boardDescription;
-        idToCardOnField.Values.ToList().ForEach(card => Destroy(card));
-        idToCardOnField.Clear();
+        ClearExistingCards();
 
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
         float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount + 1) * percentageOfCardAsSpacer);
@@ -64,6 +65,15 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         }
     }
 
+    private void ClearExistingCards()
+    {
+        foreach(var kvp in idToCardOnField)
+        {
+            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField: true);
+        }
+        idToCardOnField.Clear();
+    }
+
     private void RenderCardColumn(List<int> cardColumn, float cardWidth, Vector3 centerPosition)
     {
         float offsetX = 0.1f * cardWidth;
@@ -71,7 +81,8 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         foreach(int cardId in cardColumn)
         {
             Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId, isOpponent);
-            idToCardOnField[cardId] = onFieldCard.gameObject;
+            CardFactory.Instance.SetCardZone(cardId, this.zone);
+            idToCardOnField[cardId] = onFieldCard;
             onFieldCard.localScale = new Vector3(cardWidth, onFieldCard.localScale.y, cardWidth * 1/widthToHeightRatio);
             onFieldCard.position = centerPosition;
             onFieldCard.SetParent(transform);
@@ -146,18 +157,18 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         UpdateHolder(this.currentlyHeldCardContainers);
     }
 
-    public void RemoveCard(int cardId)
+    public void FlipTopCard(NetworkAttribute value)
     {
-        for (int i = 0; i < currentlyHeldCardContainers.Count; i++)
-        {
-            var innerList = currentlyHeldCardContainers[i];
-            int index = innerList.IndexOf(cardId);
-            if (index != -1)
-            {
-                innerList.RemoveAt(index);
-                RerenderContainer();
-                return;
-            }
-        }
+        UnityLogger.LogError("Trying to flip top card of field");
+        return;
+    }
+
+    public bool RevealTopCard()
+    {
+        return true;
+    }
+    public bool IsOpponent()
+    {
+        return this.isOpponent;
     }
 }

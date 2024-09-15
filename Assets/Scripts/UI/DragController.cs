@@ -14,11 +14,24 @@ public class DragController : MonoBehaviour
     [SerializeField] private Transform dragParent;
     [SerializeField] private CanvasScaler scaler;
     public static float scaleFactor;
+    private int ignoreLayer = 0;
     private Vector2 offset;
-
+    public static DragController Instance;
+    private void Awake() 
+    {         
+        if (Instance != null && Instance != this) 
+        { 
+            Destroy(this); 
+        } 
+        else 
+        { 
+            Instance = this; 
+        } 
+    }
     void Start()
     {
         scaleFactor = scaler.scaleFactor;
+        ignoreLayer = LayerMask.NameToLayer("IgnoreRaycast");
         pointerEventData = new(eventSystem);
     }
     public bool IsDragging()
@@ -26,38 +39,57 @@ public class DragController : MonoBehaviour
         return currentDragScript != null;
     }
 
-    private (GameObject?, IDraggable?) RaycastForUI()
+    public List<RaycastResult> PerformUIRaycast(Vector2 screenPosition)
     {
         List<RaycastResult> results = new List<RaycastResult>();
         pointerEventData = new PointerEventData(eventSystem);
-        pointerEventData.position = Input.mousePosition;
+        pointerEventData.position = screenPosition;
         eventSystem.RaycastAll(pointerEventData, results);
-        if(results.Count == 0)
+        return results;
+    }
+
+    public List<RaycastResult> FilterAndSortRaycastResults(List<RaycastResult> results)
+    {
+        return results
+            .Where(result => result.gameObject.layer != ignoreLayer)
+            .OrderBy(result => result.distance)
+            .ThenByDescending(result => result.sortingOrder)
+            .ToList();
+    }
+
+    public T GetComponentFromRaycastResult<T>(RaycastResult hit) where T : class
+    {
+        return hit.gameObject.GetComponent<T>();
+    }
+
+    public IDraggable? RaycastForDraggable()
+    {
+        var results = PerformUIRaycast(Input.mousePosition);
+        var filteredResults = FilterAndSortRaycastResults(results);
+
+        if (filteredResults.Count == 0)
         {
-            return (null,null);
+            return null;
         }
+
+        var hit = filteredResults[0];
+        var dragScript = GetComponentFromRaycastResult<IDraggable>(hit);
         
-        results = results.OrderBy(result => result.distance).ThenByDescending(result => result.sortingOrder).ToList();
-        RaycastResult hit = results[0];
-        IDraggable dragScript = hit.gameObject.GetComponent<IDraggable>();
-        if(dragScript == null)
-        {
-            //UnityLogger.LogError($"Could not find drag script on {hit.gameObject.name}");
-        }        
-        return (hit.gameObject, dragScript);
+        return dragScript;
     }
 
     private void CheckForStartDrag()
     {
         if(Input.GetMouseButtonDown((int)MouseButton.Left))
         {
-            (GameObject? dragObj , IDraggable? dragScript) = RaycastForUI();
+            IDraggable? dragScript = RaycastForDraggable();
             if(dragScript == null)
             {
                 return;
             }
             currentDragScript = dragScript;
             dragScript.StartDrag(dragParent);
+            GameOrchestrator.Instance.DisableRightClickMenu();
         }
     }
     private void CheckForReleaseDrag()

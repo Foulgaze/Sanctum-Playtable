@@ -63,7 +63,6 @@ public class BoardController : MonoBehaviour
 
     public void SetupListeners(Playtable table, Player clientPlayer, Dictionary<string,string> uuidToName)
     {
-        UnityLogger.Log("Setting up listeners");
         foreach (string uuid in uuidToName.Keys)
         {
             Player player = table.GetPlayer(uuid);
@@ -89,6 +88,7 @@ public class BoardController : MonoBehaviour
         {
             var cardContainer = player.GetCardContainer(kvp.Key);
             cardContainer.boardState.nonNetworkChange += kvp.Value.OnCardAdded;
+            cardContainer.revealTopCard.nonNetworkChange += kvp.Value.FlipTopCard;
         }
     }
 
@@ -103,11 +103,10 @@ public class BoardController : MonoBehaviour
     private void RemoveNumbers(List<List<int>> listOfLists, List<int> numbersToRemove)
     {
         HashSet<int> numbers = new HashSet<int>(numbersToRemove);
-        // Iterate through each sublist
         foreach (var sublist in listOfLists)
         {
-            // Remove each number in numbersToRemove from the current sublist
             sublist.RemoveAll(num => numbers.Contains(num));
         }
+        listOfLists.RemoveAll(sublist => sublist.Count == 0);
     }
 }

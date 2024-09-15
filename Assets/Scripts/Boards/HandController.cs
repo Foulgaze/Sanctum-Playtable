@@ -6,22 +6,22 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HandController : MonoBehaviour, IPhysicalCardContainer
+public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
 {
     [SerializeField] private Transform leftHandLocation;
     [SerializeField] private Transform middleHandLocation;
     [SerializeField] private Transform rightHandLocation;
+    private RectTransform handBox;
     public readonly static float cardHeightToWidthRatio = 7f / 5f;
     public int? currentHeldCardId {get; set;}= null;
     private CardZone zone;
     public int defaultHandSize = 7;
     private static float percentageOfScreenForCardWidth = 0.1f;
-    private readonly List<Transform> cardTransforms = new();
-    [SerializeField] private RectTransform handBox;
+    private readonly Dictionary<int,Transform> idToCardTransform = new();
     private List<int> currentlyHeldCards = new();
     void Start()
     {
-        
+        handBox = GetComponent<RectTransform>();
         
     }
     public CardZone GetZone()
@@ -48,7 +48,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     {
         ClearExistingCards();
 
-        if (IsBoardEmpty(boardDescription))
+        if (boardDescription.Count == 0 || boardDescription[0].Count == 0)
         {
             return;
         }
@@ -69,7 +69,8 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         {
  
             Transform newCard = CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
-            cardTransforms.Add(newCard);
+            
+            idToCardTransform[cardIds[i]] = newCard;
         }
     }
 
@@ -80,13 +81,12 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
 
     private void ClearExistingCards()
     {
-        cardTransforms.ForEach(card => Destroy(card.gameObject));
-        cardTransforms.Clear();
-    }
-
-    private bool IsBoardEmpty(List<List<int>> boardDescription)
-    {
-        return boardDescription.Count == 0 || boardDescription[0].Count == 0;
+        foreach(var kvp in idToCardTransform)
+        {
+            kvp.Value.rotation = Quaternion.Euler(0,0,0);
+            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField: false);
+        }
+        idToCardTransform.Clear();
     }
 
     public static Vector2 CalculateCardDimensions()
@@ -116,7 +116,11 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
     private Transform CreateAndPositionCard(int cardId, Vector3 position, float rotation, Vector2 cardDimensions)
     {
         Transform card = CardFactory.Instance.GetCardImage(cardId,false);
-        card.GetComponent<RectTransform>().sizeDelta = cardDimensions;
+        CardFactory.Instance.SetCardZone(cardId, this.zone);
+
+        RectTransform rect = card.GetComponent<RectTransform>();
+        rect.sizeDelta = cardDimensions;
+        rect.localScale = Vector3.one;
         card.SetParent(transform);
         card.position = position;
         card.GetChild(0).GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
@@ -132,21 +136,32 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer
         GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
     }
 
-    public bool MouseInHand()
-    {
-        return RectTransformUtility.RectangleContainsScreenPoint(handBox, Input.mousePosition);
-    }
-
     public void RerenderContainer()
     {
         UpdateHolder(new List<List<int>>(){currentlyHeldCards});
     }
 
-    public void RemoveCard(int cardId)
+    public bool MouseInHand()
     {
-        if(currentlyHeldCards.Remove(cardId))
-        {
-            RerenderContainer();
-        }
+        return RectTransformUtility.RectangleContainsScreenPoint(handBox, Input.mousePosition);
+    }
+
+    public void FlipTopCard(NetworkAttribute value)
+    {
+        UnityLogger.LogError("Trying to flip top card of hand");
+        return;
+    }
+    public bool RevealTopCard()
+    {
+        return true;
+    }
+
+    public void DropCard(int cardId)
+    {
+        AddCard(cardId);
+    }
+    public bool IsOpponent()
+    {
+        return false;
     }
 }

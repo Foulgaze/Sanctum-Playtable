@@ -11,6 +11,7 @@ using Sanctum_Core;
 
 public class TextureController : MonoBehaviour
 {
+    [SerializeField] Sprite cardBack;
     public static TextureController Instance { get; private set; }
     private float timer = 0;
     private float cooldownPeriod = 0.1f; // 10 miliseconds
@@ -28,6 +29,11 @@ public class TextureController : MonoBehaviour
         { 
             Instance = this; 
         } 
+    }
+    public bool TextureBackOfCard(ITextureable toBeTextured)
+    {
+        toBeTextured.TextureSelf(toBeTextured.GetCard().CurrentInfo,cardBack);
+        return true;
     }
     public bool TextureImage(ITextureable toBeTextured)
     {

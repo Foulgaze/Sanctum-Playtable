@@ -41,6 +41,13 @@ public class MouseUtility : MonoBehaviour
         return localPoint;
     }
 
+    public Vector2 GetRectPositionInCanvasSpace(Vector2 screenPoint)
+    {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(targetCanvas.transform as RectTransform, screenPoint, null, out Vector2 localPoint);
+
+        return localPoint;
+    }
+
     public RaycastHit? RaycastFromMouse(int layermask)
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
