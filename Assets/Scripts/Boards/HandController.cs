@@ -11,6 +11,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     [SerializeField] private Transform leftHandLocation;
     [SerializeField] private Transform middleHandLocation;
     [SerializeField] private Transform rightHandLocation;
+    private RectTransform handBox;
     public readonly static float cardHeightToWidthRatio = 7f / 5f;
     public int? currentHeldCardId {get; set;}= null;
     private CardZone zone;
@@ -20,7 +21,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     private List<int> currentlyHeldCards = new();
     void Start()
     {
-        
+        handBox = GetComponent<RectTransform>();
         
     }
     public CardZone GetZone()
@@ -68,6 +69,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
         {
  
             Transform newCard = CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
+            
             idToCardTransform[cardIds[i]] = newCard;
         }
     }
@@ -116,7 +118,9 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
         Transform card = CardFactory.Instance.GetCardImage(cardId,false);
         CardFactory.Instance.SetCardZone(cardId, this.zone);
 
-        card.GetComponent<RectTransform>().sizeDelta = cardDimensions;
+        RectTransform rect = card.GetComponent<RectTransform>();
+        rect.sizeDelta = cardDimensions;
+        rect.localScale = Vector3.one;
         card.SetParent(transform);
         card.position = position;
         card.GetChild(0).GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
@@ -137,12 +141,9 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
         UpdateHolder(new List<List<int>>(){currentlyHeldCards});
     }
 
-    public void RemoveCard(int cardId)
+    public bool MouseInHand()
     {
-        if(currentlyHeldCards.Remove(cardId))
-        {
-            RerenderContainer();
-        }
+        return RectTransformUtility.RectangleContainsScreenPoint(handBox, Input.mousePosition);
     }
 
     public void FlipTopCard(NetworkAttribute value)
@@ -158,5 +159,9 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     public void DropCard(int cardId)
     {
         AddCard(cardId);
+    }
+    public bool IsOpponent()
+    {
+        return false;
     }
 }

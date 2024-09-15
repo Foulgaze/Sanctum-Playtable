@@ -6,6 +6,7 @@ using Sanctum_Core;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class RightClickMenuController : MonoBehaviour
@@ -20,6 +21,7 @@ public class RightClickMenuController : MonoBehaviour
     [SerializeField] private ContainerViewer containerViewerPrefab;
     [SerializeField] private Transform moveCardMenuPrefab;
     [SerializeField] private Transform powerToughnessMenuPrefab;
+    public tokenMenuController tokenSelectMenu;
     public event Action<NetworkInstruction, string> networkCommand = delegate{};
     public float widthAsAPercentageOfSceen = 0.1f;
     public float heightAsAPercentageOfSceen = 0.1f;
@@ -32,20 +34,20 @@ public class RightClickMenuController : MonoBehaviour
         cardHolderMask = 1 << LayerMask.NameToLayer("CardContainer");
     }
 
-    private CardZone? RaycastForCardZone()
+    private (CardZone?, bool) RaycastForCardZone()
     {
         RaycastHit? hit = MouseUtility.Instance.RaycastFromMouse(cardHolderMask);
         if(!hit.HasValue)
         {
-            return null;
+            return (null, false);
         }
         IPhysicalCardContainer container = hit.Value.transform.GetComponent<IPhysicalCardContainer>();
         if(container == null)
         {
             UnityLogger.LogError($"Unable to find container script on - {hit.Value.transform}");
-            return null;
+            return (null,  false);
         }
-        return container.GetZone();
+        return (container.GetZone(), container.IsOpponent());
     }
 
     private bool HandleUIRightClick()
@@ -100,23 +102,85 @@ public class RightClickMenuController : MonoBehaviour
         };
         SetupMenu(setupButtons.Count);
     }
+
+    private void AddRelatedCardsBtn(Card card, List<Button> buttons, int insertPosition)
+    {
+        List<(string, string)>? relatedCards = CardFactory.Instance.GetRelatedCardsUUIDNamePair(card.Id);
+        if(relatedCards == null)
+        {
+            return;
+        }
+        foreach(var uuidNamePair in relatedCards)
+        {
+            Button createToken = CreateBtn($"Create - {uuidNamePair.Item2}", () => GameOrchestrator.Instance.SendSpecialAction(SpecialAction.CreateToken, $"{uuidNamePair.Item1}|{card.Id}"));
+            buttons.Insert(insertPosition++,createToken);
+        }
+    }
+
+    private string GetFlipText(Card card, CardInfo backInfo)
+    {
+        string layout = card.CurrentInfo.layout;
+        if (layout == "meld")
+        {
+            return card.isUsingBackSide.Value ? "unmeld" : "meld";
+        }
+        if (layout == "transform")
+        {
+            return card.isUsingBackSide.Value ? "untransform" : "transform";
+        }
+        return "flip";
+    }
+
+    private void AddFlipCardBtn(Card card, List<Button> buttons)
+    {
+        if(!card.HasBackside())
+        {
+            return;
+        }
+        CardInfo backSide = card.CurrentInfo == card.FrontInfo ? card.BackInfo : card.FrontInfo;
+        Button flipButton = CreateBtn(GetFlipText(card, backSide),() => {card.isUsingBackSide.SetValue(!card.isUsingBackSide.Value);} );
+        buttons.Add(flipButton);
+    }
+    
     private void CreateCardOnFieldMenu(int cardId)
     {
         CleanupMenu();
         Card card = CardFactory.Instance.GetCard(cardId); 
         List<Button> setupButtons = new()
         {
-            CreateBtn("Tap/Untap", () => {card.isTapped.SetValue(!card.isTapped.Value);}),
-            CreateBtn("Turn Over", () => {card.isFlipped.SetValue(!card.isFlipped.Value);}),
-            CreateBtn("Change Power/Toughness", () => {Instantiate(powerToughnessMenuPrefab, mainGameplayScreen).GetComponent<powerToughenssController>().Setup(card);}),
-            CreateBtn("Copy Card", () => {GameOrchestrator.Instance.SendSpecialAction(SpecialAction.CopyCard,cardId.ToString());}),
+            CreateBtn("Tap/Untap", () => card.isTapped.SetValue(!card.isTapped.Value)),
+            CreateBtn("Turn Over", () => card.isFlipped.SetValue(!card.isFlipped.Value)),
+            CreateBtn("Change Power/Toughness", () => Instantiate(powerToughnessMenuPrefab, mainGameplayScreen).GetComponent<powerToughenssController>().Setup(card)),
+            CreateBtn("Copy Card", () => GameOrchestrator.Instance.SendSpecialAction(SpecialAction.CopyCard,cardId.ToString())),
+        };
+        AddRelatedCardsBtn(card,setupButtons, 4);
+        AddFlipCardBtn(card, setupButtons);
+        SetupMenu(setupButtons.Count);
+    }
+    private void CreateFieldRightClickMenu()
+    {
+        CleanupMenu();
+        List<Button> setupButtons = new()
+        {
+            CreateBtn("Create Token", () => tokenSelectMenu.gameObject.SetActive(true)),
         };
         SetupMenu(setupButtons.Count);
     }
 
+    private void CreateInHandBoxMenu()
+    {
+        CleanupMenu();
+        List<Button> setupButtons = new()
+        {
+            CreateBtn("Reveal Hand", () => RevealZoneToOpponent(CardZone.Hand)),
+        };
+        SetupMenu(setupButtons.Count);
+    }
+
+
     private void HandleGameObjectRightClick()
     {
-        CardZone? zone = RaycastForCardZone();
+        (CardZone? zone, bool isOpponent) = RaycastForCardZone();
         switch(zone)
         {
             case CardZone.Library:
@@ -124,7 +188,13 @@ public class RightClickMenuController : MonoBehaviour
                 break;
             case CardZone.Graveyard:
             case CardZone.Exile:
-                CreateNonLibraryPileMenu((CardZone)zone);
+
+                CreateNonLibraryPileMenu((CardZone)zone, isOpponent);
+                break;
+            case CardZone.MainField:
+            case CardZone.LeftField:
+            case CardZone.RightField:
+                CreateFieldRightClickMenu();
                 break;
             default:
                 break;
@@ -138,6 +208,11 @@ public class RightClickMenuController : MonoBehaviour
         }
         if(HandleUIRightClick())
         {
+            return;
+        }
+        if(GameOrchestrator.Instance.handController.MouseInHand())
+        {
+            CreateInHandBoxMenu();
             return;
         }
         HandleGameObjectRightClick();
@@ -179,12 +254,12 @@ public class RightClickMenuController : MonoBehaviour
         ContainerViewer containerViewer = Instantiate(containerViewerPrefab, buttonHolder.parent);
         containerViewer.Setup(collection, $"{collection.Zone}", false);
     }
-    private void CreateContainerRevealCards(CardContainerCollection collection)
+    private void CreateContainerRevealCards(CardContainerCollection collection, bool isOpponent)
     {
         Action<string> revealCards = (rawCardCount) => 
         {
             ContainerViewer containerViewer = Instantiate(containerViewerPrefab, buttonHolder.parent);
-            containerViewer.Setup(collection, $"{collection.Zone}", false, int.Parse(rawCardCount));
+            containerViewer.Setup(collection, $"{collection.Zone}", isOpponent, int.Parse(rawCardCount));
         };
         SetupSingleIntInput(name : "Reveal Count", revealCards, "Reveal");
     }
@@ -194,16 +269,16 @@ public class RightClickMenuController : MonoBehaviour
         playerSelector.Setup(windowName, submitAction,submitBtnText);
     }
 
-    private void RevealLibraryOpponent(int? setValue = null)
+    private void RevealZoneToOpponent(CardZone zone, int? setValue = null)
     {
-        Action<List<string>> revealAction = (uuids) => {GameOrchestrator.Instance.RevealZoneToOpponents(CardZone.Library, uuids, setValue);};
-        CreateOpponentSelectMenu("Reveal Library", revealAction, "Reveal"); 
+        Action<List<string>> revealAction = (uuids) => {GameOrchestrator.Instance.RevealZoneToOpponents(zone, uuids, setValue);};
+        CreateOpponentSelectMenu($"Reveal {zone}", revealAction, "Reveal"); 
     }
 
     private void RevealLibraryToOpponentCount(string rawCountValue)
     {
         int? value = !string.IsNullOrWhiteSpace(rawCountValue) ? int.Parse(rawCountValue) : null;
-        RevealLibraryOpponent(value);
+        RevealZoneToOpponent(CardZone.Library, value);
     }
 
     public void RevealOpponentZone(NetworkAttribute attribute, Playtable table)
@@ -234,23 +309,24 @@ public class RightClickMenuController : MonoBehaviour
             CreateBtn("Draw Card", () => ExecuteSpecialAction(SpecialAction.Draw, "1")),
             CreateBtn("Draw Cards", () => SetupSingleIntInput("Draw Cards",(input) => ExecuteSpecialAction(SpecialAction.Draw, input), "Draw" )),
             CreateBtn("Shuffle", () => ExecuteSpecialAction(SpecialAction.Shuffle)),
-            CreateBtn("View All Cards", () => {CreateContianerView(clientPlayer.GetCardContainer(CardZone.Library));}),
-            CreateBtn("View Top Cards", () => {CreateContainerRevealCards(clientPlayer.GetCardContainer(CardZone.Library));}),
-            CreateBtn("Reveal To", () => {RevealLibraryOpponent();} ),
-            CreateBtn("Reveal Top Cards To", () => {SetupSingleIntInput("Reveal To Opponent Card Count", RevealLibraryToOpponentCount, "Select Opponents");} ),
-            CreateBtn("Flip Top Card", () => {GameOrchestrator.Instance.FlipLibraryTop();} ),
+            CreateBtn("View All Cards", () => CreateContianerView(clientPlayer.GetCardContainer(CardZone.Library))),
+            CreateBtn("View Top Cards", () => CreateContainerRevealCards(clientPlayer.GetCardContainer(CardZone.Library), false)),
+            CreateBtn("Reveal To", () => {RevealZoneToOpponent(CardZone.Library);} ),
+            CreateBtn("Reveal Top Cards To", () => SetupSingleIntInput("Reveal To Opponent Card Count", RevealLibraryToOpponentCount, "Select Opponents") ),
+            CreateBtn("Flip Top Card", () => GameOrchestrator.Instance.FlipLibraryTop()),
             CreateBtn("Mill Cards", () => SetupSingleIntInput("Mill Cards",(input) => ExecuteSpecialAction(SpecialAction.Mill, input), "Mill" )),
             CreateBtn("Exile Cards", () => SetupSingleIntInput("Exile Cards",(input) => ExecuteSpecialAction(SpecialAction.Exile, input), "Exile" )),
         };
         SetupMenu(setupButtons.Count);
     }
 
-    private void CreateNonLibraryPileMenu(CardZone zone)
+    private void CreateNonLibraryPileMenu(CardZone zone, bool isOpponent)
     {
         CleanupMenu();
+        var player = isOpponent ? GameOrchestrator.Instance.opponentRotator.GetCurrentOpponent() : clientPlayer;
         List<Button> setupButtons = new()
         {
-            CreateBtn($"View {zone}", () => CreateContianerView(clientPlayer.GetCardContainer(zone))),
+            CreateBtn($"View {zone}", () => CreateContianerView(player.GetCardContainer(zone))),
         };
         SetupMenu(setupButtons.Count);
     }

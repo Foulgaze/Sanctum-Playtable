@@ -116,14 +116,6 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
         UpdateHolder(new List<List<int>>{currentlyHeadCards});
     }
 
-    public void RemoveCard(int cardId)
-    {
-       if(currentlyHeadCards.Remove(cardId))
-       {
-            RerenderContainer();
-       }
-    }
-
     public void FlipTopCard(NetworkAttribute attribute)
     {
         revealTopCard = ((NetworkAttribute<bool>)attribute).Value;
@@ -133,5 +125,10 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     public bool RevealTopCard()
     {
         return revealTopCard;
+    }
+
+    public bool IsOpponent()
+    {
+        return this.isOpponent;
     }
 }

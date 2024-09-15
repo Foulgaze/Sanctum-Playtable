@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,6 +47,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
+        UnityLogger.Log($"RENDERING - {JsonConvert.SerializeObject(boardDescription)}");
         currentlyHeldCardContainers = boardDescription;
         ClearExistingCards();
 
@@ -155,21 +157,6 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         UpdateHolder(this.currentlyHeldCardContainers);
     }
 
-    public void RemoveCard(int cardId)
-    {
-        for (int i = 0; i < currentlyHeldCardContainers.Count; i++)
-        {
-            var innerList = currentlyHeldCardContainers[i];
-            int index = innerList.IndexOf(cardId);
-            if (index != -1)
-            {
-                innerList.RemoveAt(index);
-                RerenderContainer();
-                return;
-            }
-        }
-    }
-
     public void FlipTopCard(NetworkAttribute value)
     {
         UnityLogger.LogError("Trying to flip top card of field");
@@ -179,5 +166,9 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     public bool RevealTopCard()
     {
         return true;
+    }
+    public bool IsOpponent()
+    {
+        return this.isOpponent;
     }
 }

@@ -6,6 +6,7 @@ using System.Net;
 using Newtonsoft.Json;
 using Sanctum_Core;
 using UnityEngine;
+using UnityEngine.UI;
 using static LobbyManager;
 public class GameOrchestrator : MonoBehaviour
 {
@@ -15,7 +16,8 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
     [SerializeField] private BoardController boardController;
     [SerializeField] private RightClickMenuController rightClickMenuController; 
-
+    [SerializeField] private Canvas canvas;
+    public float scaleFactor;
     public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
     private LobbyManager lobbyManager = new();
@@ -47,6 +49,13 @@ public class GameOrchestrator : MonoBehaviour
         this.InitListeners();
     }
 
+    void Start()
+    {
+        CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
+        scaleFactor = Mathf.Lerp(Screen.width / scaler.referenceResolution.x, Screen.height / scaler.referenceResolution.y, scaler.matchWidthOrHeight);
+        UnityLogger.LogError($"SCALE FACTOR - {scaleFactor}");
+    }
+
     private void InitListeners()
     {
         this.lobbyManager.sendNetworkCommand += this.serverListener.SendMessage;
@@ -71,7 +80,7 @@ public class GameOrchestrator : MonoBehaviour
 		players.Keys.ToList().ForEach(key => this.playtable.AddPlayer(key, players[key]));
         Player clientPlayer = this.playtable.GetPlayer(this.lobbyManager.lobbyInfo.clientUUID);
         rightClickMenuController.clientPlayer = clientPlayer;
-
+        rightClickMenuController.tokenSelectMenu.Setup(CardData.GetTokenUUINamePairs());
 		this.playtable.networkAttributeFactory.attributeValueChanged += (attribute) => this.serverListener.SendMessage(NetworkInstruction.NetworkAttribute, $"{attribute.Id}|{attribute.SerializedValue}");
 		this.serverListener.onNetworkCommandReceived[NetworkInstruction.NetworkAttribute] += this.playtable.networkAttributeFactory.HandleNetworkedAttribute;
         List<string> opponentUUIDs = players.Keys.Where(uuid => this.lobbyManager.lobbyInfo.clientUUID != uuid).ToList();

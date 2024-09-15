@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Sanctum_Core;
@@ -18,7 +19,9 @@ public class CardFactory : MonoBehaviour
 	public readonly Dictionary<int, Queue<Transform>> uuidToCardOnField = new();
 	public readonly Dictionary<int, Queue<Transform>> uuidToCardImage = new();
 	public readonly Dictionary<int, CardZone> cardIdToContainer = new();
-	[SerializeField] Transform disposedCardParent;
+	[SerializeField] private Transform disposedCardParent;
+	private Dictionary<string, List<string>> nameToRelatedCards;
+	private Dictionary<string, string> uuidToName;
 
 	
 	private void Awake() 
@@ -35,11 +38,19 @@ public class CardFactory : MonoBehaviour
 
 	void Start()
 	{
+		string relatedTokensPath = $"{Application.streamingAssetsPath}/relatedTokens.txt";
+		string uuidToNamePath = $"{Application.streamingAssetsPath}/uuidToName.txt";
+		nameToRelatedCards = JsonConvert.DeserializeObject<Dictionary<string,List<string>>>(File.ReadAllText(relatedTokensPath));
+		uuidToName = JsonConvert.DeserializeObject<Dictionary<string,string>>(File.ReadAllText(uuidToNamePath));
 		Sprite[] sprites = Resources.LoadAll<Sprite>("Colors");
 		foreach(Sprite sprite in sprites)
 		{
 			fileNameToSprite[sprite.name] = sprite;
 		}
+	}
+
+	private void LoadRelatedTokens(string path)
+	{
 	}
 
 	public void DisposeOfCard(int cardId, Transform cardTransform, bool onField)
@@ -122,5 +133,22 @@ public class CardFactory : MonoBehaviour
 	{
 		cardIdToContainer[cardId] = zone;
 	}
+
+	public List<(string,string)>? GetRelatedCardsUUIDNamePair(int cardId)
+	{
+		Card card = GetCard(cardId);
+		if(!nameToRelatedCards.ContainsKey(card.CurrentInfo.name))
+		{
+			return null;
+		}
+		List<(string,string)> uuidNamePairs = new();
+		foreach(string uuid in nameToRelatedCards[card.CurrentInfo.name])
+		{
+			uuidNamePairs.Add((uuid, uuidToName[uuid]));
+		}
+		return uuidNamePairs;
+	}
+
+	
 
 }

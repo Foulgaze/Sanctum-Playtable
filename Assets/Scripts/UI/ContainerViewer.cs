@@ -94,7 +94,7 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         int trueRevealCount = Math.Clamp((int)revealCardCount,0, cardIds.Count - 1);
         revealedCardIds = new HashSet<int>(cardIds.GetRange(0, trueRevealCount));
     }
-    private void SetupGridLayout(int cardCount, float horizontalSpacingPercentage = 0.05f, float verticalSpacingPercentage = 0.1f)
+    private void SetupGridLayout(int cardCount, float horizontalSpacingPercentage = 0.03f, float verticalSpacingPercentage = 0.1f)
     {
         RectTransform holderRect = gridLayout.GetComponent<RectTransform>();
         float availableWidth = holderRect.rect.width;
@@ -108,7 +108,7 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         
         int totalVerticalCards = Mathf.CeilToInt(cardCount / (float)cardsPerRow);
         float windowHeight = CalculateWindowHeight(cellHeight, totalVerticalCards, verticalSpacingPercentage, totalPadding.y);
-        
+        UnityLogger.Log($"Total Width - {availableWidth} | Total Padding - {totalPadding} | Cell - {new Vector2(cellWidth,cellHeight)}");
         SetGridLayoutProperties(cellWidth, cellHeight, horizontalSpacingPercentage, verticalSpacingPercentage);
         AdjustRectTransform(windowHeight);
     }
@@ -126,6 +126,7 @@ public class ContainerViewer : MonoBehaviour, IDroppable
     {
         Transform cardImage = GetCardImage(cardId);
         cardImage.transform.SetParent(gridLayout.transform);
+		cardImage.GetComponent<RectTransform>().localScale = Vector3.one;
         idToTransform.Add((cardId,cardImage));  
     }
 

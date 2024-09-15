@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Sanctum_Core;
@@ -17,9 +18,12 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
 
     public void Setup(Card card)
     {
+        print($"SETTING UP CARD - {card.name.Value}");
         this.card = card;
         SetupAttributes(null);
         SetupListeners();
+        
+        
     }
     
     private void SetupListeners()
@@ -46,13 +50,12 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         }
 
         matchingChars.Sort();
-        string potentialFileName = string.Join("", matchingChars);
+        string potentialFileName = string.Join("", new HashSet<string>(matchingChars));
 
         if(card.isFlipped.Value)
         {
             potentialFileName = "default";
         }
-        print($"Matching name {potentialFileName} - {card.CurrentInfo.manaCost}");
 
         Sprite backgroundColor = CardFactory.Instance.fileNameToSprite.ContainsKey(potentialFileName) ? CardFactory.Instance.fileNameToSprite[potentialFileName]  : CardFactory.Instance.fileNameToSprite["default"];
         backgroundImage.sprite = backgroundColor;
@@ -70,7 +73,7 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     private bool EnablePowerToughess()
 	{
         bool hasDefaultPT = card.CurrentInfo.power != string.Empty || card.CurrentInfo.toughness != string.Empty; 
-		return hasDefaultPT && !card.isFlipped.Value;
+        return hasDefaultPT && !card.isFlipped.Value;
 	}
     
 
@@ -78,7 +81,8 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     {
         SetupPT(null);
         powerToughess.transform.parent.gameObject.SetActive(EnablePowerToughess());
-        name.text = card.isFlipped.Value ? string.Empty : card.name.Value;
+        UnityLogger.LogError($"Setting Power TOughness - {EnablePowerToughess()}");
+        name.text = card.isFlipped.Value ? string.Empty : card.CurrentInfo.name;
         RenderCardImage();
         SetupBackground();
         TapUntapCard(null);

@@ -103,11 +103,10 @@ public class BoardController : MonoBehaviour
     private void RemoveNumbers(List<List<int>> listOfLists, List<int> numbersToRemove)
     {
         HashSet<int> numbers = new HashSet<int>(numbersToRemove);
-        // Iterate through each sublist
         foreach (var sublist in listOfLists)
         {
-            // Remove each number in numbersToRemove from the current sublist
             sublist.RemoveAll(num => numbers.Contains(num));
         }
+        listOfLists.RemoveAll(sublist => sublist.Count == 0);
     }
 }
