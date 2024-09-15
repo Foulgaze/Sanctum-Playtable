@@ -61,27 +61,22 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    public void SetupListeners(Playtable table, Player clientPlayer, Dictionary<string,string> uuidToName)
+    public void SetupListeners(Playtable table, Player clientPlayer, Dictionary<string,string> uuidToName, OpponentRotator rotator)
     {
         foreach (string uuid in uuidToName.Keys)
         {
             Player player = table.GetPlayer(uuid);
-
-            if (clientPlayer == player)
-            {
-                this.RegisterCardZoneListeners(clientZoneToCardContainer, player);
-            }
-            else
-            {
-                this.RegisterCardZoneListeners(opponentZoneToCardContainer, player);
-            }
+            var containerMap = clientPlayer == player ? clientZoneToCardContainer : opponentZoneToCardContainer;
+            this.RegisterCardZoneListeners(containerMap, player);
             foreach (CardZone zone in CardZone.GetValues(typeof(CardZone)))
             {
                 CardContainerCollection collection = player.GetCardContainer(zone);
                 collection.removeCardIds.nonNetworkChange += (attribute) => OnCardRemoved(attribute, collection);
             }
         }
+        rotator.onPlayerChanged += OnOpponentChange;
     }
+
     private void RegisterCardZoneListeners(Dictionary<CardZone,IPhysicalCardContainer> zoneToContainer, Player player)
     {
         foreach(var kvp in zoneToContainer)
@@ -108,5 +103,13 @@ public class BoardController : MonoBehaviour
             sublist.RemoveAll(num => numbers.Contains(num));
         }
         listOfLists.RemoveAll(sublist => sublist.Count == 0);
+    }
+
+    private void OnOpponentChange(Player newOpponent)
+    {
+        foreach(var kvp in opponentZoneToCardContainer)
+        {
+            kvp.Value.OnCardAdded(newOpponent.GetCardContainer(kvp.Key).boardState);
+        }
     }
 }

@@ -44,8 +44,9 @@ public class PlayerDescriptionController : MonoBehaviour
 			this.opponentDescriptor.gameObject.SetActive(false);
 			return;
 		}
-		this.RenderOpponent();
+		this.RenderOpponent(null);
 		rotator.opponentUUIDs.ForEach(uuid => table.GetPlayer(uuid).Health.nonNetworkChange += OnOpponentHealtChange);
+		rotator.onPlayerChanged += RenderOpponent;
 	}
 
 	private void OnOpponentHealtChange(NetworkAttribute attribute)
@@ -56,7 +57,7 @@ public class PlayerDescriptionController : MonoBehaviour
 		}
 	}
 
-	private void RenderOpponent()
+	private void RenderOpponent(Player _)
 	{
 		this.opponentName.text = this.rotator.GetCurrentOpponent().Name;
 		this.opponentHealth.text = this.rotator.GetCurrentOpponent().Health.Value.ToString();
