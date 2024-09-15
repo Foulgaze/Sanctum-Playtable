@@ -13,6 +13,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 	private RectTransform draggableRect;
 	private Vector2 offset;
 	public bool renderCardBack = false;
+	public bool isOpponent = false;
 	
 
 	void Start()
@@ -90,7 +91,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 
 	private void HandleCardRelease()
 	{
-		renderCardBack = false;
+		// renderCardBack = false;
 		CardFactory.Instance.DisposeOfCard(cardId, draggableRect.transform, onField: false);
 
 		if (TryDropOnUIElement())
@@ -102,6 +103,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 		{
 			return;
 		}
+
 	}
 
 	private bool TryDropOnUIElement()
@@ -109,7 +111,6 @@ public class CardDrag : MonoBehaviour, IDraggable
 		IDroppable? droppableElement = FindFirstDroppableUIElement();
 		if (droppableElement == null)
 		{
-			UnityLogger.LogError("Could not find drop script");
 			return false;
 		}
 
@@ -132,7 +133,17 @@ public class CardDrag : MonoBehaviour, IDraggable
 			return false;
 		}
 
+		if(container.IsOpponent())
+		{
+			return false;
+		}
+		
 		container.AddCard(cardId);
 		return true;
+	}
+
+	public bool IsPickupable()
+	{
+		return !isOpponent;
 	}
 }

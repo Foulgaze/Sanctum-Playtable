@@ -59,6 +59,10 @@ public class RightClickMenuController : MonoBehaviour
         }
         CardDrag hitCardScript = (CardDrag) draggableScript;
         CardZone hitCardCurrentZone = CardFactory.Instance.GetCardZone(hitCardScript.cardId);
+        if(hitCardScript.isOpponent)
+        {
+            return false;
+        }
         var skipZones = new CardZone[]{CardZone.Library, CardZone.Graveyard, CardZone.Exile, CardZone.CommandZone};
         if(skipZones.Contains(hitCardCurrentZone))
         {
@@ -188,7 +192,6 @@ public class RightClickMenuController : MonoBehaviour
                 break;
             case CardZone.Graveyard:
             case CardZone.Exile:
-
                 CreateNonLibraryPileMenu((CardZone)zone, isOpponent);
                 break;
             case CardZone.MainField:
@@ -323,6 +326,10 @@ public class RightClickMenuController : MonoBehaviour
     private void CreateNonLibraryPileMenu(CardZone zone, bool isOpponent)
     {
         CleanupMenu();
+        if(isOpponent && GameOrchestrator.Instance.opponentRotator.opponentUUIDs.Count == 0)
+        {
+            return;
+        }
         var player = isOpponent ? GameOrchestrator.Instance.opponentRotator.GetCurrentOpponent() : clientPlayer;
         List<Button> setupButtons = new()
         {

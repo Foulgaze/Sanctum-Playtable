@@ -71,7 +71,9 @@ public class CardFactory : MonoBehaviour
 		Transform cardOnField = queueHasCard ? uuidToCardOnField[cardId].Dequeue() : Instantiate(cardOnFieldPrefab);
 		
 		CardOnFieldComponents components = cardOnField.GetComponent<CardOnFieldComponents>();
-		components.backgroundImage.raycastTarget = !isOpponentCard;
+		// components.backgroundImage.raycastTarget = !isOpponentCard;
+		cardOnField.GetChild(0).GetChild(0).GetComponent<CardDrag>().isOpponent = isOpponentCard;
+
 		
 		if(!queueHasCard)
 		{
@@ -98,6 +100,7 @@ public class CardFactory : MonoBehaviour
 
 	public Transform GetCardImage(int cardId, bool isOpponentCard, bool renderCardBack = false)
 	{
+		UnityLogger.Log($"GETTING CARD IMAGE - {renderCardBack}");
 		Card card = GetCard(cardId);
 		
 		bool queueHasCard = uuidToCardImage.ContainsKey(cardId) && uuidToCardImage[cardId].Count != 0;
@@ -106,6 +109,7 @@ public class CardFactory : MonoBehaviour
 		GenericCardComponents components = cardImage.GetComponent<GenericCardComponents>();
 		if(queueHasCard)
 		{
+			components.renderCardBack = renderCardBack;
 			components.RenderCardImage(renderCardBack);
 		}
 		else
@@ -115,7 +119,8 @@ public class CardFactory : MonoBehaviour
 			components.Setup(card, renderCardBack);
 		}
 		
-		cardImage.GetComponent<Image>().raycastTarget = !isOpponentCard;
+		// cardImage.GetComponent<Image>().raycastTarget = !isOpponentCard;
+		cardImage.GetComponent<CardDrag>().isOpponent = isOpponentCard;
 		return cardImage;
 	}
 

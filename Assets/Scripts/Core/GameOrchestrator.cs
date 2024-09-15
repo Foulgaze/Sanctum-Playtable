@@ -16,8 +16,7 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
     [SerializeField] private BoardController boardController;
     [SerializeField] private RightClickMenuController rightClickMenuController; 
-    [SerializeField] private Canvas canvas;
-    public float scaleFactor;
+    [SerializeField] private cardIdentifier cardIdentifier; 
     public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
     private LobbyManager lobbyManager = new();
@@ -26,6 +25,7 @@ public class GameOrchestrator : MonoBehaviour
     private const int ServerPort = 51522;
     private Playtable playtable;
     public OpponentRotator opponentRotator;
+
 	private void Awake() 
     {         
         if (Instance != null && Instance != this) 
@@ -45,13 +45,6 @@ public class GameOrchestrator : MonoBehaviour
         serverListener = new(IPAddress.Loopback.ToString(),ServerPort);
         pathToCSVs = $"{Application.streamingAssetsPath}/CSVs/";
         InitListeners();
-    }
-
-    void Start()
-    {
-        CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
-        scaleFactor = Mathf.Lerp(Screen.width / scaler.referenceResolution.x, Screen.height / scaler.referenceResolution.y, scaler.matchWidthOrHeight);
-        UnityLogger.LogError($"SCALE FACTOR - {scaleFactor}");
     }
 
     public void InitListeners()
@@ -96,7 +89,7 @@ public class GameOrchestrator : MonoBehaviour
     public void OnLobbyFilled(LobbyInfo info, Dictionary<string, string> players)
     {
         InitializePlaytable(players);
-        SetupRightClickMenuController(players);
+        SetupUIControllers(players);
         SetupNetworkListeners();
         SetupOpponents(players);
         SetupPlayerDescriptions(players);
@@ -113,12 +106,13 @@ public class GameOrchestrator : MonoBehaviour
         lobbyScreenChanger.OnPlaytableCreated(playtable);
     }
 
-    private void SetupRightClickMenuController(Dictionary<string, string> players)
+    private void SetupUIControllers(Dictionary<string, string> players)
     {
         Player clientPlayer = playtable.GetPlayer(lobbyManager.lobbyInfo.clientUUID);
         rightClickMenuController.clientPlayer = clientPlayer;
         rightClickMenuController.tokenSelectMenu.Setup(CardData.GetTokenUUINamePairs());
         clientPlayer.RevealCardZone.nonNetworkChange += (attribute) => rightClickMenuController.RevealOpponentZone(attribute, playtable);
+        cardIdentifier.clientPlayer = clientPlayer;
     }
 
     private void SetupNetworkListeners()

@@ -72,6 +72,7 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     }
     private void PrepareTopCard(Transform createdCard, int cardId)
     {
+        UnityLogger.LogError($"PREPARING TOP CARD - {!revealTopCard}");
         Transform cardImage = CardFactory.Instance.GetCardImage(cardId, isOpponent, renderCardBack : !revealTopCard);
         Transform canvas = createdCard.GetChild(0);
 
