@@ -59,5 +59,28 @@ public class MouseUtility : MonoBehaviour
 		}
 		return hit;
     }
+
+    public bool IsRectTransformOutsideCanvas(RectTransform rectTransform)
+    {
+        Vector3[] corners = new Vector3[4];
+        rectTransform.GetWorldCorners(corners);
+        
+        Rect canvasRect = targetCanvas.GetComponent<RectTransform>().rect;
+        
+        Vector2 canvasMin = RectTransformUtility.WorldToScreenPoint(targetCanvas.worldCamera, targetCanvas.transform.TransformPoint(canvasRect.min));
+        Vector2 canvasMax = RectTransformUtility.WorldToScreenPoint(targetCanvas.worldCamera, targetCanvas.transform.TransformPoint(canvasRect.max));
+        
+        foreach (Vector3 corner in corners)
+        {
+            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(targetCanvas.worldCamera, corner);
+            if (screenPoint.x >= canvasMin.x && screenPoint.x <= canvasMax.x &&
+                screenPoint.y >= canvasMin.y && screenPoint.y <= canvasMax.y)
+            {
+                return false; 
+            }
+        }
+        
+        return true;
+    }
     
 }
