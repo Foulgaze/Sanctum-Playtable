@@ -6,11 +6,12 @@ public class WindowDrag : MonoBehaviour, IDraggable
 {
 	private RectTransform rect;
 	private Vector2 offset;
-	
+	private Transform originalParent;
 
 	void Start()
 	{
 		rect = GetComponent<RectTransform>();
+		originalParent = transform.parent;
 	}
 
 	public void StartDrag(Transform dragParent)
@@ -35,6 +36,12 @@ public class WindowDrag : MonoBehaviour, IDraggable
         {
             rect.anchoredPosition = Vector2.zero;
         }
+		transform.SetParent(originalParent);
     }
+
+	public bool IsPickupable()
+	{
+		return true;
+	}
 
 }

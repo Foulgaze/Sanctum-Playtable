@@ -83,7 +83,7 @@ public class DragController : MonoBehaviour
         if(Input.GetMouseButtonDown((int)MouseButton.Left))
         {
             IDraggable? dragScript = RaycastForDraggable();
-            if(dragScript == null)
+            if(dragScript == null || !dragScript.IsPickupable())
             {
                 return;
             }
