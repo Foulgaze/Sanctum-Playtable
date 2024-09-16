@@ -12,8 +12,6 @@ public class DragController : MonoBehaviour
     private PointerEventData pointerEventData;
     [SerializeField] private EventSystem eventSystem;
     [SerializeField] private Transform dragParent;
-    [SerializeField] private CanvasScaler scaler;
-    public static float scaleFactor;
     private int ignoreLayer = 0;
     private Vector2 offset;
     public static DragController Instance;
@@ -30,7 +28,6 @@ public class DragController : MonoBehaviour
     }
     void Start()
     {
-        scaleFactor = scaler.scaleFactor;
         ignoreLayer = LayerMask.NameToLayer("IgnoreRaycast");
         pointerEventData = new(eventSystem);
     }

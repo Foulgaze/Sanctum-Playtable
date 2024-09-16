@@ -26,6 +26,9 @@ public class CardDrag : MonoBehaviour, IDraggable
         GameOrchestrator.Instance.handController.currentHeldCardId = cardId;
 		Transform cardImage = CardFactory.Instance.GetCardImage(cardId, false,  renderCardBack : renderCardBack);
 		draggableRect = cardImage.GetComponent<RectTransform>();
+		CardIdentifier.Instance.currentlyHeldCardImage = cardImage.GetComponent<GenericCardComponents>().cardImage;
+
+		cardImage.GetComponent<Image>().raycastTarget = false;
 		draggableRect.transform.SetParent(dragParent);
 		SetupDraggedCard(draggableRect);
 		offset = GetDragOffset();
@@ -56,6 +59,8 @@ public class CardDrag : MonoBehaviour, IDraggable
     public void Release()
     {
 		GameOrchestrator.Instance.handController.currentHeldCardId = null;
+		CardIdentifier.Instance.SetHeldCardOpacity(1f);
+		CardIdentifier.Instance.currentlyHeldCardImage = null;
 		HandleCardRelease();
     }
 
@@ -92,6 +97,8 @@ public class CardDrag : MonoBehaviour, IDraggable
 	private void HandleCardRelease()
 	{
 		// renderCardBack = false;
+		draggableRect.GetComponent<Image>().raycastTarget = true;
+
 		CardFactory.Instance.DisposeOfCard(cardId, draggableRect.transform, onField: false);
 
 		if (TryDropOnUIElement())

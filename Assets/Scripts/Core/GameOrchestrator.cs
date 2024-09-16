@@ -16,7 +16,7 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private ConnectToLobbyMenu connectToLobbyMenu;
     [SerializeField] private BoardController boardController;
     [SerializeField] private RightClickMenuController rightClickMenuController; 
-    [SerializeField] private cardIdentifier cardIdentifier; 
+    [SerializeField] private CardIdentifier cardIdentifier; 
     public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
     private LobbyManager lobbyManager = new();

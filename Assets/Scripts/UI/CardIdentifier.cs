@@ -4,11 +4,25 @@ using Sanctum_Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class cardIdentifier : MonoBehaviour, ITextureable
+public class CardIdentifier : MonoBehaviour, ITextureable
 {
     private Card? currentHoverCard;
     [SerializeField] Image hoveredCardImage;
     public Player clientPlayer;
+    [HideInInspector] public Image? currentlyHeldCardImage;
+     public static CardIdentifier Instance;
+    private void Awake() 
+    {         
+        if (Instance != null && Instance != this) 
+        { 
+            Destroy(this); 
+        } 
+        else 
+        { 
+            Instance = this; 
+        } 
+    }
+
     public Card GetCard()
     {
         return currentHoverCard;
@@ -51,16 +65,31 @@ public class cardIdentifier : MonoBehaviour, ITextureable
         IDraggable? draggable = DragController.Instance.RaycastForDraggable();
         if(draggable == null || draggable is not CardDrag)
         {
+            SetHeldCardOpacity(1f);
             return;
         }
+        SetHeldCardOpacity(0.5f);
         Card? hoveredCard = GetHoveredCard((CardDrag)draggable);
-        if(hoveredCard == null)
+        if(hoveredCard == null || hoveredCard == currentHoverCard)
         {
             return;
         }
         currentHoverCard = hoveredCard;
-        TextureController.Instance.TextureImage(this);
     
+        TextureController.Instance.TextureImage(this);
+    }
+
+    public void SetHeldCardOpacity(float opacity)
+    {
+        if(currentlyHeldCardImage == null)
+        {
+            return;
+        }
+        Color color = currentlyHeldCardImage.color;
+        color.a = opacity;  
+        currentlyHeldCardImage.color = color;
+        UnityLogger.Log($"SETTING OPACITY - {color}");
+
     }
     // Update is called once per frame
     void Update()

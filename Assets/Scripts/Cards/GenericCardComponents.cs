@@ -55,26 +55,30 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
     
         if(renderCardBack)
         {
+            SetComponentState(false);
             return TextureController.Instance.TextureBackOfCard(this);
         }
         else
         {
+            SetComponentState(false);
 		    return TextureController.Instance.TextureImage(this);
         }
     }
 
     private void SetComponentState(bool state)
     {
-        name.gameObject.SetActive(state);
-        manaCost.gameObject.SetActive(state);
-        type.gameObject.SetActive(state);
-        description.gameObject.SetActive(state);
+        UnityLogger.Log($"SETTING COMPONENT STATE - {state}");
+        name.transform.parent.gameObject.SetActive(state);
+        manaCost.transform.parent.gameObject.SetActive(state);
+        type.transform.parent.gameObject.SetActive(state);
+        description.transform.parent.gameObject.SetActive(state);
     }
 
     public void TextureSelf(CardInfo info, Sprite sprite)
     {
         if(info.name == card.CurrentInfo.name)
         {
+            SetComponentState(false);
             cardImage.sprite = sprite;
             cardImage.enabled = true;
         }

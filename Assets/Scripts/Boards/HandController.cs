@@ -123,9 +123,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
         rect.localScale = Vector3.one;
         card.SetParent(transform);
         card.position = position;
-        card.GetChild(0).GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
         card.rotation = Quaternion.Euler(0, 0, 90 - rotation);
-        card.GetComponent<Image>().color = UnityEngine.Random.ColorHSV();
         return card;
     }
 

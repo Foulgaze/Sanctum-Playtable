@@ -1015,7 +1015,7 @@ GameObject:
   - component: {fileID: 9085361960085218593}
   - component: {fileID: 2275540118441918493}
   - component: {fileID: 3510089520876431672}
-  - component: {fileID: 8521511456339674521}
+  - component: {fileID: 741070998330540940}
   m_Layer: 5
   m_Name: moveCardMenu
   m_TagString: Untagged
@@ -1106,7 +1106,7 @@ MonoBehaviour:
   moveToBottomBtn: {fileID: 241185366963350616}
   closeBtn: {fileID: 5859782815608037744}
   countInputField: {fileID: 3454880954560128193}
---- !u!114 &8521511456339674521
+--- !u!114 &741070998330540940
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6070976193808813816}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea9af3f32de163346b5c34426ff55b6e, type: 3}
+  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6911073206534159394
