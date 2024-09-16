@@ -492,8 +492,8 @@ GameObject:
   - component: {fileID: 5541708118382289930}
   - component: {fileID: 5791680549510809738}
   - component: {fileID: 9003219495727101910}
-  - component: {fileID: 2003704337751514308}
-  - component: {fileID: 6199132476873199175}
+  - component: {fileID: 2542234452957758675}
+  - component: {fileID: 5487361937061220617}
   m_Layer: 5
   m_Name: playerSelection
   m_TagString: Untagged
@@ -563,7 +563,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2003704337751514308
+--- !u!114 &2542234452957758675
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -572,7 +572,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5602897308178587400}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18dc9ab117238f14c81599cf21b2baa6, type: 3}
+  m_Script: {fileID: 11500000, guid: 8091a72ce0b1ac348a7eaf8a595ab3ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   windowNameText: {fileID: 145192414887292996}
@@ -581,7 +581,7 @@ MonoBehaviour:
   playerSelectPrefab: {fileID: 2582001999586403808, guid: cf496db8670159f4cb729a9a670c731c, type: 3}
   submitBtn: {fileID: 1435466405778613648}
   closeBtn: {fileID: 8215420953288043408}
---- !u!114 &6199132476873199175
+--- !u!114 &5487361937061220617
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -590,7 +590,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5602897308178587400}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6431255128323791406

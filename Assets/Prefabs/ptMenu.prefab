@@ -850,8 +850,8 @@ GameObject:
   - component: {fileID: 9182647339866525440}
   - component: {fileID: 5146465590489525690}
   - component: {fileID: 1091915970441689839}
-  - component: {fileID: 5321696238342200475}
-  - component: {fileID: 6447847720798967588}
+  - component: {fileID: 282974757472779627}
+  - component: {fileID: 5622260921302528948}
   m_Layer: 5
   m_Name: ptMenu
   m_TagString: Untagged
@@ -921,7 +921,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5321696238342200475
+--- !u!114 &282974757472779627
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -930,7 +930,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3678866338497665337}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed74c4343138e184da3114b3670e1370, type: 3}
+  m_Script: {fileID: 11500000, guid: 26aa30339a77b3d4fb03d0a8cb869262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   powerPlusBtn: {fileID: 471494662577448410}
@@ -940,7 +940,7 @@ MonoBehaviour:
   toughnessMinusBtn: {fileID: 8990143011088556289}
   toughnessInputField: {fileID: 8462502008584001348}
   closeBtn: {fileID: 6979244550564904050}
---- !u!114 &6447847720798967588
+--- !u!114 &5622260921302528948
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -949,7 +949,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3678866338497665337}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5252013501966526704

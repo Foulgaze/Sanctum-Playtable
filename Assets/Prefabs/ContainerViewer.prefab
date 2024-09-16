@@ -325,7 +325,6 @@ GameObject:
   - component: {fileID: 5000252630184991825}
   - component: {fileID: 8425660964035400684}
   - component: {fileID: 1998084657127697085}
-  - component: {fileID: 4565003788865954159}
   m_Layer: 5
   m_Name: mask
   m_TagString: Untagged
@@ -405,36 +404,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
---- !u!114 &4565003788865954159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4850502487562893531}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 620d5e7caf4a64d4c847f26e65851421, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Content: {fileID: 1603793013574928641}
-  m_Horizontal: 0
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 15
-  m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 0
-  m_VerticalScrollbarVisibility: 0
-  m_HorizontalScrollbarSpacing: 0
-  m_VerticalScrollbarSpacing: 0
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &6450835879519027914
 GameObject:
   m_ObjectHideFlags: 0
@@ -447,7 +416,7 @@ GameObject:
   - component: {fileID: 322427938354489785}
   - component: {fileID: 4834117938267769725}
   - component: {fileID: 5856819999723173368}
-  - component: {fileID: 732700709023486756}
+  - component: {fileID: 1777103039533761169}
   m_Layer: 5
   m_Name: ContainerViewer
   m_TagString: Untagged
@@ -533,7 +502,7 @@ MonoBehaviour:
   gridLayout: {fileID: 2457015578840029054}
   hiddenCardPrefab: {fileID: 7885452660997004820, guid: 846ee76bfd34cec47bad797dc25db45e, type: 3}
   cardsPerRow: 5
---- !u!114 &732700709023486756
+--- !u!114 &1777103039533761169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -542,7 +511,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6450835879519027914}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8826873505427207146

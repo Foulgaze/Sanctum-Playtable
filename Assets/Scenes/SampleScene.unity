@@ -4196,7 +4196,7 @@ MonoBehaviour:
   connectToLobbyMenu: {fileID: 604468248}
   boardController: {fileID: 288914915}
   rightClickMenuController: {fileID: 288914918}
-  cardIdentifier: {fileID: 1796782752}
+  cardIdentifier: {fileID: 1796782753}
   handController: {fileID: 1595541205}
 --- !u!4 &288914912
 Transform:
@@ -4307,13 +4307,13 @@ MonoBehaviour:
   buttonHolder: {fileID: 2094041140}
   menuDisableBtn: {fileID: 1644289666}
   singleIntInputFieldPrefab: {fileID: 4827227516083999252, guid: de85353cd80f69d4c8bdd3593d254eb1, type: 3}
-  playerSelectorPrefab: {fileID: 2003704337751514308, guid: 2f881da982e43444384e2f9796f1526e, type: 3}
+  playerSelectorPrefab: {fileID: 2542234452957758675, guid: 2f881da982e43444384e2f9796f1526e, type: 3}
   mainGameplayScreen: {fileID: 1998041330}
   buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
   containerViewerPrefab: {fileID: 5856819999723173368, guid: 9092b527445cbd64ca0f11d88399ab17, type: 3}
   moveCardMenuPrefab: {fileID: 265312105039473404, guid: f9ff9f48275bcbc4883977ed539b922a, type: 3}
   powerToughnessMenuPrefab: {fileID: 9182647339866525440, guid: c71d1fcc610fbda40a809c080e670089, type: 3}
-  tokenSelectMenu: {fileID: 1811334903}
+  tokenSelectMenu: {fileID: 1811334907}
   widthAsAPercentageOfSceen: 0.1
   heightAsAPercentageOfSceen: 0.05
 --- !u!1 &296402555
@@ -27322,8 +27322,8 @@ GameObject:
   - component: {fileID: 1796782750}
   - component: {fileID: 1796782749}
   - component: {fileID: 1796782751}
-  - component: {fileID: 1796782752}
   - component: {fileID: 1796782753}
+  - component: {fileID: 1796782752}
   m_Layer: 5
   m_Name: cardIdentifier
   m_TagString: Untagged
@@ -27412,11 +27412,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1796782745}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7d2ca2eaeb458c48986df6d81a9d9b0, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoveredCardImage: {fileID: 74057433}
-  currentlyHeldCardImage: {fileID: 0}
 --- !u!114 &1796782753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27426,9 +27424,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1796782745}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
+  m_Script: {fileID: 11500000, guid: c2ee37432073af9428f9e2585ae69ebd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hoveredCardImage: {fileID: 74057433}
+  currentlyHeldCardImage: {fileID: 0}
 --- !u!4 &1798607581 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5202732821079344928, guid: cebfacc247a640945a2c30b442202fca, type: 3}
@@ -27603,7 +27603,8 @@ GameObject:
   - component: {fileID: 1811334904}
   - component: {fileID: 1811334906}
   - component: {fileID: 1811334905}
-  - component: {fileID: 1811334903}
+  - component: {fileID: 1811334907}
+  - component: {fileID: 1811334908}
   m_Layer: 5
   m_Name: tokenCreateMenu
   m_TagString: Untagged
@@ -27611,25 +27612,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1811334903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1811334902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f8bfe8413f32574da4cf38263b00e2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
-  viewPort: {fileID: 459377181}
-  contentRect: {fileID: 40725098}
-  buttonViewCount: 10
-  closeBtn: {fileID: 731398179}
-  createBtn: {fileID: 228940675}
-  tokenCountField: {fileID: 305087512}
 --- !u!224 &1811334904
 RectTransform:
   m_ObjectHideFlags: 0
@@ -27693,6 +27675,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811334902}
   m_CullTransparentMesh: 1
+--- !u!114 &1811334907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811334902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 707bc3c0815f49b47abfb632428f963c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
+  viewPort: {fileID: 459377181}
+  contentRect: {fileID: 40725098}
+  buttonViewCount: 10
+  closeBtn: {fileID: 731398179}
+  createBtn: {fileID: 228940675}
+  tokenCountField: {fileID: 305087512}
+--- !u!114 &1811334908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811334902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1819765617 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5202732821079344928, guid: cebfacc247a640945a2c30b442202fca, type: 3}

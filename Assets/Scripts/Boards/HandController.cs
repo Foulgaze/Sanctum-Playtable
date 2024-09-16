@@ -17,7 +17,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     private CardZone zone;
     public int defaultHandSize = 7;
     private static float percentageOfScreenForCardWidth = 0.1f;
-    private readonly Dictionary<int,Transform> idToCardTransform = new();
+    private readonly Dictionary<int,RectTransform> idToCardTransform = new();
     private List<int> currentlyHeldCards = new();
     void Start()
     {
@@ -70,7 +70,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
  
             Transform newCard = CreateAndPositionCard(cardIds[i], cardPositions[positionIndex], cardRotations[positionIndex], cardDimensions);
             
-            idToCardTransform[cardIds[i]] = newCard;
+            idToCardTransform[cardIds[i]] = newCard.GetComponent<RectTransform>();
         }
     }
 
@@ -84,7 +84,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
         foreach(var kvp in idToCardTransform)
         {
             kvp.Value.rotation = Quaternion.Euler(0,0,0);
-            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value, onField: false);
+            CardFactory.Instance.DisposeOfCard(kvp.Key, kvp.Value.transform, onField: false);
         }
         idToCardTransform.Clear();
     }
@@ -131,6 +131,7 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
 
     public void AddCard(int cardId)
     {
+
         GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, null, false));
     }
 
@@ -156,7 +157,25 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
 
     public void DropCard(int cardId)
     {
-        AddCard(cardId);
+        float mousePositionX = MouseUtility.Instance.GetMousePositionOnCanvas().x;
+        int insertPosition = 0;
+        var transforms = idToCardTransform.Values.ToList();
+        for(; insertPosition < transforms.Count; ++insertPosition )
+        {
+            if(transforms[insertPosition].anchoredPosition.x > mousePositionX)
+            {
+                break;
+            }
+        }
+        if(idToCardTransform.ContainsKey(cardId))
+        {
+            if(transforms.IndexOf(idToCardTransform[cardId]) < insertPosition)
+            {
+                insertPosition -= 1;
+            }
+        }
+        
+        GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, insertPosition, false));
     }
     public bool IsOpponent()
     {

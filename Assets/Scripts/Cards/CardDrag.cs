@@ -74,9 +74,7 @@ public class CardDrag : MonoBehaviour, IDraggable
 		{
 			return null;
 		}
-		UnityLogger.LogError($"Results - {results.Count}");
 		int droppableIndex = SkipDraggableResults(results, draggableLayer);
-		UnityLogger.LogError($"Index - {droppableIndex}");
 		if (droppableIndex >= results.Count)
 		{
 			return null;
