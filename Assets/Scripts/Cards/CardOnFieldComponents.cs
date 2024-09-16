@@ -81,7 +81,6 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     {
         SetupPT(null);
         powerToughess.transform.parent.gameObject.SetActive(EnablePowerToughess());
-        UnityLogger.LogError($"Setting Power TOughness - {EnablePowerToughess()}");
         name.text = card.isFlipped.Value ? string.Empty : card.CurrentInfo.name;
         RenderCardImage();
         SetupBackground();

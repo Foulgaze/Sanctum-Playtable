@@ -1014,8 +1014,8 @@ GameObject:
   - component: {fileID: 265312105039473404}
   - component: {fileID: 9085361960085218593}
   - component: {fileID: 2275540118441918493}
-  - component: {fileID: 3510089520876431672}
-  - component: {fileID: 8521511456339674521}
+  - component: {fileID: 3430998179649339941}
+  - component: {fileID: 4618704318742030384}
   m_Layer: 5
   m_Name: moveCardMenu
   m_TagString: Untagged
@@ -1088,7 +1088,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3510089520876431672
+--- !u!114 &3430998179649339941
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1097,7 +1097,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6070976193808813816}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8b8367856bcf2e4daf5f42832632345, type: 3}
+  m_Script: {fileID: 11500000, guid: 79ea8a9c048d9b14d9be67a4d10a7dac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveToGraveyardBtn: {fileID: 7150812275928164185}
@@ -1106,7 +1106,7 @@ MonoBehaviour:
   moveToBottomBtn: {fileID: 241185366963350616}
   closeBtn: {fileID: 5859782815608037744}
   countInputField: {fileID: 3454880954560128193}
---- !u!114 &8521511456339674521
+--- !u!114 &4618704318742030384
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6070976193808813816}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea9af3f32de163346b5c34426ff55b6e, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6911073206534159394

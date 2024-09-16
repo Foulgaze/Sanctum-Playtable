@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WindowDrag : MonoBehaviour, IDraggable
+public class WindowDragger : MonoBehaviour, IDraggable
 {
 	private RectTransform rect;
 	private Vector2 offset;

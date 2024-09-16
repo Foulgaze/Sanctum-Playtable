@@ -695,7 +695,7 @@ GameObject:
   - component: {fileID: 3256088721996546773}
   - component: {fileID: 8306522334165665313}
   - component: {fileID: 4827227516083999252}
-  - component: {fileID: 2946819040634701293}
+  - component: {fileID: 5057732402325096822}
   m_Layer: 5
   m_Name: singleIntInput
   m_TagString: Untagged
@@ -782,7 +782,7 @@ MonoBehaviour:
   submitBtn: {fileID: 6494767992108199314}
   submitBtnText: {fileID: 7322558101389649422}
   closeBtn: {fileID: 1972825281208613145}
---- !u!114 &2946819040634701293
+--- !u!114 &5057732402325096822
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -791,7 +791,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4758661408455813763}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea9af3f32de163346b5c34426ff55b6e, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &4874301452475472868
