@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748171, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4312,7 +4312,7 @@ MonoBehaviour:
   buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
   containerViewerPrefab: {fileID: 5856819999723173368, guid: 9092b527445cbd64ca0f11d88399ab17, type: 3}
   moveCardMenuPrefab: {fileID: 265312105039473404, guid: f9ff9f48275bcbc4883977ed539b922a, type: 3}
-  powerToughnessMenuPrefab: {fileID: 9182647339866525440, guid: c71d1fcc610fbda40a809c080e670089, type: 3}
+  powerToughnessMenuPrefab: {fileID: 9182647339866525440, guid: b40e3a24b03566540a69c26ec0cb0c96, type: 3}
   tokenSelectMenu: {fileID: 1811334907}
   widthAsAPercentageOfSceen: 0.1
   heightAsAPercentageOfSceen: 0.05

@@ -9,12 +9,15 @@ using UnityEngine.UI;
 public class CardOnFieldComponents : MonoBehaviour, ITextureable
 {
     public Card card;
-    public bool enablePT;
-    public TextMeshProUGUI powerToughess;
-    public TextMeshProUGUI name;
+    [SerializeField] private TextMeshProUGUI powerToughess;
+    [SerializeField] private TextMeshProUGUI name;
     public Image cardImage;
-    public Transform tappedSymbol;
+    [SerializeField] private Transform tappedSymbol;
     public Image backgroundImage;
+
+    [SerializeField] private TextMeshProUGUI redCounterText;
+    [SerializeField] private TextMeshProUGUI greenCounterText;
+    [SerializeField] private TextMeshProUGUI blueCounterText;
 
     public void Setup(Card card)
     {
@@ -22,7 +25,7 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         this.card = card;
         SetupAttributes(null);
         SetupListeners();
-        
+        SetupCounters(null);
         
     }
     
@@ -33,8 +36,23 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         card.isUsingBackSide.nonNetworkChange += SetupAttributes;
         card.power.nonNetworkChange += SetupPT;
         card.toughness.nonNetworkChange += SetupPT;
+        card.redCounters.nonNetworkChange += SetupCounters;
+        card.greenCounters.nonNetworkChange += SetupCounters;
+        card.blueCounters.nonNetworkChange += SetupCounters;
     }
 
+    private void SetupCounters(NetworkAttribute _)
+    {
+        UpdateCounter(redCounterText, card.redCounters.Value);
+        UpdateCounter(blueCounterText, card.blueCounters.Value);
+        UpdateCounter(greenCounterText, card.greenCounters.Value);
+    }
+
+    private void UpdateCounter(TextMeshProUGUI counterText, int counterValue)
+    {
+        counterText.text = counterValue.ToString();
+        counterText.transform.parent.gameObject.SetActive(counterValue > 0);
+    }
     private void SetupBackground()
     {
         
@@ -120,5 +138,8 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         card.isUsingBackSide.nonNetworkChange -= SetupAttributes;
         card.power.nonNetworkChange -= SetupPT;
         card.toughness.nonNetworkChange -= SetupPT;
+        card.redCounters.nonNetworkChange -= SetupCounters;
+        card.greenCounters.nonNetworkChange -= SetupCounters;
+        card.blueCounters.nonNetworkChange -= SetupCounters;
     }
 }

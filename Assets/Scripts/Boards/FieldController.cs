@@ -13,7 +13,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
     private bool isOpponent;
     private Vector3 extents;
     private static float widthToHeightRatio = 4/3f;
-    private float percentageOfCardAsSpacer = 0.25f;
+    private float percentageOfCardAsSpacer = 0.3f;
     public int defaultCardCount = 0;
     private Dictionary<int, Transform> idToCardOnField = new();
     private List<List<int>> currentlyHeldCardContainers = new();
@@ -76,8 +76,8 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     private void RenderCardColumn(List<int> cardColumn, float cardWidth, Vector3 centerPosition)
     {
-        float offsetX = 0.1f * cardWidth;
-        float offsetZ = 0.1f * (cardWidth * 1/widthToHeightRatio);
+        float offsetX = 0.12f * cardWidth;
+        float offsetZ = 0.15f * (cardWidth * 1/widthToHeightRatio);
         foreach(int cardId in cardColumn)
         {
             Transform onFieldCard = CardFactory.Instance.GetCardOnField(cardId, isOpponent);
