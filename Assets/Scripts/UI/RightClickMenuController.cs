@@ -20,7 +20,8 @@ public class RightClickMenuController : MonoBehaviour
     [SerializeField] private Button buttonPrefab;
     [SerializeField] private ContainerViewer containerViewerPrefab;
     [SerializeField] private Transform moveCardMenuPrefab;
-    [SerializeField] private Transform powerToughnessMenuPrefab;
+    [SerializeField] private powerToughenssController powerToughnessMenuPrefab;
+    [SerializeField] private CounterController counterMenuPrefab;
     public tokenMenuController tokenSelectMenu;
     public event Action<NetworkInstruction, string> networkCommand = delegate{};
     public float widthAsAPercentageOfSceen = 0.1f;
@@ -154,7 +155,8 @@ public class RightClickMenuController : MonoBehaviour
         {
             CreateBtn("Tap/Untap", () => card.isTapped.SetValue(!card.isTapped.Value)),
             CreateBtn("Turn Over", () => card.isFlipped.SetValue(!card.isFlipped.Value)),
-            CreateBtn("Change Power/Toughness", () => Instantiate(powerToughnessMenuPrefab, mainGameplayScreen).GetComponent<powerToughenssController>().Setup(card)),
+            CreateBtn("Change Power/Toughness", () => Instantiate(powerToughnessMenuPrefab, mainGameplayScreen).Setup(card)),
+            CreateBtn("Change Counters",() => {Instantiate(counterMenuPrefab, mainGameplayScreen).Setup(card);}),
             CreateBtn("Copy Card", () => GameOrchestrator.Instance.SendSpecialAction(SpecialAction.CopyCard,cardId.ToString())),
         };
         AddRelatedCardsBtn(card,setupButtons, 4);
