@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748171, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3676,7 +3676,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.28, y: 0.021}
   m_AnchorMax: {x: 0.72, y: 0.08}
-  m_AnchoredPosition: {x: 69.12, y: -0.55358887}
+  m_AnchoredPosition: {x: 69.12, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &228940673
@@ -4312,7 +4312,8 @@ MonoBehaviour:
   buttonPrefab: {fileID: 2477203470030294230, guid: 7d01591ba23f5d74cbbf4db94601679e, type: 3}
   containerViewerPrefab: {fileID: 5856819999723173368, guid: 9092b527445cbd64ca0f11d88399ab17, type: 3}
   moveCardMenuPrefab: {fileID: 265312105039473404, guid: f9ff9f48275bcbc4883977ed539b922a, type: 3}
-  powerToughnessMenuPrefab: {fileID: 9182647339866525440, guid: b40e3a24b03566540a69c26ec0cb0c96, type: 3}
+  powerToughnessMenuPrefab: {fileID: 282974757472779627, guid: b40e3a24b03566540a69c26ec0cb0c96, type: 3}
+  counterMenuPrefab: {fileID: 8388089646837588613, guid: a8ccd14f0a5a67b44b1b28918423f761, type: 3}
   tokenSelectMenu: {fileID: 1811334907}
   widthAsAPercentageOfSceen: 0.1
   heightAsAPercentageOfSceen: 0.05
@@ -10532,7 +10533,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.9, y: 0.93100005}
   m_AnchorMax: {x: 0.96500003, y: 0.97900003}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0.000045776, y: -0.000038147}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &731398177
@@ -27349,7 +27350,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.103}
   m_AnchorMin: {x: 0.83152086, y: 0.596}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00390625, y: 0.001953125}
+  m_AnchoredPosition: {x: -0.00390625, y: 0}
   m_SizeDelta: {x: -0.80722, y: -0.56396}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1796782749
