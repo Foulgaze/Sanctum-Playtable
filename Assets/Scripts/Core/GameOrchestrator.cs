@@ -17,6 +17,7 @@ public class GameOrchestrator : MonoBehaviour
     [SerializeField] private BoardController boardController;
     [SerializeField] private RightClickMenuController rightClickMenuController; 
     [SerializeField] private CardIdentifier cardIdentifier; 
+    [SerializeField] private HotkeyController hotkeyController; 
     public HandController handController;
 	public static GameOrchestrator Instance { get; private set; }
     private LobbyManager lobbyManager = new();
@@ -113,6 +114,7 @@ public class GameOrchestrator : MonoBehaviour
         rightClickMenuController.tokenSelectMenu.Setup(CardData.GetTokenUUINamePairs());
         clientPlayer.RevealCardZone.nonNetworkChange += (attribute) => rightClickMenuController.RevealOpponentZone(attribute, playtable);
         cardIdentifier.clientPlayer = clientPlayer;
+        hotkeyController.clientPlayer = clientPlayer;
     }
 
     private void SetupNetworkListeners()
