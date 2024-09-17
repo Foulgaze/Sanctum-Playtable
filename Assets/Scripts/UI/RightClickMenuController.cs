@@ -21,6 +21,7 @@ public class RightClickMenuController : MonoBehaviour
     [SerializeField] private ContainerViewer containerViewerPrefab;
     [SerializeField] private Transform moveCardMenuPrefab;
     [SerializeField] private powerToughenssController powerToughnessMenuPrefab;
+    [SerializeField] private MoveContainerToContainerMenu moveContainerToContainerMenuPrefab;
     [SerializeField] private CounterController counterMenuPrefab;
     public tokenMenuController tokenSelectMenu;
     public event Action<NetworkInstruction, string> networkCommand = delegate{};
@@ -337,7 +338,16 @@ public class RightClickMenuController : MonoBehaviour
         {
             CreateBtn($"View {zone}", () => CreateContianerView(player.GetCardContainer(zone))),
         };
+        if(!isOpponent)
+        {
+            setupButtons.Add(CreateBtn("Move Cards To", () => Instantiate(moveContainerToContainerMenuPrefab, mainGameplayScreen).Setup(zone)));
+        }
         SetupMenu(setupButtons.Count);
+    }
+
+    private void Instantiate()
+    {
+        throw new NotImplementedException();
     }
 
     private void SetupMenu(int buttonCount)

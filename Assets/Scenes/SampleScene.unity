@@ -4160,6 +4160,7 @@ GameObject:
   - component: {fileID: 288914916}
   - component: {fileID: 288914917}
   - component: {fileID: 288914918}
+  - component: {fileID: 288914919}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -4203,6 +4204,7 @@ MonoBehaviour:
   boardController: {fileID: 288914915}
   rightClickMenuController: {fileID: 288914918}
   cardIdentifier: {fileID: 1796782753}
+  hotkeyController: {fileID: 288914919}
   handController: {fileID: 1595541205}
 --- !u!4 &288914912
 Transform:
@@ -4319,10 +4321,23 @@ MonoBehaviour:
   containerViewerPrefab: {fileID: 5856819999723173368, guid: 9092b527445cbd64ca0f11d88399ab17, type: 3}
   moveCardMenuPrefab: {fileID: 265312105039473404, guid: f9ff9f48275bcbc4883977ed539b922a, type: 3}
   powerToughnessMenuPrefab: {fileID: 282974757472779627, guid: b40e3a24b03566540a69c26ec0cb0c96, type: 3}
+  moveContainerToContainerMenuPrefab: {fileID: 9065265246338535015, guid: cdbd2ca9baf6fcf4a9eb1997238cfc46, type: 3}
   counterMenuPrefab: {fileID: 8388089646837588613, guid: a8ccd14f0a5a67b44b1b28918423f761, type: 3}
   tokenSelectMenu: {fileID: 1811334907}
   widthAsAPercentageOfSceen: 0.1
   heightAsAPercentageOfSceen: 0.05
+--- !u!114 &288914919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288914909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c40f4bb29bf9e6342affa8b9d1424bf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &296402555
 GameObject:
   m_ObjectHideFlags: 0
@@ -9800,7 +9815,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 654017119}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &659655189
@@ -22133,7 +22148,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1494948843}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b23342e5720e444ba960d1ae2a8cfb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1495981313
