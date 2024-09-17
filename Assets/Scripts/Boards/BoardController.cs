@@ -14,6 +14,7 @@ public class BoardController : MonoBehaviour
     [SerializeField] private Transform clientLeftField;
     [SerializeField] private Transform clientRightField;
     [SerializeField] private Transform clientHand;
+    [SerializeField] private Transform clientCommandZone;
     [SerializeField] private Transform opponentLibrary;
     [SerializeField] private Transform opponentGraveyard;
     [SerializeField] private Transform opponentExile;
@@ -21,6 +22,7 @@ public class BoardController : MonoBehaviour
     [SerializeField] private Transform opponentLeftField;
     [SerializeField] private Transform opponentRightField;
     [SerializeField] private Transform opponentHand;
+    [SerializeField] private Transform opponentCommandZone;
 
     Dictionary<CardZone, IPhysicalCardContainer> clientZoneToCardContainer;
     Dictionary<CardZone, IPhysicalCardContainer> opponentZoneToCardContainer;
@@ -40,6 +42,7 @@ public class BoardController : MonoBehaviour
             {CardZone.LeftField , clientLeftField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.RightField , clientRightField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.Hand, clientHand.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.CommandZone, clientCommandZone.GetComponent<IPhysicalCardContainer>()}
         };
         opponentZoneToCardContainer = new()
         {
@@ -50,6 +53,7 @@ public class BoardController : MonoBehaviour
             {CardZone.LeftField , opponentLeftField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.RightField , opponentRightField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.Hand, opponentHand.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.CommandZone, opponentCommandZone.GetComponent<IPhysicalCardContainer>()}
         };
         SetupZones(clientZoneToCardContainer, isOpponent : false);
         SetupZones(opponentZoneToCardContainer, isOpponent : true);

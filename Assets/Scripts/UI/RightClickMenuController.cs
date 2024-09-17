@@ -195,6 +195,7 @@ public class RightClickMenuController : MonoBehaviour
                 break;
             case CardZone.Graveyard:
             case CardZone.Exile:
+            case CardZone.CommandZone:
                 CreateNonLibraryPileMenu((CardZone)zone, isOpponent);
                 break;
             case CardZone.MainField:
@@ -338,7 +339,7 @@ public class RightClickMenuController : MonoBehaviour
         {
             CreateBtn($"View {zone}", () => CreateContianerView(player.GetCardContainer(zone))),
         };
-        if(!isOpponent)
+        if(!isOpponent && zone != CardZone.CommandZone)
         {
             setupButtons.Add(CreateBtn("Move Cards To", () => Instantiate(moveContainerToContainerMenuPrefab, mainGameplayScreen).Setup(zone)));
         }
