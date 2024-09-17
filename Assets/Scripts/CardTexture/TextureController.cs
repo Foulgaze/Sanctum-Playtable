@@ -59,8 +59,6 @@ public class TextureController : MonoBehaviour
         }
         else
         {
-            UnityLogger.Log($"Enqueing {info.name}");
-
             CardTexture newTexture = new(info, card.isUsingBackSide.Value);
             newTexture.Enqueue(toBeTextured);
             uuidToTextureable[info.uuid] = newTexture;

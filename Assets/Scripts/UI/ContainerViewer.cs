@@ -108,7 +108,6 @@ public class ContainerViewer : MonoBehaviour, IDroppable
         
         int totalVerticalCards = Mathf.CeilToInt(cardCount / (float)cardsPerRow);
         float windowHeight = CalculateWindowHeight(cellHeight, totalVerticalCards, verticalSpacingPercentage, totalPadding.y);
-        UnityLogger.Log($"Total Width - {availableWidth} | Total Padding - {totalPadding} | Cell - {new Vector2(cellWidth,cellHeight)}");
         SetGridLayoutProperties(cellWidth, cellHeight, horizontalSpacingPercentage, verticalSpacingPercentage);
         AdjustRectTransform(windowHeight);
     }

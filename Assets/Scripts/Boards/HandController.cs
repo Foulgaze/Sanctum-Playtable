@@ -154,15 +154,38 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
     {
         return true;
     }
+    public void DropCard(int cardId, CardDrag droppedCardOn)
+    {
+        if(!idToCardTransform.ContainsKey(droppedCardOn.cardId))
+        {
+            UnityLogger.LogError($"Unable to find card {droppedCardOn.cardId} in hand box");
+        }
+        var transforms = idToCardTransform.Values.OrderBy(transform => transform.anchoredPosition.x).ToList();
+        float mousePositionX = MouseUtility.Instance.GetMousePositionOnCanvas().x;
+        int insertPosition = transforms.IndexOf(idToCardTransform[droppedCardOn.cardId]);
+        if(mousePositionX >= transforms[insertPosition].anchoredPosition.x)
+        {
+            insertPosition += 1;
+        }
+        if(idToCardTransform.ContainsKey(cardId))
+        {
+            if(transforms.IndexOf(idToCardTransform[cardId]) < insertPosition)
+            {
+                insertPosition -= 1;
+            }
+        }
+        GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, insertPosition, false));
+
+    }
 
     public void DropCard(int cardId)
     {
         float mousePositionX = MouseUtility.Instance.GetMousePositionOnCanvas().x;
-        int insertPosition = 0;
-        var transforms = idToCardTransform.Values.ToList();
+        int? insertPosition = 0;
+        var transforms = idToCardTransform.Values.OrderBy(transform => transform.anchoredPosition.x).ToList();
         for(; insertPosition < transforms.Count; ++insertPosition )
         {
-            if(transforms[insertPosition].anchoredPosition.x > mousePositionX)
+            if(transforms[(int)insertPosition].anchoredPosition.x > mousePositionX)
             {
                 break;
             }
@@ -173,6 +196,10 @@ public class HandController : MonoBehaviour, IPhysicalCardContainer, IDroppable
             {
                 insertPosition -= 1;
             }
+        }
+        if(transforms.Count != 0 && transforms.Last().anchoredPosition.x < mousePositionX )
+        {
+            insertPosition = null;
         }
         
         GameOrchestrator.Instance.MoveCard(this.zone, new InsertCardData(null, cardId, insertPosition, false));

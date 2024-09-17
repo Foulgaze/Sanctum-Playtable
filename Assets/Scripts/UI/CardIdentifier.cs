@@ -88,8 +88,6 @@ public class CardIdentifier : MonoBehaviour, ITextureable
         Color color = currentlyHeldCardImage.color;
         color.a = opacity;  
         currentlyHeldCardImage.color = color;
-        UnityLogger.Log($"SETTING OPACITY - {color}");
-
     }
     // Update is called once per frame
     void Update()

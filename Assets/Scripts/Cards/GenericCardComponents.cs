@@ -18,8 +18,6 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
 
     void Start()
     {
-        // UnityLogger.Log($"Card Name : [{card.Id}]");
-        // card.isUsingBackSide.nonNetworkChange += Setup;
         card.isUsingBackSide.nonNetworkChange += SetAttributes;
     }
 
@@ -67,7 +65,6 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
 
     private void SetComponentState(bool state)
     {
-        UnityLogger.Log($"SETTING COMPONENT STATE - {state}");
         name.transform.parent.gameObject.SetActive(state);
         manaCost.transform.parent.gameObject.SetActive(state);
         type.transform.parent.gameObject.SetActive(state);

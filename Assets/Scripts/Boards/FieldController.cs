@@ -47,7 +47,6 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 
     public void UpdateHolder(List<List<int>> boardDescription)
     {
-        UnityLogger.Log($"RENDERING - {JsonConvert.SerializeObject(boardDescription)}");
         currentlyHeldCardContainers = boardDescription;
         ClearExistingCards();
 
