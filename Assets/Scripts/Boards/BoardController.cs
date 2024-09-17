@@ -20,6 +20,7 @@ public class BoardController : MonoBehaviour
     [SerializeField] private Transform opponentMainField;
     [SerializeField] private Transform opponentLeftField;
     [SerializeField] private Transform opponentRightField;
+    [SerializeField] private Transform opponentHand;
 
     Dictionary<CardZone, IPhysicalCardContainer> clientZoneToCardContainer;
     Dictionary<CardZone, IPhysicalCardContainer> opponentZoneToCardContainer;
@@ -48,6 +49,7 @@ public class BoardController : MonoBehaviour
             {CardZone.MainField , opponentMainField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.LeftField , opponentLeftField.GetComponent<IPhysicalCardContainer>()},
             {CardZone.RightField , opponentRightField.GetComponent<IPhysicalCardContainer>()},
+            {CardZone.Hand, opponentHand.GetComponent<IPhysicalCardContainer>()},
         };
         SetupZones(clientZoneToCardContainer, isOpponent : false);
         SetupZones(opponentZoneToCardContainer, isOpponent : true);
