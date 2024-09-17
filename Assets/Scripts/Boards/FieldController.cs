@@ -147,7 +147,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
             {
                 break;
             }
-            if(currentlyHeldCardContainers[insertPosition].Contains(cardId))
+            if(currentlyHeldCardContainers[insertPosition].Contains(cardId) && currentlyHeldCardContainers[insertPosition].Count == 1) // If only card in column
             {
                 foundSelf = true;
             }
