@@ -64,8 +64,9 @@ public class CardDrag : MonoBehaviour, IDraggable
 		HandleCardRelease();
     }
 
-	private IDroppable FindFirstDroppableUIElement()
+	private IDroppable? FindFirstDroppableUIElement(out bool droppedInHand)
 	{
+		droppedInHand = false;
 		int draggableLayer = LayerMask.NameToLayer("Draggable");
 
 		List<RaycastResult> results = DragController.Instance.PerformUIRaycast(Input.mousePosition);
@@ -74,22 +75,50 @@ public class CardDrag : MonoBehaviour, IDraggable
 		{
 			return null;
 		}
-		int droppableIndex = SkipDraggableResults(results, draggableLayer);
+		int? droppableIndex = SkipDraggableResultsUnlessInHand(results, draggableLayer);
+		if(droppableIndex == null)
+		{
+			droppedInHand = true;
+			GameOrchestrator.Instance.handController.DropCard(cardId,(CardDrag)results[0].gameObject.GetComponent<IDraggable>());
+			return null;
+		}
 		if (droppableIndex >= results.Count)
 		{
 			return null;
 		}		
-		return results[droppableIndex].gameObject.GetComponent<IDroppable>();
+		return results[(int)droppableIndex].gameObject.GetComponent<IDroppable>();
 	}
 
-	private int SkipDraggableResults(List<RaycastResult> results, int draggableLayer)
+	private int? SkipDraggableResultsUnlessInHand(List<RaycastResult> results, int draggableLayer)
 	{
 		int index = 0;
+		if(CheckIfCardIsInHand(results,draggableLayer))
+		{
+			return null;
+		}
 		while (index < results.Count && results[index].gameObject.layer == draggableLayer)
 		{
 			++index;
 		}
 		return index;
+	}
+
+	private bool CheckIfCardIsInHand(List<RaycastResult> results, int draggableLayer)
+	{
+		if(results.Count == 0 || results[0].gameObject.layer != draggableLayer)
+		{
+			return false;
+		}
+		CardDrag? cardDrag = (CardDrag)results[0].gameObject.GetComponent<IDraggable>();
+		if(cardDrag == null)
+		{
+			return false;
+		}
+		if(CardFactory.Instance.GetCardZone(cardDrag.cardId) == CardZone.Hand)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private void HandleCardRelease()
@@ -113,10 +142,10 @@ public class CardDrag : MonoBehaviour, IDraggable
 
 	private bool TryDropOnUIElement()
 	{
-		IDroppable? droppableElement = FindFirstDroppableUIElement();
+		IDroppable? droppableElement = FindFirstDroppableUIElement(out bool droppedInHand);
 		if (droppableElement == null)
 		{
-			return false;
+			return droppedInHand;
 		}
 
 		droppableElement.DropCard(cardId);

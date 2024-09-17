@@ -100,7 +100,6 @@ public class CardFactory : MonoBehaviour
 
 	public Transform GetCardImage(int cardId, bool isOpponentCard, bool renderCardBack = false)
 	{
-		UnityLogger.Log($"GETTING CARD IMAGE - {renderCardBack}");
 		Card card = GetCard(cardId);
 		
 		bool queueHasCard = uuidToCardImage.ContainsKey(cardId) && uuidToCardImage[cardId].Count != 0;

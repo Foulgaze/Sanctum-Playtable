@@ -40,7 +40,6 @@ public class PlayerDescriptionController : MonoBehaviour
 	{
 		if(!rotator.HasOpponents())
 		{
-			UnityLogger.Log("Disabled Descriptor");
 			this.opponentDescriptor.gameObject.SetActive(false);
 			return;
 		}
