@@ -114,10 +114,4 @@ public class DragController : MonoBehaviour
     {
         currentDragScript.UpdateDrag();
     }
-    public static Vector2 ClampNewPosition(Vector2 newPosition)
-    {
-        // newPosition.x = Math.Clamp(newPosition.x, screenDimensions.x/-2, screenDimensions.x/2);
-        // newPosition.y = Math.Clamp(newPosition.y, screenDimensions.y/-2, screenDimensions.y/2);
-        return newPosition;
-    }
 }
