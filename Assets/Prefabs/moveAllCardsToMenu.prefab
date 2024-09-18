@@ -995,7 +995,7 @@ GameObject:
   - component: {fileID: 3407747798267275665}
   - component: {fileID: 1712135757877477169}
   - component: {fileID: 4335501909337331947}
-  - component: {fileID: 9065265246338535015}
+  - component: {fileID: 3363473979421752791}
   m_Layer: 5
   m_Name: moveAllCardsToMenu
   m_TagString: Untagged
@@ -1079,7 +1079,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6312c0247ddc4d48bc407fc660cb9b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &9065265246338535015
+--- !u!114 &3363473979421752791
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1088,7 +1088,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6955188239940755974}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e03d7445e75ff244bd7f71ecd94f74e, type: 3}
+  m_Script: {fileID: 11500000, guid: 37d4714c7a176464c9264ec1b99d0e24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   windowText: {fileID: 4962081344834553663}

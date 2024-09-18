@@ -77,7 +77,7 @@ public class DragController : MonoBehaviour
 
     private void CheckForStartDrag()
     {
-        if(Input.GetMouseButtonDown((int)MouseButton.Left))
+        if(Input.GetMouseButtonDown((int)MouseButton.Left) && !HotkeyController.IsCtrlDown())
         {
             IDraggable? dragScript = RaycastForDraggable();
             if(dragScript == null || !dragScript.IsPickupable())

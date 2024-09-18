@@ -22,7 +22,7 @@ public class PileController : MonoBehaviour, IPhysicalCardContainer
     public bool revealTopCard = true;
     void Start()
     {
-        extents = this.transform.GetComponent<MeshRenderer>().bounds.extents;
+        extents = this.transform.GetComponent<BoxCollider>().bounds.extents;
         cardTopperExtents = CardFactory.Instance.cardPilePrefab.GetComponent<MeshRenderer>().bounds.extents;
     }
     
