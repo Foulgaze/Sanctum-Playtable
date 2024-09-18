@@ -51,7 +51,7 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         ClearExistingCards();
 
         int currentCardCount = Math.Max(boardDescription.Count, this.defaultCardCount);
-        float cardWidth = transform.localScale.x / (currentCardCount + (currentCardCount + 1) * percentageOfCardAsSpacer);
+        float cardWidth = transform.GetComponent<BoxCollider>().size.x / (currentCardCount + (currentCardCount + 1) * percentageOfCardAsSpacer);
         float spacerWidth = cardWidth * percentageOfCardAsSpacer;
         float totalWidth = (cardWidth * boardDescription.Count) + (spacerWidth * (boardDescription.Count + 1));
 

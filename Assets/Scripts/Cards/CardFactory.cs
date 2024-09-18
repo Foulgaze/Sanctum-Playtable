@@ -71,16 +71,17 @@ public class CardFactory : MonoBehaviour
 		Transform cardOnField = queueHasCard ? uuidToCardOnField[cardId].Dequeue() : Instantiate(cardOnFieldPrefab);
 		
 		CardOnFieldComponents components = cardOnField.GetComponent<CardOnFieldComponents>();
-		// components.backgroundImage.raycastTarget = !isOpponentCard;
 		cardOnField.GetChild(0).GetChild(0).GetComponent<CardDrag>().isOpponent = isOpponentCard;
-
 		
 		if(!queueHasCard)
 		{
-			
 			components.backgroundImage.GetComponent<CardDrag>().cardId = cardId;
 			Card card = GetCard(cardId);
 			components.Setup(card);
+		}
+		else
+		{
+			components.Setup();
 		}
 
 		return cardOnField;
@@ -118,7 +119,6 @@ public class CardFactory : MonoBehaviour
 			components.Setup(card, renderCardBack);
 		}
 		
-		// cardImage.GetComponent<Image>().raycastTarget = !isOpponentCard;
 		cardImage.GetComponent<CardDrag>().isOpponent = isOpponentCard;
 		return cardImage;
 	}

@@ -15,17 +15,22 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     [SerializeField] private Transform tappedSymbol;
     public Image backgroundImage;
 
+    private Vector3 tappedRotation = new Vector3(0,7f,0);
+
     [SerializeField] private TextMeshProUGUI redCounterText;
     [SerializeField] private TextMeshProUGUI greenCounterText;
     [SerializeField] private TextMeshProUGUI blueCounterText;
 
     public void Setup(Card card)
     {
-        print($"SETTING UP CARD - {card.name.Value}");
         this.card = card;
         SetupAttributes(null);
         SetupListeners();
         SetupCounters(null);
+    }
+    public void Setup()
+    {
+        SetPowerToughnessStatus();
         
     }
     
@@ -82,6 +87,14 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
     private void TapUntapCard(NetworkAttribute _)
     {
         tappedSymbol.gameObject.SetActive(card.isTapped.Value);
+        if(card.isTapped.Value)
+        {
+            transform.rotation = Quaternion.Euler(tappedRotation);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(Vector3.zero);
+        }
     }
     private void SetupPT(NetworkAttribute _)
     {
@@ -94,11 +107,14 @@ public class CardOnFieldComponents : MonoBehaviour, ITextureable
         return hasDefaultPT && !card.isFlipped.Value;
 	}
     
-
+    public void SetPowerToughnessStatus()
+    {
+        powerToughess.transform.parent.gameObject.SetActive(EnablePowerToughess());
+    }
     private void SetupAttributes(NetworkAttribute _)
     {
         SetupPT(null);
-        powerToughess.transform.parent.gameObject.SetActive(EnablePowerToughess());
+        SetPowerToughnessStatus();
         name.text = card.isFlipped.Value ? string.Empty : card.CurrentInfo.name;
         RenderCardImage();
         SetupBackground();
