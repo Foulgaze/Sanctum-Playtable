@@ -4993,7 +4993,7 @@ MonoBehaviour:
   hotkeyController: {fileID: 288914919}
   commandTaxController: {fileID: 616129315}
   handController: {fileID: 1595541205}
-  loopback: 0
+  loopback: 1
 --- !u!4 &288914912
 Transform:
   m_ObjectHideFlags: 0
