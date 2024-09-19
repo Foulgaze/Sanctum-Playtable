@@ -45,7 +45,7 @@ public class TextureController : MonoBehaviour
             return true;
         }
 
-        string filepath = $"Assets/Resources/Textures/{info.uuid}.jpg";
+        string filepath = $"{Application.streamingAssetsPath}/Textures/{info.uuid}.jpg";
         if (File.Exists(filepath))
         {
             uuidToSprite[info.uuid] = LoadSpriteFromFile(filepath);
@@ -78,8 +78,7 @@ public class TextureController : MonoBehaviour
     // TODO make multiple sources that images can be gathered from. 
     public IEnumerator GetSprite(CardInfo info, Queue<ITextureable> toBeTextured, bool usingBackSide)
     {
-        UnityLogger.Log("Getting sprite");
-        string filepath = $"Assets/Resources/Textures/{info.uuid}.jpg";
+        string filepath = $"{Application.streamingAssetsPath}/Textures/{info.uuid}.jpg";
         if (File.Exists(filepath))
         {
             uuidToSprite[info.uuid] = LoadSpriteFromFile(filepath);

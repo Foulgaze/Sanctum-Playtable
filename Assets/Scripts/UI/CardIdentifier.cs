@@ -47,18 +47,12 @@ public class CardIdentifier : MonoBehaviour, ITextureable
             return null;
         }
 
-        // Case 2. On opponents library AND flipped over OR Client library And Flipped over
-        bool inLibrary = CardFactory.Instance.GetCardZone(cardDrag.cardId) == CardZone.Library;
-        bool hasOpponents = GameOrchestrator.Instance.opponentRotator.opponentUUIDs.Count != 0;
-        bool opponentTopCardFlipped = hasOpponents && GameOrchestrator.Instance.opponentRotator.GetCurrentOpponent().GetCardContainer(CardZone.Library).revealTopCard.Value;
-        bool clientTopCardFlipped = clientPlayer.GetCardContainer(CardZone.Library).revealTopCard.Value;
-        if (inLibrary && ((!cardDrag.isOpponent && !clientTopCardFlipped) || (cardDrag.isOpponent && !opponentTopCardFlipped)))
+
+        if(cardDrag.renderCardBack)
         {
             return null;
         }
-
         return hoveredCard;
-        // Case 3???
     }
     private void RaycastForCard()
     {

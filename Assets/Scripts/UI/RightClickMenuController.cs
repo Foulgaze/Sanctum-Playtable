@@ -256,10 +256,10 @@ public class RightClickMenuController : MonoBehaviour
         GameOrchestrator.Instance.SendSpecialAction(action, payload);
     }
 
-    private void CreateContianerView(CardContainerCollection collection)
+    private void CreateContianerView(CardContainerCollection collection, bool isOpponent = false)
     {
         ContainerViewer containerViewer = Instantiate(containerViewerPrefab, buttonHolder.parent);
-        containerViewer.Setup(collection, $"{collection.Zone}", false);
+        containerViewer.Setup(collection, $"{collection.Zone}", isOpponent);
     }
     private void CreateContainerRevealCards(CardContainerCollection collection, bool isOpponent)
     {
@@ -337,7 +337,7 @@ public class RightClickMenuController : MonoBehaviour
         var player = isOpponent ? GameOrchestrator.Instance.opponentRotator.GetCurrentOpponent() : clientPlayer;
         List<Button> setupButtons = new()
         {
-            CreateBtn($"View {zone}", () => CreateContianerView(player.GetCardContainer(zone))),
+            CreateBtn($"View {zone}", () => CreateContianerView(player.GetCardContainer(zone), isOpponent)),
         };
         if(!isOpponent && zone != CardZone.CommandZone)
         {

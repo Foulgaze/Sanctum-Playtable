@@ -40,7 +40,7 @@ public class GenericCardComponents : MonoBehaviour, ITextureable
         manaCost.text = card.CurrentInfo.manaCost;
         type.text = card.CurrentInfo.type;
         description.text = card.CurrentInfo.text;
-        cardImage.enabled = false;
+        cardImage.enabled = true;
         
     }
 
