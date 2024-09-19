@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
@@ -27,6 +28,7 @@ public class GameOrchestrator : MonoBehaviour
     private const int ServerPort = 51522;
     private Playtable playtable;
     public OpponentRotator opponentRotator;
+    public bool loopback = false;
 
 	private void Awake() 
     {         
@@ -44,7 +46,9 @@ public class GameOrchestrator : MonoBehaviour
     private void Init()
     {
         Debug.developerConsoleVisible = true;
-        serverListener = new(IPAddress.Loopback.ToString(),ServerPort);
+        string ip = loopback ? IPAddress.Loopback.ToString() : File.ReadLines($"{Application.streamingAssetsPath}/env.txt").First();
+        UnityLogger.Log($"Connecting to {ip} at port - {ServerPort}");
+        serverListener = new(ip,ServerPort);
         pathToCSVs = $"{Application.streamingAssetsPath}/CSVs/";
         InitListeners();
     }

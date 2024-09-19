@@ -71,7 +71,6 @@ public class DragController : MonoBehaviour
 
         var hit = filteredResults[0];
         var dragScript = GetComponentFromRaycastResult<IDraggable>(hit);
-        UnityLogger.Log($"Drag Script - {hit.gameObject.name}");
         return dragScript;
     }
 

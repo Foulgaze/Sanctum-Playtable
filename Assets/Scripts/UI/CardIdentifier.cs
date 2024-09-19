@@ -60,7 +60,6 @@ public class CardIdentifier : MonoBehaviour, ITextureable
         if(draggable == null || draggable is not CardDrag)
         {
             SetHeldCardOpacity(1f);
-            UnityLogger.Log("Not Draggable");
             return;
         }
         SetHeldCardOpacity(0.5f);

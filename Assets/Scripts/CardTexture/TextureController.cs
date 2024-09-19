@@ -35,7 +35,7 @@ public class TextureController : MonoBehaviour
         toBeTextured.TextureSelf(toBeTextured.GetCard().CurrentInfo,cardBack);
         return true;
     }
-    Coroutine bool TextureImage(ITextureable toBeTextured)
+    public bool TextureImage(ITextureable toBeTextured)
     {
         Card card = toBeTextured.GetCard();
         CardInfo info = card.CurrentInfo;

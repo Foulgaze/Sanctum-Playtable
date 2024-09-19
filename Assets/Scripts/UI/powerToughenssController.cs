@@ -28,12 +28,12 @@ public class powerToughenssController : MonoBehaviour
     }
     private void InitializeListeners()
     {
-        powerInputField.onEndEdit.AddListener((_) => {card.power.SetValue(int.Parse(powerInputField.text));});
-        toughnessInputField.onEndEdit.AddListener((_) => {card.toughness.SetValue(int.Parse(toughnessInputField.text));});
-        powerPlusBtn.onClick.AddListener(() => {card.isIncreasingPower.SetValue(true);});
-        powerMinusBtn.onClick.AddListener(() => {card.isIncreasingPower.SetValue(false);});
-        toughnessPlusBtn.onClick.AddListener(() => {card.isIncreasingToughness.SetValue(true);});
-        toughnessMinusBtn.onClick.AddListener(() => {card.isIncreasingToughness.SetValue(false);});
+        powerInputField.onEndEdit.AddListener((_) => card.power.SetValue(int.Parse(powerInputField.text)));
+        toughnessInputField.onEndEdit.AddListener((_) => card.toughness.SetValue(int.Parse(toughnessInputField.text)));
+        powerPlusBtn.onClick.AddListener(() => card.isIncreasingPower.SetValue(true));
+        powerMinusBtn.onClick.AddListener(() => card.isIncreasingPower.SetValue(false));
+        toughnessPlusBtn.onClick.AddListener(() => card.isIncreasingToughness.SetValue(true));
+        toughnessMinusBtn.onClick.AddListener(() => card.isIncreasingToughness.SetValue(false));
         closeBtn.onClick.AddListener(() => Destroy(this.gameObject));
 
         card.power.nonNetworkChange += (_) => {powerInputField.text = card.power.Value.ToString();};

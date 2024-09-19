@@ -46,6 +46,15 @@ public class CounterController : MonoBehaviour
         card.redCounters.nonNetworkChange += HandleCounterChange;
         card.greenCounters.nonNetworkChange += HandleCounterChange;
         card.blueCounters.nonNetworkChange += HandleCounterChange;
+        redInputField.onEndEdit.AddListener((value) => UpdateCounter(value, card.redCounters));
+        greenInputField.onEndEdit.AddListener((value) => UpdateCounter(value, card.greenCounters));
+        blueInputField.onEndEdit.AddListener((value) => UpdateCounter(value, card.blueCounters));
+    }
+
+    private void UpdateCounter(string inputValue, NetworkAttribute attribute)
+    {
+        int value = string.IsNullOrEmpty(inputValue) ? 0: int.Parse(inputValue);
+        attribute.SetValue(value);
     }
     private void SetCounterValues()
     {
