@@ -26,7 +26,7 @@ public class GameOrchestrator : MonoBehaviour
     private ServerConnectionManager serverListener;
     private string pathToCSVs;
     private const int ServerPort = 51522;
-    private Playtable playtable;
+    private Playtable playtable = null;
     public OpponentRotator opponentRotator;
     public bool loopback = false;
 
@@ -216,13 +216,16 @@ public class GameOrchestrator : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.RightArrow))
+        if(playtable != null)
         {
-            opponentRotator.Right();
-        }
-        else if(Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            opponentRotator.Left();
+            if(Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                opponentRotator.Right();
+            }
+            else if(Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                opponentRotator.Left();
+            }
         }
         serverListener.ReadServerData();
     }	

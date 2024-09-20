@@ -86,7 +86,7 @@ public class TextureController : MonoBehaviour
             yield break;
         }
 
-        string face = usingBackSide ? "back" : "front";
+        string face = usingBackSide  && info.layout != "meld" ? "back" : "front";
         string url = $"https://api.scryfall.com/cards/{info.setCode.ToLower()}/{info.cardNumber}?format=image&version=normal&face={face}";
         string backupUrl = $"https://api.scryfall.com/cards/named?exact={HttpUtility.UrlEncode(name)}&format=image&face={face}";
 
