@@ -115,12 +115,21 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
         {
             return null;
         }
+        bool foundSelf = false;
         for(int currentContainerIndex = 0; currentContainerIndex < currentlyHeldCardContainers.Count; ++currentContainerIndex)
         {
             List<int> currentCardColumn = currentlyHeldCardContainers[currentContainerIndex];
             int cardIndex = currentCardColumn.IndexOf(hitCardId);
+            if(currentlyHeldCardContainers[currentContainerIndex].Contains(cardId) && currentlyHeldCardContainers[currentContainerIndex].Count == 1) // If only card in column
+            {
+                foundSelf = true;
+            }
             if(cardIndex != -1)
             {
+                if(foundSelf)
+                {
+                    currentContainerIndex -= 1;
+                }
                 return new InsertCardData(insertPosition : currentContainerIndex, cardID: cardId, containerInsertPosition: null, createNewContainer: false);
             }
         }
@@ -143,14 +152,15 @@ public class FieldController : MonoBehaviour, IPhysicalCardContainer
 		for(; insertPosition < currentlyHeldCardContainers.Count; ++insertPosition)
         {
             float xPositionOfContainer = idToCardOnField[currentlyHeldCardContainers[insertPosition][0]].transform.position.x; 
-            if(xPositionOfContainer > hitXPosition)
-            {
-                break;
-            }
             if(currentlyHeldCardContainers[insertPosition].Contains(cardId) && currentlyHeldCardContainers[insertPosition].Count == 1) // If only card in column
             {
                 foundSelf = true;
             }
+            if(xPositionOfContainer > hitXPosition)
+            {
+                break;
+            }
+            
         }
         if(foundSelf)
         {
