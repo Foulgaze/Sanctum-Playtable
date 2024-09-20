@@ -27,12 +27,20 @@ public class OpponentRotator
 
 	public void Left()
 	{
+		if(opponentUUIDs.Count == 0)
+		{
+			return;
+		}
 		this.currentIndex = this.currentIndex - 1 < 0 ? this.opponentUUIDs.Count - 1 : this.currentIndex - 1;
 		this.onPlayerChanged(GetCurrentOpponent());
 	}
 
 	public void Right()
 	{
+		if(opponentUUIDs.Count == 0)
+		{
+			return;
+		}
 		this.currentIndex  += 1;
 		this.currentIndex %= opponentUUIDs.Count;
 		this.onPlayerChanged(GetCurrentOpponent());
